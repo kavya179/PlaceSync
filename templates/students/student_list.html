@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Directory | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Student Directory</h1>
+            <p class="dashboard-welcome">View and manage enrolled university students and login accounts</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <!-- Export CSV button preserving current filters -->
+            <a href="{% url 'students:export' %}?q={{ q }}&department={{ selected_dept }}&batch={{ selected_batch }}&cgpa={{ selected_cgpa }}&placement_status={{ selected_status }}" class="btn btn-secondary" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">
+                📥 Export CSV List
+            </a>
+        </div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Left: Filters Panel Form (No JS) -->
+        <div class="card-panel" style="margin-top: 0; padding: 1.25rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--card-border);">Filters Console</h3>
+            
+            <form method="get" novalidate style="display: flex; flex-direction: column; gap: 1.25rem;">
+                
+                <!-- Keyword Search -->
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.8rem;">Search Query</label>
+                    <input type="text" name="q" value="{{ q }}" placeholder="Name, Roll No, Email..." class="form-input" style="font-size: 0.85rem;">
+                </div>
+
+                <!-- Department Filter -->
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.8rem;">Department</label>
+                    <select name="department" class="form-input" style="font-size: 0.85rem;">
+                        <option value="">-- All Departments --</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.pk }}" {% if selected_dept == dept.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ dept.code }} - {{ dept.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Batch Filter -->
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.8rem;">Batch</label>
+                    <select name="batch" class="form-input" style="font-size: 0.85rem;">
+                        <option value="">-- All Batches --</option>
+                        {% for batch in batches %}
+                            <option value="{{ batch.pk }}" {% if selected_batch == batch.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ batch.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- CGPA Filter -->
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.8rem;">CGPA Criteria</label>
+                    <select name="cgpa" class="form-input" style="font-size: 0.85rem;">
+                        <option value="">-- All CGPA --</option>
+                        <option value="9.0" {% if selected_cgpa == "9.0" %}selected{% endif %}>&ge; 9.0 CGPA</option>
+                        <option value="8.0" {% if selected_cgpa == "8.0" %}selected{% endif %}>&ge; 8.0 CGPA</option>
+                        <option value="7.0" {% if selected_cgpa == "7.0" %}selected{% endif %}>&ge; 7.0 CGPA</option>
+                        <option value="6.0" {% if selected_cgpa == "6.0" %}selected{% endif %}>&ge; 6.0 CGPA</option>
+                    </select>
+                </div>
+
+                <!-- Placement Status Filter -->
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.8rem;">Placement Status</label>
+                    <select name="placement_status" class="form-input" style="font-size: 0.85rem;">
+                        <option value="">-- All Statuses --</option>
+                        {% for code, label in placement_statuses %}
+                            <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.65rem;">Apply Filters</button>
+                    {% if q or selected_dept or selected_batch or selected_cgpa or selected_status %}
+                        <a href="{% url 'students:list' %}" class="btn btn-secondary" style="padding: 0.65rem; text-align: center;">Reset Form</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: Students Table Grid -->
+        <div class="card-panel" style="margin-top: 0;">
+            <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">Student Listing (Count: {{ students|length }})</h3>
+
+            {% if students %}
+                <div class="table-wrapper">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%;">Roll Number</th>
+                                    <th style="width: 20%;">Student Details</th>
+                                    <th style="width: 20%;">Batch & Dept</th>
+                                    <th style="width: 12%;">CGPA</th>
+                                    <th style="width: 18%;">Status / Package</th>
+                                    <th style="width: 15%; text-align: right;">Directory Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                    <tr {% if not student.user.is_active %}style="opacity: 0.6;"{% endif %}>
+                                        <td>
+                                            <span class="badge" style="background: rgba(255,255,255,0.03); color: #fff;">{{ student.roll_number }}</span>
+                                        </td>
+                                        <td>
+                                            <strong style="color: #fff;">{{ student.name }}</strong>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.15rem;">{{ student.email }}</div>
+                                            {% if student.phone %}
+                                                <div style="font-size: 0.75rem; color: var(--text-muted);">📞 {{ student.phone }}</div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div style="color: #fff; font-size: 0.85rem; font-weight: 500;">{{ student.batch.name }}</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">Dept: {{ student.department.code }}</div>
+                                        </td>
+                                        <td>
+                                            <strong style="color: var(--info); font-size: 1rem;">{{ student.cgpa }}</strong>
+                                        </td>
+                                        <td>
+                                            <!-- Status Tag -->
+                                            {% if student.placement_status == 'PLACED' %}
+                                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">Placed</span>
+                                            {% elif student.placement_status == 'INTERN' %}
+                                                <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.25);">Internship</span>
+                                            {% elif student.placement_status == 'PLACED_AND_INTERN' %}
+                                                <span class="badge" style="background: rgba(139, 92, 246, 0.1); color: #a78bfa; border-color: rgba(139, 92, 246, 0.25);">Placed & Intern</span>
+                                            {% else %}
+                                                <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); border-color: rgba(245, 158, 11, 0.25);">Unplaced</span>
+                                            {% endif %}
+
+                                            <!-- Salary Package CTC Details -->
+                                            {% if student.package_amount %}
+                                                <div style="font-size: 0.8rem; color: #fff; font-weight: 600; margin-top: 0.25rem;">💵 {{ student.package_amount }} LPA</div>
+                                            {% endif %}
+                                            {% if student.stipend_amount %}
+                                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.1rem;">💸 Stipend: {{ student.stipend_amount }}/mo</div>
+                                            {% endif %}
+
+                                            <!-- Suspension Status Badge -->
+                                            {% if not student.user.is_active %}
+                                                <div style="margin-top: 0.35rem;">
+                                                    <span class="badge" style="background: rgba(244, 63, 94, 0.15); color: var(--danger); border-color: rgba(244, 63, 94, 0.25); font-size: 0.7rem;">Suspended</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <!-- Action Console Links -->
+                                            <div class="table-actions" style="justify-content: flex-end; flex-wrap: wrap; gap: 0.35rem;">
+                                                <a href="{% url 'students:edit' pk=student.pk %}" class="btn btn-secondary btn-xs" title="Edit Student">Edit</a>
+                                                <a href="{% url 'students:move' pk=student.pk %}" class="btn btn-secondary btn-xs" style="background: rgba(14, 165, 233, 0.05); color: var(--info); border-color: rgba(14, 165, 233, 0.2);" title="Move Batch">Move</a>
+                                                <a href="{% url 'students:reset_password' pk=student.pk %}" class="btn btn-secondary btn-xs" title="Reset Password">Keys</a>
+                                                
+                                                <!-- Suspend Form (POST) -->
+                                                <form action="{% url 'students:suspend' pk=student.pk %}" method="post" style="display: inline-block; margin: 0;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-secondary btn-xs {% if student.user.is_active %}btn-danger-text{% else %}btn-success-text{% endif %}" style="padding: 0.15rem 0.35rem;">
+                                                        {% if student.user.is_active %}Suspend{% else %}Enable{% endif %}
+                                                    </button>
+                                                </form>
+
+                                                <a href="{% url 'students:delete' pk=student.pk %}" class="btn btn-secondary btn-xs btn-danger-text" title="Delete Student">Delete</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 4rem 2rem; border: 1.5px dashed var(--card-border); border-radius: var(--radius-md); background: var(--card-bg); margin-top: 1.5rem;">
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; font-style: italic;">
+                        No student records matched the current filter conditions.
+                    </p>
+                    {% if q or selected_dept or selected_batch or selected_cgpa or selected_status %}
+                        <a href="{% url 'students:list' %}" class="btn btn-secondary" style="font-size: 0.85rem; margin-top: 1rem;">Clear Search Filters</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

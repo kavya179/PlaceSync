@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PlaceSync — Training & Placement Cell Management Portal">
+    <title>{% block title %}PlaceSync{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+
+<!-- Pure-CSS sidebar toggle (no JavaScript) -->
+<input type="checkbox" id="sidebar-toggle" aria-hidden="true">
+
+<div class="app-layout">
+
+    <!-- ── Sidebar overlay (mobile: closes sidebar when tapped) ── -->
+    <label class="sidebar-overlay" for="sidebar-toggle" aria-hidden="true"></label>
+
+    <!-- ══════════ SIDEBAR ══════════ -->
+    <aside class="sidebar" role="navigation" aria-label="Main navigation">
+
+        <!-- Brand -->
+        <a href="{% url 'dashboard:index' %}" class="sidebar-brand">
+            <div class="sidebar-brand-icon">🎓</div>
+            <div class="sidebar-brand-text">Place<span>Sync</span></div>
+        </a>
+
+        <!-- User block -->
+        <div class="sidebar-user">
+            <div class="sidebar-avatar">{{ user.username|slice:":2"|upper }}</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">{{ user.username }}</div>
+                <div class="sidebar-user-role">{{ user.college.code }} — Admin</div>
+            </div>
+        </div>
+
+        <!-- Core -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Core</div>
+            <ul class="sidebar-nav">
+                <li><a href="{% url 'dashboard:index' %}"         class="sidebar-link"><span class="sidebar-link-icon">📊</span> Dashboard</a></li>
+                <li><a href="{% url 'colleges:profile_detail' %}" class="sidebar-link"><span class="sidebar-link-icon">🏫</span> College Profile</a></li>
+                <li><a href="{% url 'departments:list' %}"        class="sidebar-link"><span class="sidebar-link-icon">📂</span> Departments</a></li>
+                <li><a href="{% url 'batches:list' %}"            class="sidebar-link"><span class="sidebar-link-icon">🎓</span> Batches</a></li>
+            </ul>
+        </div>
+
+        <!-- People -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">People</div>
+            <ul class="sidebar-nav">
+                <li><a href="{% url 'students:list' %}"                   class="sidebar-link"><span class="sidebar-link-icon">🧑</span> Students</a></li>
+                <li><a href="{% url 'companies:list' %}"                  class="sidebar-link"><span class="sidebar-link-icon">🏢</span> Companies</a></li>
+                <li><a href="{% url 'companies:verification_dashboard' %}" class="sidebar-link"><span class="sidebar-link-icon">🛡</span> Verification</a></li>
+            </ul>
+        </div>
+
+        <!-- Placements -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Placements</div>
+            <ul class="sidebar-nav">
+                <li><a href="{% url 'placements:list' %}"    class="sidebar-link"><span class="sidebar-link-icon">🚀</span> Drives</a></li>
+                <li><a href="{% url 'opportunities:list' %}" class="sidebar-link"><span class="sidebar-link-icon">🔍</span> Discovery</a></li>
+            </ul>
+        </div>
+
+        <!-- Insights -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Insights</div>
+            <ul class="sidebar-nav">
+                <li><a href="{% url 'analytics:dashboard' %}"         class="sidebar-link"><span class="sidebar-link-icon">📈</span> Analytics</a></li>
+                <li><a href="{% url 'reports:dashboard' %}"           class="sidebar-link"><span class="sidebar-link-icon">📋</span> Reports</a></li>
+                <li><a href="{% url 'communication:dashboard' %}"     class="sidebar-link"><span class="sidebar-link-icon">✉</span> Comm Center</a></li>
+                <li><a href="{% url 'communication:notifications' %}" class="sidebar-link"><span class="sidebar-link-icon">🔔</span> Notifications</a></li>
+            </ul>
+        </div>
+
+        <!-- Sign out -->
+        <div class="sidebar-footer">
+            <a href="{% url 'accounts:logout' %}" class="sidebar-logout">
+                <span>↩</span> Sign Out
+            </a>
+        </div>
+    </aside>
+
+    <!-- ══════════ MAIN AREA ══════════ -->
+    <div class="main-area">
+
+        <!-- Sticky Topbar -->
+        <header class="topbar">
+            <!-- Hamburger (mobile only, visible via CSS) -->
+            <label class="sidebar-toggle-label" for="sidebar-toggle" aria-label="Toggle navigation">☰</label>
+
+            <span class="topbar-title">{% block topbar_title %}PlaceSync{% endblock %}</span>
+
+            <div class="topbar-actions">
+                <a href="{% url 'communication:notifications' %}" class="topbar-btn" title="Notifications">
+                    🔔<span class="topbar-notif-dot"></span>
+                </a>
+                <a href="{% url 'reports:dashboard' %}"   class="topbar-btn" title="Reports">📋</a>
+                <a href="{% url 'analytics:dashboard' %}" class="topbar-btn" title="Analytics">📈</a>
+            </div>
+        </header>
+
+        <!-- Flash messages -->
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- ── Page content ── -->
+        <main class="page-content" id="main-content">
+{% else %}
+
+<!-- ══════════ UNAUTHENTICATED ══════════ -->
+{% if messages %}
+    <div style="position:fixed;top:1rem;right:1rem;z-index:999;min-width:280px;max-width:380px;">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" style="margin-bottom:.5rem;">
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+<div>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+{% if user.is_authenticated %}
+        </main>
+        <footer class="footer">
+            &copy; 2026 PlaceSync &mdash; Training &amp; Placement Cell Portal
+        </footer>
+    </div><!-- /.main-area -->
+</div><!-- /.app-layout -->
+{% else %}
+</div>
+{% endif %}
+
+</body>
+</html>

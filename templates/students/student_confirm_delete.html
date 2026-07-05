@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Student - {{ student.name }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="padding-top: 4rem;">
+    <div class="auth-card" style="max-width: 500px; border-color: var(--danger);">
+        <div class="auth-header">
+            <h1 class="auth-title" style="color: var(--danger);">Delete Student Profile</h1>
+            <p class="auth-subtitle">This action is permanent and cannot be undone.</p>
+        </div>
+
+        <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid var(--danger); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 2rem; color: #fda4af;">
+            <p style="margin: 0; font-size: 0.95rem;">
+                Are you sure you want to delete student <strong>{{ student.name }}</strong> (Roll No: <code>{{ student.roll_number }}</code>)?
+            </p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+                ⚠️ This will permanently remove the student profile, academic records, and delete their linked user login account.
+            </p>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="background-color: var(--danger); border-color: var(--danger); flex: 1; padding: 0.8rem;">Yes, Delete Student</button>
+                <a href="{% url 'students:list' %}" class="btn btn-secondary" style="flex: 1; padding: 0.8rem; text-align: center;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

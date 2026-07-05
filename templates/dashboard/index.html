@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | PlaceSync{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- ── Page Header ── -->
+<div class="page-header">
+    <div class="page-header-left">
+        <h1 class="page-title">Overview</h1>
+        <p class="page-subtitle">
+            Welcome back, <strong style="color:#fff;">{{ user.username }}</strong> &mdash;
+            <span style="color:var(--primary-lt);">{{ user.college.name }}</span>
+        </p>
+    </div>
+    <div class="page-header-actions">
+        <a href="{% url 'placements:create' %}" class="btn btn-primary">
+            ➕ &nbsp;New Drive
+        </a>
+        <a href="{% url 'students:list' %}" class="btn btn-secondary">
+            🧑‍🎓 &nbsp;Students
+        </a>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     KPI Stats Row
+══════════════════════════════════════════════════ -->
+<div class="stats-grid">
+
+    <div class="stats-card">
+        <div class="stats-card-icon icon-indigo">🧑‍🎓</div>
+        <div class="stats-label">Total Students</div>
+        <div class="stats-value">{{ stats.total_students }}</div>
+        <span class="stats-change up">↑ Enrolled</span>
+    </div>
+
+    <div class="stats-card">
+        <div class="stats-card-icon icon-green">✅</div>
+        <div class="stats-label">Placed</div>
+        <div class="stats-value" style="color:var(--success);">{{ stats.placed_students }}</div>
+        <span class="stats-change up">Offers secured</span>
+    </div>
+
+    <div class="stats-card">
+        <div class="stats-card-icon icon-violet">📊</div>
+        <div class="stats-label">Placement %</div>
+        <div class="stats-value" style="background:var(--grad-brand);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+            {{ stats.placement_ratio }}%
+        </div>
+        <span class="stats-change up">Overall rate</span>
+    </div>
+
+    <div class="stats-card">
+        <div class="stats-card-icon icon-sky">🏢</div>
+        <div class="stats-label">Companies</div>
+        <div class="stats-value" style="color:var(--info);">{{ stats.total_companies }}</div>
+        <span class="stats-change" style="color:var(--txt-muted);">{{ stats.verified_companies }} verified</span>
+    </div>
+
+    <div class="stats-card">
+        <div class="stats-card-icon icon-amber">🚀</div>
+        <div class="stats-label">Active Drives</div>
+        <div class="stats-value" style="color:var(--warning);">{{ stats.active_drives }}</div>
+        <span class="stats-change" style="color:var(--txt-muted);">{{ stats.total_drives }} total</span>
+    </div>
+
+    <div class="stats-card">
+        <div class="stats-card-icon icon-rose">📬</div>
+        <div class="stats-label">Applications</div>
+        <div class="stats-value" style="color:var(--danger);">{{ stats.total_applications }}</div>
+        <span class="stats-change" style="color:var(--txt-muted);">Across all drives</span>
+    </div>
+
+    <div class="stats-card">
+        <div class="stats-card-icon icon-cyan">🔍</div>
+        <div class="stats-label">Opportunities</div>
+        <div class="stats-value" style="color:var(--info);">{{ stats.active_opportunities }}</div>
+        <span class="stats-change" style="color:var(--txt-muted);">Open profiles</span>
+    </div>
+
+    <div class="stats-card">
+        <div class="stats-card-icon icon-teal">🔔</div>
+        <div class="stats-label">Notifications</div>
+        <div class="stats-value" style="color:#2dd4bf;">{{ stats.unread_notifications }}</div>
+        <span class="stats-change" style="color:var(--txt-muted);">Unread alerts</span>
+    </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Two-column content grid
+══════════════════════════════════════════════════ -->
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+
+    <!-- Recent Drives -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">🚀 Recent Placement Drives</span>
+            <a href="{% url 'placements:list' %}" class="btn btn-xs btn-secondary">View all</a>
+        </div>
+        <div class="card-body" style="padding:0;">
+            {% if recent_drives %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Drive</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for drive in recent_drives %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'placements:detail' drive.pk %}"
+                                   style="color:var(--txt-primary);text-decoration:none;font-weight:500;">
+                                    {{ drive.title }}
+                                </a>
+                                <div style="font-size:0.75rem;color:var(--txt-muted);margin-top:2px;">
+                                    {{ drive.company.name }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge {% if drive.drive_type == 'job' %}badge-indigo{% else %}badge-sky{% endif %}">
+                                    {{ drive.get_drive_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if drive.status == 'active' %}badge-green{% elif drive.status == 'completed' %}badge-sky{% else %}badge-amber{% endif %}">
+                                    {{ drive.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div style="padding:2.5rem; text-align:center; color:var(--txt-muted);">
+                    <div style="font-size:2rem;margin-bottom:0.75rem;">🚀</div>
+                    <p style="font-weight:500;margin-bottom:0.5rem;color:var(--txt-secondary);">No placement drives yet</p>
+                    <a href="{% url 'placements:create' %}" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">Create Drive</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">⚡ Quick Actions</span>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;">
+
+            <a href="{% url 'students:list' %}" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-md);text-decoration:none;transition:var(--trans);" class="quick-action-row">
+                <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">📥</div>
+                <div>
+                    <div style="font-size:0.875rem;font-weight:600;color:#fff;">Import Students</div>
+                    <div style="font-size:0.78rem;color:var(--txt-muted);">Upload CSV batch file</div>
+                </div>
+            </a>
+
+            <a href="{% url 'companies:create' %}" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-md);text-decoration:none;transition:var(--trans);" class="quick-action-row">
+                <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(56,189,248,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">🏢</div>
+                <div>
+                    <div style="font-size:0.875rem;font-weight:600;color:#fff;">Add Company</div>
+                    <div style="font-size:0.78rem;color:var(--txt-muted);">Register a new recruiter</div>
+                </div>
+            </a>
+
+            <a href="{% url 'opportunities:list' %}" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-md);text-decoration:none;transition:var(--trans);" class="quick-action-row">
+                <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">🔍</div>
+                <div>
+                    <div style="font-size:0.875rem;font-weight:600;color:#fff;">Discover Opportunities</div>
+                    <div style="font-size:0.78rem;color:var(--txt-muted);">Scrape career pages</div>
+                </div>
+            </a>
+
+            <a href="{% url 'communication:compose' %}" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-md);text-decoration:none;transition:var(--trans);" class="quick-action-row">
+                <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">✉️</div>
+                <div>
+                    <div style="font-size:0.875rem;font-weight:600;color:#fff;">Send Email</div>
+                    <div style="font-size:0.78rem;color:var(--txt-muted);">Compose bulk communication</div>
+                </div>
+            </a>
+
+            <a href="{% url 'analytics:dashboard' %}" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-md);text-decoration:none;transition:var(--trans);" class="quick-action-row">
+                <div style="width:40px;height:40px;border-radius:var(--r-md);background:rgba(139,92,246,0.12);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">📈</div>
+                <div>
+                    <div style="font-size:0.875rem;font-weight:600;color:#fff;">View Analytics</div>
+                    <div style="font-size:0.78rem;color:var(--txt-muted);">Charts &amp; placement trends</div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Module cards grid
+══════════════════════════════════════════════════ -->
+<div style="margin-bottom:0.75rem;">
+    <h2 style="font-size:1rem;font-weight:600;color:var(--txt-secondary);margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:0.08em;">All Modules</h2>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
+
+
+    <a href="{% url 'students:list' %}"
+       style="display:flex;flex-direction:column;gap:0.625rem;padding:1.25rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-lg);text-decoration:none;transition:var(--trans);position:relative;overflow:hidden;"
+       class="module-card">
+        <div style="font-size:1.75rem;">🧑‍🎓</div>
+        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Students</div>
+        <div style="font-size:0.78rem;color:var(--txt-muted);line-height:1.5;">Manage student records, profiles, CGPA &amp; status</div>
+    </a>
+
+    <a href="{% url 'companies:list' %}"
+       style="display:flex;flex-direction:column;gap:0.625rem;padding:1.25rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-lg);text-decoration:none;transition:var(--trans);"
+       class="module-card">
+        <div style="font-size:1.75rem;">🏢</div>
+        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Companies</div>
+        <div style="font-size:0.78rem;color:var(--txt-muted);line-height:1.5;">Recruiters, HR contacts, placement history</div>
+    </a>
+
+    <a href="{% url 'placements:list' %}"
+       style="display:flex;flex-direction:column;gap:0.625rem;padding:1.25rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-lg);text-decoration:none;transition:var(--trans);"
+       class="module-card">
+        <div style="font-size:1.75rem;">🚀</div>
+        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Drives</div>
+        <div style="font-size:0.78rem;color:var(--txt-muted);line-height:1.5;">Job &amp; Internship drives, eligibility, applications</div>
+    </a>
+
+    <a href="{% url 'opportunities:list' %}"
+       style="display:flex;flex-direction:column;gap:0.625rem;padding:1.25rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-lg);text-decoration:none;transition:var(--trans);"
+       class="module-card">
+        <div style="font-size:1.75rem;">🔍</div>
+        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Discovery</div>
+        <div style="font-size:0.78rem;color:var(--txt-muted);line-height:1.5;">Scrape career pages, auto-discover opportunities</div>
+    </a>
+
+    <a href="{% url 'analytics:dashboard' %}"
+       style="display:flex;flex-direction:column;gap:0.625rem;padding:1.25rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-lg);text-decoration:none;transition:var(--trans);"
+       class="module-card">
+        <div style="font-size:1.75rem;">📈</div>
+        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Analytics</div>
+        <div style="font-size:0.78rem;color:var(--txt-muted);line-height:1.5;">Charts, placement trends, department stats</div>
+    </a>
+
+    <a href="{% url 'reports:dashboard' %}"
+       style="display:flex;flex-direction:column;gap:0.625rem;padding:1.25rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-lg);text-decoration:none;transition:var(--trans);"
+       class="module-card">
+        <div style="font-size:1.75rem;">📋</div>
+        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Reports</div>
+        <div style="font-size:0.78rem;color:var(--txt-muted);line-height:1.5;">PDF/CSV exports — placement, salary, batch</div>
+    </a>
+
+    <a href="{% url 'communication:dashboard' %}"
+       style="display:flex;flex-direction:column;gap:0.625rem;padding:1.25rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-lg);text-decoration:none;transition:var(--trans);"
+       class="module-card">
+        <div style="font-size:1.75rem;">✉️</div>
+        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Comm Center</div>
+        <div style="font-size:0.78rem;color:var(--txt-muted);line-height:1.5;">Email students &amp; companies, notifications</div>
+    </a>
+
+    <a href="{% url 'companies:verification_dashboard' %}"
+       style="display:flex;flex-direction:column;gap:0.625rem;padding:1.25rem;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r-lg);text-decoration:none;transition:var(--trans);"
+       class="module-card">
+        <div style="font-size:1.75rem;">🛡️</div>
+        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Verification</div>
+        <div style="font-size:0.78rem;color:var(--txt-muted);line-height:1.5;">Company trust scores, verify/reject status</div>
+    </a>
+
+
+
+</div>
+
+<!-- Module card hover CSS -->
+<style>
+.module-card:hover {
+    background: rgba(99,102,241,0.07);
+    border-color: rgba(99,102,241,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+.quick-action-row:hover {
+    background: rgba(99,102,241,0.07) !important;
+    border-color: rgba(99,102,241,0.3) !important;
+    transform: translateX(3px);
+}
+</style>
+
+{% endblock %}

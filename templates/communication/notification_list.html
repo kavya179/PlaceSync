@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}My Notifications Inbox | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 800px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Notifications Inbox</h1>
+            <p class="dashboard-welcome">View system updates, recruitment listings alerts, and emails dispatch status reports.</p>
+        </div>
+    </div>
+
+    <!-- Notifications Listing -->
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+        {% if notifications %}
+            {% for note in notifications %}
+                <div class="card-panel" style="margin-top: 0; padding: 1.25rem; {% if not note.is_read %}border-left: 4px solid var(--primary); background: rgba(99, 102, 241, 0.02);{% endif %}">
+                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0;">{{ note.title }}</h4>
+                                {% if not note.is_read %}
+                                    <span class="badge" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.3); font-size: 0.7rem; padding: 0.1rem 0.35rem;">New</span>
+                                {% endif %}
+                            </div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">📅 Received: {{ note.created_at|date:"Y-m-d H:i" }}</span>
+                        </div>
+                        
+                        <!-- Mark Read Button -->
+                        {% if not note.is_read %}
+                            <form action="{% url 'communication:notification_read' pk=note.pk %}" method="post" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary btn-xs" style="padding: 0.35rem 0.75rem;">Mark Read</button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-top: 0.85rem; white-space: pre-line;">
+                        {{ note.message }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 5rem 2rem; border: 1.5px dashed var(--card-border); border-radius: var(--radius-md); background: var(--card-bg);">
+                <p style="color: var(--text-secondary); font-size: 0.95rem; font-style: italic; margin: 0;">
+                    Your inbox is empty. No notifications received.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

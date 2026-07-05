@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PlaceSync — Training & Placement Cell Management Portal Login">
+    <title>Login | PlaceSync</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<div class="auth-page">
+
+    <!-- Left decorative panel -->
+    <div class="auth-left">
+        <div class="auth-left-brand">Place<span>Sync</span></div>
+        <p class="auth-left-tagline">
+            The complete Training &amp; Placement Cell management platform for modern institutions.
+        </p>
+
+        <div class="auth-features">
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">🎓</span>
+                <span>Manage students, batches &amp; departments</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">🏢</span>
+                <span>Track companies &amp; placement drives</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">📈</span>
+                <span>Real-time analytics &amp; reports</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">🔍</span>
+                <span>Opportunity discovery &amp; verification</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">✉️</span>
+                <span>Communication center &amp; notifications</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right form panel -->
+    <div class="auth-right">
+        <div class="auth-card">
+
+            <div class="auth-logo">
+                <div class="auth-logo-icon">🎓</div>
+                <div class="auth-logo-text">Place<span>Sync</span></div>
+            </div>
+
+            <h1 class="auth-title">Welcome back</h1>
+            <p class="auth-subtitle">Sign in to your placement cell admin portal</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" style="margin-bottom:1.25rem;">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="non-field-errors">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <ul class="form-error">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div style="text-align:right; margin-top:-0.5rem; margin-bottom:1.5rem;">
+                    <a href="{% url 'accounts:password_reset' %}"
+                       style="font-size:0.825rem; color:var(--primary-lt); text-decoration:none; font-weight:500; transition:var(--trans);">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="padding:0.8rem 1.5rem; font-size:0.95rem; border-radius:var(--r-lg);">
+                    Sign In &nbsp;→
+                </button>
+            </form>
+
+            <div class="auth-divider"><span>New to PlaceSync?</span></div>
+
+            <a href="{% url 'accounts:register' %}" class="btn btn-secondary btn-block" style="border-radius:var(--r-lg); padding:0.75rem 1.5rem;">
+                Register Your College
+            </a>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

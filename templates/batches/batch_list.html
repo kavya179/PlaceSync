@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Batches | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Batches</h1>
+            <p class="dashboard-welcome">Manage student batches and track placement statistics</p>
+        </div>
+        <div>
+            <a href="{% url 'batches:create' %}" class="btn btn-primary">Add Batch</a>
+        </div>
+    </div>
+
+    <!-- Search Toolbar -->
+    <form method="get" class="search-bar">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by batch name or department..." class="form-input search-input">
+        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.25rem;">Search</button>
+        {% if q %}
+            <a href="{% url 'batches:list' %}" class="btn btn-secondary" style="padding: 0.75rem 1.25rem;">Clear</a>
+        {% endif %}
+    </form>
+
+    <!-- Table Section -->
+    {% if batches %}
+        <div class="table-wrapper">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">Batch Name</th>
+                            <th style="width: 25%;">Department</th>
+                            <th style="width: 15%;">Graduation Year</th>
+                            <th style="width: 25%; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for batch in batches %}
+                            <tr>
+                                <td style="color: #fff; font-weight: 600;">
+                                    <a href="{% url 'batches:dashboard' pk=batch.pk %}" style="color: #818cf8; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                        {{ batch.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge badge-code">{{ batch.department.code }}</span> - {{ batch.department.name }}
+                                </td>
+                                <td style="color: #fff;">
+                                    {{ batch.graduation_year }}
+                                </td>
+                                <td>
+                                    <div class="table-actions" style="justify-content: flex-end;">
+                                        <a href="{% url 'batches:dashboard' pk=batch.pk %}" class="btn btn-secondary btn-xs" style="background: rgba(99, 102, 241, 0.1); color: #818cf8; border-color: rgba(99, 102, 241, 0.25);">Dashboard</a>
+                                        <a href="{% url 'batches:edit' pk=batch.pk %}" class="btn btn-secondary btn-xs">Edit</a>
+                                        <a href="{% url 'batches:delete' pk=batch.pk %}" class="btn btn-secondary btn-xs btn-danger-text">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State Panel -->
+        <div style="text-align: center; padding: 4rem 2rem; border: 1.5px dashed var(--card-border); border-radius: var(--radius-md); background: var(--card-bg); margin-top: 1.5rem;">
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 1rem;">
+                {% if q %}
+                    No batches match your search query: <strong style="color: #fff;">"{{ q }}"</strong>
+                {% else %}
+                    No batches have been registered in your college database yet.
+                {% endif %}
+            </p>
+            {% if q %}
+                <a href="{% url 'batches:list' %}" class="btn btn-secondary">Clear Search</a>
+            {% else %}
+                <a href="{% url 'batches:create' %}" class="btn btn-primary">Create Your First Batch</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Compose Broadcast | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 800px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Compose Email Broadcast</h1>
+            <p class="dashboard-welcome">Broadcast notifications to students, partner recruiters, or custom recipient lists.</p>
+        </div>
+        <div>
+            <a href="{% url 'communication:dashboard' %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Composers Form -->
+    <div class="card-panel" style="margin-top: 0; padding: 1.75rem;">
+        
+        <!-- Quick Template Selector Helper (Prefill via GET reload) -->
+        <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--card-border); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <span style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Prefill Template:</span>
+            {% if form.fields.template.queryset %}
+                <form method="get" action="{% url 'communication:compose' %}" style="display: flex; gap: 0.5rem; margin: 0; align-items: center; flex: 1;">
+                    <select name="template_id" class="form-input" style="font-size: 0.8rem; padding: 0.4rem; max-width: 300px;" onchange="this.form.submit()">
+                        <option value="">-- Choose Template --</option>
+                        {% for tpl in form.fields.template.queryset %}
+                            <option value="{{ tpl.pk }}" {% if request.GET.template_id|add:"0" == tpl.pk %}selected{% endif %}>{{ tpl.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-secondary btn-xs" style="padding: 0.4rem 0.85rem;">Apply</button>
+                </form>
+            {% else %}
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">No templates configured. Create one first!</span>
+            {% endif %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" novalidate style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% csrf_token %}
+
+            <!-- Section 1: Recipients Target Setup -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">👥 Recipients Configuration</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <!-- Recipient Type -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_recipient_type">Recipient Category *</label>
+                        {{ form.recipient_type }}
+                        {% if form.recipient_type.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.recipient_type.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Target Batch -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_target_batch">Filter Student Batch</label>
+                        {{ form.target_batch }}
+                        {% if form.target_batch.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.target_batch.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Target Department -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_target_department">Filter Student Department</label>
+                        {{ form.target_department }}
+                        {% if form.target_department.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.target_department.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Custom Recipients list -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label" for="id_custom_recipients">Custom Recipients (Comma-separated)</label>
+                    {{ form.custom_recipients }}
+                    {% if form.custom_recipients.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.custom_recipients.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 2: Subject & Message Body -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">✍️ Message Composer</h3>
+                
+                <!-- Subject -->
+                <div class="form-group">
+                    <label class="form-label" for="id_subject">Subject Line *</label>
+                    {{ form.subject }}
+                    {% if form.subject.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.subject.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Body -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label" for="id_body">Message Body *</label>
+                    {{ form.body }}
+                    {% if form.body.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.body.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 3: Attachment & Dispatch Scheduling -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">⏱️ Attachments &amp; Timeline</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <!-- Attachment -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_attachment">File Attachment</label>
+                        {{ form.attachment }}
+                        {% if form.attachment.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.attachment.errors.0 }}</span>
+                        {% endif %}
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Upload PDFs, DOCX, or Excel sheets to broadcast.</span>
+                    </div>
+
+                    <!-- Scheduled datetime -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_scheduled_time">Schedule Dispatch Date/Time</label>
+                        {{ form.scheduled_time }}
+                        {% if form.scheduled_time.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.scheduled_time.errors.0 }}</span>
+                        {% endif %}
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Leave blank to broadcast immediately via SMTP.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Submit -->
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2.5rem;">🚀 Dispatch Broadcast</button>
+                <a href="{% url 'communication:dashboard' %}" class="btn btn-secondary" style="padding: 0.85rem 1.5rem;">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

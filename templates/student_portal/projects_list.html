@@ -84,7 +84,7 @@
         <select name="category" id="filter_category" class="sp-form-input">
           <option value="">All Categories</option>
           {% for val, label in categories %}
-          <option value="{{ val }}" {% if selected_category==val %}selected{% endif %}>{{ label }}</option>
+          <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
       </div>
@@ -94,7 +94,7 @@
         <select name="status" id="filter_status" class="sp-form-input">
           <option value="">All Statuses</option>
           {% for val, label in statuses %}
-          <option value="{{ val }}" {% if selected_status==val %}selected{% endif %}>{{ label }}</option>
+          <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
       </div>

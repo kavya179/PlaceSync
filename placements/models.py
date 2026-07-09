@@ -65,6 +65,15 @@ class PlacementDrive(models.Model):
         related_name='eligible_drives',
         blank=True
     )
+    eligible_batches = models.ManyToManyField(
+        'batches.Batch',
+        related_name='eligible_drives',
+        blank=True
+    )
+    required_skills = models.TextField(
+        blank=True,
+        help_text="Comma-separated required skills (e.g. Python, SQL)"
+    )
     
     # Selection Process
     selection_process = models.TextField(
@@ -122,3 +131,80 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.student.user.username} application to {self.drive}"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DriveBookmark — tracks student bookmarks for placement drives
+# ─────────────────────────────────────────────────────────────────────────────
+
+class DriveBookmark(models.Model):
+    student = models.ForeignKey(
+        'students.Student',
+        on_delete=models.CASCADE,
+        related_name='drive_bookmarks'
+    )
+    drive = models.ForeignKey(
+        PlacementDrive,
+        on_delete=models.CASCADE,
+        related_name='bookmarked_by'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['student', 'drive'],
+                name='unique_student_drive_bookmark'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.student.name} bookmarked {self.drive}"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PlacementCalendarEvent — tracks timeline events for applied drives
+# ─────────────────────────────────────────────────────────────────────────────
+
+class PlacementCalendarEvent(models.Model):
+    class EventType(models.TextChoices):
+        DEADLINE = 'DEADLINE', 'Application Deadline'
+        APTITUDE_TEST = 'APTITUDE_TEST', 'Aptitude Test'
+        TECH_INTERVIEW = 'TECH_INTERVIEW', 'Technical Interview'
+        HR_INTERVIEW = 'HR_INTERVIEW', 'HR Interview'
+        OFFER_RELEASE = 'OFFER_RELEASE', 'Offer Release'
+        JOINING_DATE = 'JOINING_DATE', 'Joining Date'
+
+    student = models.ForeignKey(
+        'students.Student',
+        on_delete=models.CASCADE,
+        related_name='calendar_events'
+    )
+    drive = models.ForeignKey(
+        PlacementDrive,
+        on_delete=models.CASCADE,
+        related_name='calendar_events'
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    event_date = models.DateField()
+    event_type = models.CharField(
+        max_length=20,
+        choices=EventType.choices,
+        default=EventType.DEADLINE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['event_date', 'event_type']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['student', 'drive', 'event_type'],
+                name='unique_student_drive_event_type'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.title} on {self.event_date} ({self.get_event_type_display()})"
+

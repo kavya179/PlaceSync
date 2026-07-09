@@ -1,0 +1,186 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}My Profile | PlaceSync{% endblock %}
+{% block topbar_title %}My Profile{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">My Profile</h1>
+    <p class="sp-page-subtitle">Your personal and academic information</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:profile_edit' %}" class="sp-btn sp-btn-primary">Edit Profile</a>
+  </div>
+</div>
+
+<div class="sp-profile-grid">
+
+  <!-- Left: avatar + quick info -->
+  <div>
+    <div class="sp-profile-avatar-card">
+      <div class="sp-profile-avatar-lg">{{ student.name|slice:":2"|upper }}</div>
+      <div style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:.25rem;">{{ student.name }}</div>
+      <div style="font-size:.825rem;color:var(--txt-2);margin-bottom:.75rem;">{{ student.roll_number }}</div>
+
+      <span class="sp-badge {% if student.placement_status == 'PLACED' %}sp-badge-green{% elif student.placement_status == 'INTERN' %}sp-badge-sky{% elif student.placement_status == 'PLACED_AND_INTERN' %}sp-badge-violet{% else %}sp-badge-gray{% endif %}" style="margin-bottom:1.25rem;">
+        {{ student.get_placement_status_display }}
+      </span>
+
+      <!-- Score mini-bars -->
+      <div style="margin-top:1rem;text-align:left;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.3rem;font-size:.75rem;">
+          <span style="color:var(--txt-3);">Profile</span>
+          <span style="color:#c4b5fd;font-weight:600;">{{ student.profile_completion }}%</span>
+        </div>
+        <div class="sp-bar-wrap">
+          <div class="sp-bar-fill bar-violet" style="width:{{ student.profile_completion }}%"></div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:.75rem;margin-bottom:.3rem;font-size:.75rem;">
+          <span style="color:var(--txt-3);">ATS Score</span>
+          <span style="color:#7dd3fc;font-weight:600;">{{ student.ats_score }}/100</span>
+        </div>
+        <div class="sp-bar-wrap">
+          <div class="sp-bar-fill bar-sky" style="width:{{ student.ats_score }}%"></div>
+        </div>
+      </div>
+
+      <!-- Resume upload -->
+      <div style="margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1.25rem;">
+        {% if student.resume %}
+          <div style="font-size:.78rem;color:var(--txt-3);margin-bottom:.5rem;">Resume uploaded</div>
+          <a href="{{ student.resume.url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-sm sp-btn-block" style="margin-bottom:.5rem;">View Resume</a>
+        {% else %}
+          <div style="font-size:.78rem;color:var(--amber);margin-bottom:.5rem;">No resume uploaded</div>
+        {% endif %}
+        <form method="post" action="{% url 'student_portal:resume_upload' %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <label class="sp-form-label" style="font-size:.73rem;">Upload PDF Resume</label>
+          <input type="file" name="resume" accept=".pdf" class="sp-form-input" style="padding:.4rem;font-size:.78rem;margin-bottom:.5rem;">
+          <button type="submit" class="sp-btn sp-btn-primary sp-btn-sm sp-btn-block">Upload Resume</button>
+        </form>
+      </div>
+
+      <!-- Social links -->
+      <div style="margin-top:1.25rem;display:flex;flex-direction:column;gap:.5rem;">
+        {% if student.linkedin_url %}
+        <a href="{{ student.linkedin_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-sm">LinkedIn Profile</a>
+        {% endif %}
+        {% if student.github_url %}
+        <a href="{{ student.github_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-sm">GitHub Profile</a>
+        {% endif %}
+        {% if student.portfolio_url %}
+        <a href="{{ student.portfolio_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-sm">Portfolio</a>
+        {% endif %}
+        {% if not student.linkedin_url and not student.github_url and not student.portfolio_url %}
+        <div style="font-size:.75rem;color:var(--txt-3);text-align:center;">Add social links in Edit Profile</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: detailed info -->
+  <div>
+
+    <!-- Personal Information -->
+    <div class="sp-card" style="margin-bottom:1.25rem;">
+      <div class="sp-card-header">
+        <span class="sp-card-title">👤 Personal Information</span>
+      </div>
+      <div class="sp-profile-info-card" style="border:none;">
+        <div class="sp-info-row">
+          <div class="sp-info-label">Full Name</div>
+          <div class="sp-info-value">{{ student.name }}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Email</div>
+          <div class="sp-info-value">{{ student.email }}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Phone</div>
+          <div class="sp-info-value">{% if student.phone %}{{ student.phone }}{% else %}<span style="color:var(--txt-3);">Not provided</span>{% endif %}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Address</div>
+          <div class="sp-info-value">{% if student.address %}{{ student.address }}{% else %}<span style="color:var(--txt-3);">Not provided</span>{% endif %}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Bio</div>
+          <div class="sp-info-value">{% if student.bio %}{{ student.bio }}{% else %}<span style="color:var(--txt-3);">Not provided</span>{% endif %}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Academic Information -->
+    <div class="sp-card" style="margin-bottom:1.25rem;">
+      <div class="sp-card-header">
+        <span class="sp-card-title">🎓 Academic Information</span>
+      </div>
+      <div class="sp-profile-info-card" style="border:none;">
+        <div class="sp-info-row">
+          <div class="sp-info-label">Roll Number</div>
+          <div class="sp-info-value"><span class="sp-badge sp-badge-violet">{{ student.roll_number }}</span></div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Department</div>
+          <div class="sp-info-value">{{ student.department.name }} ({{ student.department.code }})</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Batch</div>
+          <div class="sp-info-value">{{ student.batch.name }}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Semester</div>
+          <div class="sp-info-value">{{ student.semester }}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">CGPA</div>
+          <div class="sp-info-value">{% if student.cgpa %}<strong style="color:#c4b5fd;">{{ student.cgpa }}</strong> / 10.00{% else %}<span style="color:var(--txt-3);">Not updated</span>{% endif %}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Backlogs</div>
+          <div class="sp-info-value">
+            {% if student.backlogs == 0 %}
+              <span class="sp-badge sp-badge-green">Clear</span>
+            {% else %}
+              <span class="sp-badge sp-badge-red">{{ student.backlogs }} Active</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">College</div>
+          <div class="sp-info-value">{{ student.college.name }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="sp-card">
+      <div class="sp-card-header">
+        <span class="sp-card-title">💡 Skills</span>
+        <a href="{% url 'student_portal:profile_edit' %}" class="sp-btn sp-btn-secondary sp-btn-xs">Edit</a>
+      </div>
+      <div class="sp-card-body">
+        {% if skill_list %}
+          <div class="sp-skills-wrap">
+            {% for skill in skill_list %}
+            <span class="sp-skill-chip">{{ skill }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="sp-empty" style="padding:1.5rem 1rem;">
+            <div class="sp-empty-icon" style="font-size:1.5rem;">💡</div>
+            <div class="sp-empty-text" style="font-size:.85rem;">No skills added yet</div>
+            <a href="{% url 'student_portal:profile_edit' %}" class="sp-btn sp-btn-primary sp-btn-sm" style="margin-top:.75rem;">Add Skills</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

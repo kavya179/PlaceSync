@@ -1,0 +1,211 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}My Skills | PlaceSync{% endblock %}
+{% block topbar_title %}My Skills{% endblock %}
+{% block nav_skills %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">💡 My Skills</h1>
+    <p class="sp-page-subtitle">Track and showcase your technical and soft skills</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Summary Stats Row
+════════════════════════════════════════════════════ -->
+<div class="sp-stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.75rem;">
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-v">💡</div>
+    <div class="sp-stat-label">Total Skills</div>
+    <div class="sp-stat-value">{{ total_skills }}</div>
+    <div class="sp-stat-sub">across all categories</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-g">🎯</div>
+    <div class="sp-stat-label">Advanced</div>
+    <div class="sp-stat-value">{{ advanced_count }}</div>
+    <div class="sp-stat-sub {% if advanced_count > 0 %}good{% endif %}">expert-level skills</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-s">📈</div>
+    <div class="sp-stat-label">Intermediate</div>
+    <div class="sp-stat-value">{{ intermediate_count }}</div>
+    <div class="sp-stat-sub {% if intermediate_count > 0 %}good{% endif %}">growing proficiency</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-a">🌱</div>
+    <div class="sp-stat-label">Beginner</div>
+    <div class="sp-stat-value">{{ beginner_count }}</div>
+    <div class="sp-stat-sub">learning in progress</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Category Distribution Chips
+════════════════════════════════════════════════════ -->
+{% if category_stats %}
+<div style="display:flex;flex-wrap:wrap;gap:.625rem;margin-bottom:1.75rem;">
+  {% for cs in category_stats %}
+  <span class="sp-skill-chip" style="font-size:.8rem;padding:.35rem .9rem;">
+    {{ cs.label }} <span style="background:rgba(255,255,255,.12);padding:.1rem .4rem;border-radius:9999px;font-size:.7rem;margin-left:.35rem;">{{ cs.count }}</span>
+  </span>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ══════════════════════════════════════════════════
+     Two-Column Layout: Add Form | Skill Categories
+════════════════════════════════════════════════════ -->
+<div class="sk-layout">
+
+  <!-- ─── LEFT: Add Skill Form ─── -->
+  <div>
+    <div class="sp-card sk-add-card">
+      <div class="sp-card-header">
+        <span class="sp-card-title">➕ Add New Skill</span>
+      </div>
+      <div class="sp-card-body">
+        <form method="post" action="{% url 'student_portal:skill_add' %}">
+          {% csrf_token %}
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_name">Skill Name <span style="color:var(--red);">*</span></label>
+            <input type="text" name="name" id="id_name" class="sp-form-input"
+                   placeholder="e.g. Python, MySQL, Docker…" required maxlength="100">
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_category">Category <span style="color:var(--red);">*</span></label>
+            <select name="category" id="id_category" class="sp-form-input">
+              {% for val, label in categories %}
+              <option value="{{ val }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_proficiency">Proficiency Level <span style="color:var(--red);">*</span></label>
+            <select name="proficiency" id="id_proficiency" class="sp-form-input">
+              {% for val, label in proficiencies %}
+              <option value="{{ val }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Visual proficiency preview (pure CSS) -->
+          <div style="margin-bottom:1.1rem;">
+            <div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--txt-3);margin-bottom:.4rem;">
+              <span>Beginner</span><span>Intermediate</span><span>Advanced</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,.07);border-radius:9999px;overflow:hidden;">
+              <div style="width:33%;height:100%;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:9999px;"></div>
+            </div>
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_description">Short Note <span style="color:var(--txt-3);font-weight:400;">(optional)</span></label>
+            <input type="text" name="description" id="id_description" class="sp-form-input"
+                   placeholder="e.g. 2 years experience, used in final year project…" maxlength="255">
+          </div>
+
+          <button type="submit" class="sp-btn sp-btn-primary sp-btn-block">Add Skill</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Quick Proficiency Legend -->
+    <div class="sp-card" style="margin-top:1.125rem;">
+      <div class="sp-card-header">
+        <span class="sp-card-title">📖 Proficiency Guide</span>
+      </div>
+      <div class="sp-card-body" style="display:flex;flex-direction:column;gap:.75rem;">
+        <div class="sk-legend-item">
+          <span class="sp-badge sp-badge-amber">Beginner</span>
+          <span style="font-size:.8rem;color:var(--txt-2);">Basic understanding, learned recently</span>
+        </div>
+        <div class="sk-legend-item">
+          <span class="sp-badge sp-badge-sky">Intermediate</span>
+          <span style="font-size:.8rem;color:var(--txt-2);">Can work independently, applied in projects</span>
+        </div>
+        <div class="sk-legend-item">
+          <span class="sp-badge sp-badge-green">Advanced</span>
+          <span style="font-size:.8rem;color:var(--txt-2);">Expert level, 2+ years, mentor others</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── RIGHT: Skill Cards by Category ─── -->
+  <div>
+    {% if grouped %}
+      {% for cat_key, cat_data in grouped.items %}
+      <div class="sk-category-section">
+        <!-- Category header -->
+        <div class="sk-category-header">
+          <span class="sk-category-icon">{{ cat_data.icon }}</span>
+          <span class="sk-category-label">{{ cat_data.label }}</span>
+          <span class="sk-category-count">{{ cat_data.skills.count }} skill{{ cat_data.skills.count|pluralize }}</span>
+        </div>
+
+        <!-- Skill cards grid -->
+        <div class="sk-cards-grid">
+          {% for skill in cat_data.skills %}
+          <div class="sk-card">
+            <!-- Card top: name + badge -->
+            <div class="sk-card-top">
+              <div class="sk-card-name">{{ skill.name }}</div>
+              <span class="sp-badge {{ skill.proficiency_css }}">{{ skill.get_proficiency_display }}</span>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="sk-progress-wrap">
+              <div class="sp-bar-wrap">
+                <div class="sp-bar-fill {{ skill.bar_color_css }}" style="width:{{ skill.proficiency_pct }}%"></div>
+              </div>
+              <span class="sk-pct-label">{{ skill.proficiency_pct }}%</span>
+            </div>
+
+            <!-- Description if present -->
+            {% if skill.description %}
+            <div class="sk-description">{{ skill.description }}</div>
+            {% endif %}
+
+            <!-- Action buttons -->
+            <div class="sk-card-actions">
+              <a href="{% url 'student_portal:skill_edit' skill.pk %}"
+                 class="sp-btn sp-btn-secondary sp-btn-xs">✏️ Edit</a>
+              <a href="{% url 'student_portal:skill_delete' skill.pk %}"
+                 class="sp-btn sp-btn-danger sp-btn-xs">🗑 Delete</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+
+    {% else %}
+      <!-- Empty state -->
+      <div class="sp-card">
+        <div class="sp-empty" style="padding:4rem 2rem;">
+          <div class="sp-empty-icon">💡</div>
+          <div class="sp-empty-text">No skills added yet</div>
+          <div class="sp-empty-sub">Add your first skill using the form on the left to start building your profile.</div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+</div><!-- /.sk-layout -->
+
+{% endblock %}

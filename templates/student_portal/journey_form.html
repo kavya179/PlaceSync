@@ -1,0 +1,62 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{{ title_prefix }} | PlaceSync{% endblock %}
+{% block topbar_title %}{{ title_prefix }}{% endblock %}
+{% block nav_coding %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">✏️ {{ title_prefix }}</h1>
+    <p class="sp-page-subtitle">Update your developer logs, achievements, platform metrics or links.</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:journey' %}" class="sp-btn sp-btn-secondary">⬅️ Cancel</a>
+  </div>
+</div>
+
+<div style="max-width: 720px; margin: 0 auto 3rem;">
+  <form method="post" enctype="multipart/form-data" class="sp-card" style="box-shadow: 0 16px 40px rgba(0,0,0,0.35);">
+    {% csrf_token %}
+
+    <div class="sp-card-body" style="padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
+      
+      {% if form.non_field_errors %}
+      <div class="sp-alert sp-alert-error">
+        <span>{{ form.non_field_errors }}</span>
+      </div>
+      {% endif %}
+
+      {% for field in form %}
+      <div class="sp-form-group">
+        <label class="sp-form-label" for="{{ field.id_for_label }}">
+          {{ field.label }} 
+          {% if field.field.required %}<span style="color: var(--red);">*</span>{% endif %}
+        </label>
+        {{ field }}
+        {% if field.errors %}
+        <div style="color: var(--red); font-size: 0.75rem; margin-top: 0.25rem;">
+          {{ field.errors.0 }}
+        </div>
+        {% endif %}
+        {% if field.help_text %}
+        <small style="color: var(--txt-3); font-size: 0.72rem; margin-top: 0.15rem; display: block;">
+          {{ field.help_text }}
+        </small>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div style="border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 0.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <a href="{% url 'student_portal:journey' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2rem;">Cancel</a>
+        <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem 2.5rem;">
+          {% if is_edit %}Save Changes{% else %}Record Entry{% endif %}
+        </button>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+{% endblock %}

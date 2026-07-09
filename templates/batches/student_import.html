@@ -50,7 +50,7 @@
                     <label class="form-label" for="csv_file">Select Student CSV File *</label>
                     <input type="file" name="csv_file" id="csv_file" class="form-input" accept=".csv" required style="padding: 0.5rem;">
                     <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
-                        Select a comma-separated values file (.csv) containing columns: <code>roll_number</code>, <code>name</code>, <code>email</code>, and optional <code>phone</code>.
+                        Select a comma-separated values file (.csv) containing the columns listed in the guidelines panel.
                     </span>
                 </div>
 
@@ -69,15 +69,21 @@
             </p>
             
             <div style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 0.75rem; font-family: monospace; font-size: 0.8rem; color: #fff; margin-bottom: 1.5rem; overflow-x: auto; white-space: nowrap;">
-                roll_number,name,email,phone
+                Enrollment Number,Student Name,Email,Phone,Department,Semester,Division,SPI,CPI,CGPA,Current Backlogs,Passing Year
             </div>
 
             <h4 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">Schema Guidelines:</h4>
             <ul style="font-size: 0.8rem; color: var(--text-secondary); padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                <li><code>roll_number</code>: (Required) Serves as the unique student identifier and login username.</li>
-                <li><code>name</code>: (Required) Candidate's full name.</li>
-                <li><code>email</code>: (Required) Unique email address. Checked for syntax validation.</li>
-                <li><code>phone</code>: (Optional) Candidate's contact number.</li>
+                <li><code>Enrollment Number</code>: (Required) Serves as student ID and login username.</li>
+                <li><code>Student Name</code>: (Required) Full candidate name.</li>
+                <li><code>Email</code>: (Required) Candidate email address (must be unique).</li>
+                <li><code>Phone</code>: (Optional) Candidate contact number.</li>
+                <li><code>Department</code>: (Optional) Code of department.</li>
+                <li><code>Semester</code>: (Optional) Current active semester (e.g. 1 to 8).</li>
+                <li><code>Division</code>: (Optional) e.g. A, B, C.</li>
+                <li><code>SPI / CPI / CGPA</code>: (Optional) Academic grades (Decimals out of 10.00).</li>
+                <li><code>Current Backlogs</code>: (Optional) Number of active backlogs (Defaults to 0).</li>
+                <li><code>Passing Year</code>: (Optional) e.g. 2027.</li>
             </ul>
         </div>
 

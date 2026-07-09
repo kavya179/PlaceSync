@@ -1,0 +1,89 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Settings | PlaceSync{% endblock %}
+{% block topbar_title %}Settings{% endblock %}
+{% block nav_settings %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">Settings</h1>
+    <p class="sp-page-subtitle">Manage your account and security preferences</p>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+  <!-- Change Password -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🔒 Change Password</span>
+    </div>
+    <div class="sp-card-body">
+      <p style="font-size:.855rem;color:var(--txt-2);margin-bottom:1.25rem;line-height:1.6;">
+        Update your password regularly to keep your account secure.
+        Your password must be at least 8 characters long.
+      </p>
+      <a href="{% url 'accounts:password_change' %}" class="sp-btn sp-btn-primary">Change Password</a>
+    </div>
+  </div>
+
+  <!-- Account Info -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">👤 Account Information</span>
+    </div>
+    <div class="sp-profile-info-card" style="border:none;">
+      <div class="sp-info-row">
+        <div class="sp-info-label">Username</div>
+        <div class="sp-info-value" style="color:#c4b5fd;font-weight:600;">{{ request.user.username }}</div>
+      </div>
+      <div class="sp-info-row">
+        <div class="sp-info-label">Email</div>
+        <div class="sp-info-value">{{ request.user.email }}</div>
+      </div>
+      <div class="sp-info-row">
+        <div class="sp-info-label">Role</div>
+        <div class="sp-info-value"><span class="sp-badge sp-badge-violet">Student</span></div>
+      </div>
+      <div class="sp-info-row">
+        <div class="sp-info-label">College</div>
+        <div class="sp-info-value">{{ request.user.college.name }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">↩ Sign Out</span>
+    </div>
+    <div class="sp-card-body">
+      <p style="font-size:.855rem;color:var(--txt-2);margin-bottom:1.25rem;line-height:1.6;">
+        You will be logged out from all sessions on this device.
+      </p>
+      <a href="{% url 'accounts:logout' %}" class="sp-btn sp-btn-danger">Sign Out</a>
+    </div>
+  </div>
+
+  <!-- Contact TPO -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">📧 Need Help?</span>
+    </div>
+    <div class="sp-card-body">
+      <p style="font-size:.855rem;color:var(--txt-2);margin-bottom:1rem;line-height:1.6;">
+        Contact your Training &amp; Placement Officer for any issues with your account,
+        CGPA, or placement status.
+      </p>
+      <div style="padding:.75rem 1rem;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.2);border-radius:var(--r-md);">
+        <div style="font-size:.8rem;color:#c4b5fd;font-weight:600;">{{ student.college.name }}</div>
+        <div style="font-size:.78rem;color:var(--txt-3);margin-top:.2rem;">Your Placement Cell</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

@@ -18,7 +18,7 @@
 
     <!-- Search Toolbar -->
     <form method="get" class="search-bar">
-        <input type="text" name="q" value="{{ q }}" placeholder="Search by name or code..." class="form-input search-input">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name, code, or HOD..." class="form-input search-input">
         <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.25rem;">Search</button>
         {% if q %}
             <a href="{% url 'departments:list' %}" class="btn btn-secondary" style="padding: 0.75rem 1.25rem;">Clear</a>
@@ -26,38 +26,52 @@
     </form>
 
     <!-- Table Section -->
-    {% if departments %}
+    {% if departments_data %}
         <div class="table-wrapper">
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th style="width: 15%;">Code</th>
-                            <th style="width: 35%;">Department Name</th>
-                            <th style="width: 30%;">Description</th>
-                            <th style="width: 20%; text-align: right;">Actions</th>
+                            <th style="width: 12%;">Code</th>
+                            <th style="width: 25%;">Department Name</th>
+                            <th style="width: 20%;">HOD (Head)</th>
+                            <th style="width: 10%; text-align: center;">Students</th>
+                            <th style="width: 10%; text-align: center;">Batches</th>
+                            <th style="width: 13%; text-align: center;">Placement %</th>
+                            <th style="width: 10%; text-align: right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for dept in departments %}
+                        {% for item in departments_data %}
                             <tr>
                                 <td>
-                                    <span class="badge badge-code">{{ dept.code }}</span>
+                                    <span class="badge badge-code">{{ item.dept.code }}</span>
                                 </td>
                                 <td style="color: #fff; font-weight: 600;">
-                                    {{ dept.name }}
+                                    {{ item.dept.name }}
                                 </td>
-                                <td style="font-size: 0.9rem; color: var(--text-secondary);">
-                                    {% if dept.description %}
-                                        {{ dept.description }}
+                                <td style="color: var(--text-secondary); font-weight: 500;">
+                                    {% if item.dept.department_head %}
+                                        👨‍🏫 {{ item.dept.department_head }}
                                     {% else %}
-                                        <span style="color: var(--text-muted); font-style: italic;">No description provided</span>
+                                        <span style="color: var(--text-muted); font-style: italic;">Not assigned</span>
                                     {% endif %}
+                                </td>
+                                <td style="text-align: center; color: var(--text-secondary); font-weight: 600;">
+                                    {{ item.total_students }}
+                                </td>
+                                <td style="text-align: center; color: var(--text-secondary); font-weight: 600;">
+                                    {{ item.total_batches }}
+                                </td>
+                                <td style="text-align: center; font-weight: 700;">
+                                    <span class="badge {% if item.placement_pct >= 70 %}badge-green{% elif item.placement_pct >= 40 %}badge-amber{% else %}badge-sky{% endif %}">
+                                        {{ item.placement_pct }}%
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="table-actions" style="justify-content: flex-end;">
-                                        <a href="{% url 'departments:edit' pk=dept.pk %}" class="btn btn-secondary btn-xs">Edit</a>
-                                        <a href="{% url 'departments:delete' pk=dept.pk %}" class="btn btn-secondary btn-xs btn-danger-text">Delete</a>
+                                        <a href="{% url 'departments:edit' pk=item.dept.pk %}" class="btn btn-secondary btn-xs">Edit</a>
+                                        <a href="{% url 'departments:delete' pk=item.dept.pk %}" class="btn btn-secondary btn-xs btn-danger-text">Delete</a>
                                     </div>
                                 </td>
                             </tr>

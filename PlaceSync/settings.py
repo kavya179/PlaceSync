@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-npp+z(%(zk^^@blu99og$w^u2$ie81x86fuk0skpnz1l@i%c+c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'communication.apps.CommunicationConfig',
     'analytics.apps.AnalyticsConfig',
     'reports.apps.ReportsConfig',
+    'student_portal.apps.StudentPortalConfig',
 ]
 
 MIDDLEWARE = [

@@ -186,11 +186,46 @@ class BatchStudentImportView(LoginRequiredMixin, View):
             df = pd.read_csv(csv_file, dtype=str)
             
             # Clean headers: lowercase and stripped
-            df.columns = [str(c).strip().lower() for c in df.columns]
+            df.columns = [str(c).strip() for c in df.columns]
             
-            # Map required columns
-            required_cols = ['roll_number', 'name', 'email']
-            missing_cols = [c for c in required_cols if c not in df.columns]
+            # Map canonical column names to CSV columns dynamically
+            header_map = {}
+            for col in df.columns:
+                c = str(col).strip().lower().replace(' ', '_').replace('current_', '').replace('graduation_', 'passing_')
+                if c in ['enrollment_number', 'roll_number', 'enrollmentno', 'username']:
+                    header_map['roll_number'] = col
+                elif c in ['student_name', 'name', 'fullname']:
+                    header_map['name'] = col
+                elif c in ['email', 'email_address']:
+                    header_map['email'] = col
+                elif c in ['phone', 'phone_number', 'contact']:
+                    header_map['phone'] = col
+                elif c in ['department', 'dept']:
+                    header_map['department'] = col
+                elif c in ['semester', 'sem']:
+                    header_map['semester'] = col
+                elif c in ['division', 'div']:
+                    header_map['division'] = col
+                elif c in ['spi']:
+                    header_map['spi'] = col
+                elif c in ['cpi']:
+                    header_map['cpi'] = col
+                elif c in ['cgpa']:
+                    header_map['cgpa'] = col
+                elif c in ['backlogs', 'backlog', 'active_backlogs']:
+                    header_map['backlogs'] = col
+                elif c in ['passing_year', 'year']:
+                    header_map['passing_year'] = col
+
+            # Check required columns
+            missing_cols = []
+            if 'roll_number' not in header_map:
+                missing_cols.append("Enrollment Number")
+            if 'name' not in header_map:
+                missing_cols.append("Student Name")
+            if 'email' not in header_map:
+                missing_cols.append("Email")
+
             if missing_cols:
                 errors.append(f"CSV is missing required columns: {', '.join(missing_cols)}.")
                 return render(request, self.template_name, {'batch': batch, 'errors': errors})
@@ -200,75 +235,178 @@ class BatchStudentImportView(LoginRequiredMixin, View):
             for c in df.columns:
                 df[c] = df[c].str.strip()
 
-            # Ensure phone column exists
-            if 'phone' not in df.columns:
-                df['phone'] = ''
+            valid_students = []
+            failed_students = []
+            duplicate_students = []
 
-            # Rows validation
             rolls_seen = set()
             emails_seen = set()
-            valid_records = []
 
             for idx, row in df.iterrows():
                 row_num = idx + 2 # 1-based index + header row = idx + 2
-                roll = row['roll_number']
-                name = row['name']
-                email = row['email']
-                phone = row.get('phone', '')
+                
+                # Fetch row fields dynamically based on header mapping
+                roll = row[header_map['roll_number']].strip()
+                name = row[header_map['name']].strip()
+                email = row[header_map['email']].strip()
+                
+                phone = row[header_map['phone']].strip() if 'phone' in header_map else ''
+                dept_val = row[header_map['department']].strip() if 'department' in header_map else ''
+                sem_val = row[header_map['semester']].strip() if 'semester' in header_map else ''
+                div_val = row[header_map['division']].strip() if 'division' in header_map else ''
+                spi_val = row[header_map['spi']].strip() if 'spi' in header_map else ''
+                cpi_val = row[header_map['cpi']].strip() if 'cpi' in header_map else ''
+                cgpa_val = row[header_map['cgpa']].strip() if 'cgpa' in header_map else ''
+                backlog_val = row[header_map['backlogs']].strip() if 'backlogs' in header_map else ''
+                passing_val = row[header_map['passing_year']].strip() if 'passing_year' in header_map else ''
 
                 # Skip completely empty rows
-                if not roll and not name and not email and not phone:
+                if not any([roll, name, email]):
                     continue
 
+                row_errors = []
                 if not roll:
-                    errors.append(f"Row {row_num}: Roll Number is empty.")
+                    row_errors.append("Roll Number is empty.")
                 if not name:
-                    errors.append(f"Row {row_num}: Student Name is empty.")
+                    row_errors.append("Student Name is empty.")
                 if not email:
-                    errors.append(f"Row {row_num}: Email Address is empty.")
+                    row_errors.append("Email Address is empty.")
                 else:
                     try:
                         validate_email(email)
                     except ValidationError:
-                        errors.append(f"Row {row_num}: Email '{email}' is invalid.")
+                        row_errors.append(f"Email '{email}' is invalid.")
 
-                # Unique constraints in CSV itself
-                if roll:
-                    roll_lower = roll.lower()
+                # Parse and validate numbers / decimals
+                def parse_decimal(val, name_label):
+                    if not val:
+                        return None, None
+                    try:
+                        return float(val), None
+                    except ValueError:
+                        return None, f"Invalid {name_label} value '{val}'"
+
+                def parse_int(val, name_label):
+                    if not val:
+                        return None, None
+                    try:
+                        return int(val), None
+                    except ValueError:
+                        return None, f"Invalid {name_label} value '{val}'"
+
+                spi_num, err = parse_decimal(spi_val, "SPI")
+                if err: row_errors.append(err)
+                
+                cpi_num, err = parse_decimal(cpi_val, "CPI")
+                if err: row_errors.append(err)
+
+                cgpa_num, err = parse_decimal(cgpa_val, "CGPA")
+                if err: row_errors.append(err)
+
+                backlog_num, err = parse_int(backlog_val, "Backlogs")
+                if err: row_errors.append(err)
+
+                sem_num, err = parse_int(sem_val, "Semester")
+                if err: row_errors.append(err)
+
+                passing_num, err = parse_int(passing_val, "Passing Year")
+                if err: row_errors.append(err)
+
+                # Validation failure?
+                if row_errors:
+                    failed_students.append({
+                        'row_num': row_num,
+                        'roll_number': roll or '—',
+                        'name': name or '—',
+                        'email': email or '—',
+                        'errors': ', '.join(row_errors)
+                    })
+                    continue
+
+                # Check duplicates in CSV itself
+                roll_lower = roll.lower() if roll else ''
+                email_lower = email.lower() if email else ''
+                is_duplicate = False
+
+                if roll_lower:
                     if roll_lower in rolls_seen:
-                        errors.append(f"Row {row_num}: Duplicate Roll Number '{roll}' within CSV.")
+                        duplicate_students.append({
+                            'row_num': row_num,
+                            'roll_number': roll,
+                            'name': name,
+                            'email': email,
+                            'reason': f"Duplicate Roll Number '{roll}' within CSV."
+                        })
+                        is_duplicate = True
                     else:
                         rolls_seen.add(roll_lower)
 
-                if email:
-                    email_lower = email.lower()
+                if email_lower:
                     if email_lower in emails_seen:
-                        errors.append(f"Row {row_num}: Duplicate Email '{email}' within CSV.")
+                        if not is_duplicate:
+                            duplicate_students.append({
+                                'row_num': row_num,
+                                'roll_number': roll,
+                                'name': name,
+                                'email': email,
+                                'reason': f"Duplicate Email '{email}' within CSV."
+                            })
+                            is_duplicate = True
                     else:
                         emails_seen.add(email_lower)
 
-                # Database existence check
+                if is_duplicate:
+                    continue
+
+                # Check database existence check
+                db_dup_reason = []
                 if roll:
                     if Student.objects.filter(college=request.user.college, roll_number__iexact=roll).exists():
-                        errors.append(f"Row {row_num}: Roll Number '{roll}' is already registered in your college.")
+                        db_dup_reason.append(f"Roll Number '{roll}' is already registered in your college.")
                     if User.objects.filter(username__iexact=roll).exists():
-                        errors.append(f"Row {row_num}: Roll Number (Username) '{roll}' is already registered in the system.")
+                        db_dup_reason.append(f"Roll Number (Username) '{roll}' is already registered in the system.")
                 if email:
                     if User.objects.filter(email__iexact=email).exists():
-                        errors.append(f"Row {row_num}: Email '{email}' is already registered in the system.")
+                        db_dup_reason.append(f"Email '{email}' is already registered in the system.")
 
-                valid_records.append({
+                if db_dup_reason:
+                    duplicate_students.append({
+                        'row_num': row_num,
+                        'roll_number': roll,
+                        'name': name,
+                        'email': email,
+                        'reason': ', '.join(db_dup_reason)
+                    })
+                    continue
+
+                # Clean parsed records
+                valid_students.append({
                     'roll_number': roll,
                     'name': name,
                     'email': email,
-                    'phone': phone
+                    'phone': phone,
+                    'semester': sem_num or batch.semester or 1,
+                    'division': div_val or '',
+                    'spi': spi_num,
+                    'cpi': cpi_num,
+                    'cgpa': cgpa_num,
+                    'backlogs': backlog_num or 0,
+                    'passing_year': passing_num or batch.graduation_year or 2027
                 })
 
-            if errors:
-                return render(request, self.template_name, {'batch': batch, 'errors': errors[:50]}) # cap to first 50 errors
+            # If any validation errors or duplicate conflicts exist, block import at this stage
+            if failed_students or duplicate_students:
+                errors = []
+                for f in failed_students:
+                    errors.append(f"Row {f['row_num']}: {f['errors']}")
+                for d in duplicate_students:
+                    errors.append(f"Row {d.get('row_num', '—')}: {d['reason']}")
+                return render(request, self.template_name, {'batch': batch, 'errors': errors[:50]})
 
-            # Validation succeeded, save to session and redirect
-            request.session['import_preview_data'] = valid_records
+            # Save arrays to session (using canonical keys for test compatibility)
+            request.session['import_preview_data'] = valid_students
+            request.session['import_failed_data'] = failed_students
+            request.session['import_duplicate_data'] = duplicate_students
             request.session['import_default_password'] = default_password
 
             return redirect('batches:import_preview', pk=batch.pk)
@@ -278,39 +416,40 @@ class BatchStudentImportView(LoginRequiredMixin, View):
             return render(request, self.template_name, {'batch': batch, 'errors': errors})
 
 
-
 class BatchStudentImportPreviewView(LoginRequiredMixin, View):
     template_name = 'batches/student_import_preview.html'
 
     def get(self, request, pk, *args, **kwargs):
         batch = get_object_or_404(Batch, pk=pk, department__college=request.user.college)
-        records = request.session.get('import_preview_data')
+        valid_records = request.session.get('import_preview_data', [])
+        failed_records = request.session.get('import_failed_data', [])
+        duplicate_records = request.session.get('import_duplicate_data', [])
         default_password = request.session.get('import_default_password')
 
-        if not records or not default_password:
-            messages.error(request, "No import preview session found. Please upload CSV first.")
+        if default_password is None:
+            messages.error(request, "No import session found. Please upload CSV first.")
             return redirect('batches:import_students', pk=batch.pk)
 
         return render(request, self.template_name, {
             'batch': batch,
-            'records': records,
-            'total_count': len(records),
+            'valid_records': valid_records,
+            'failed_records': failed_records,
+            'duplicate_records': duplicate_records,
             'default_password': default_password
         })
 
     def post(self, request, pk, *args, **kwargs):
         batch = get_object_or_404(Batch, pk=pk, department__college=request.user.college)
-        records = request.session.get('import_preview_data')
+        records = request.session.get('import_preview_data', [])
         default_password = request.session.get('import_default_password')
 
-        if not records or not default_password:
+        if default_password is None:
             messages.error(request, "Import session expired or invalid. Please re-upload.")
             return redirect('batches:import_students', pk=batch.pk)
 
         college = request.user.college
-
-        # Database Insertion
         imported_list = []
+
         try:
             with transaction.atomic():
                 for row in records:
@@ -321,7 +460,7 @@ class BatchStudentImportPreviewView(LoginRequiredMixin, View):
 
                     # 1. Create custom User account
                     user = User.objects.create_user(
-                        username=roll, # Username is the Enrollment Number
+                        username=roll, # Enrollment Number as username
                         email=email,
                         password=default_password,
                         role=User.Role.STUDENT,
@@ -331,7 +470,7 @@ class BatchStudentImportPreviewView(LoginRequiredMixin, View):
                     user.save()
 
                     # 2. Create Student Profile
-                    student = Student.objects.create(
+                    Student.objects.create(
                         user=user,
                         college=college,
                         department=batch.department,
@@ -339,7 +478,13 @@ class BatchStudentImportPreviewView(LoginRequiredMixin, View):
                         roll_number=roll,
                         name=name,
                         email=email,
-                        phone=phone
+                        phone=phone,
+                        semester=row.get('semester', 1),
+                        division=row.get('division', ''),
+                        spi=row.get('spi'),
+                        cpi=row.get('cpi'),
+                        cgpa=row.get('cgpa'),
+                        backlogs=row.get('backlogs', 0)
                     )
                     
                     imported_list.append({
@@ -349,7 +494,9 @@ class BatchStudentImportPreviewView(LoginRequiredMixin, View):
                         'phone': phone
                     })
 
-            # Save report to session and clean temporary data
+            # Retrieve fails/dups from session and clear temp data
+            failed_students = request.session.pop('import_failed_data', [])
+            duplicate_students = request.session.pop('import_duplicate_data', [])
             request.session.pop('import_preview_data', None)
             request.session.pop('import_default_password', None)
             
@@ -357,13 +504,18 @@ class BatchStudentImportPreviewView(LoginRequiredMixin, View):
                 'batch_name': batch.name,
                 'total_imported': len(imported_list),
                 'default_password': default_password,
-                'students': imported_list
+                'students': imported_list, # For test suite compatibility
+                'imported': imported_list,
+                'failed': failed_students,
+                'duplicates': duplicate_students
             }
 
             messages.success(request, f"Imported {len(imported_list)} student accounts successfully.")
             return redirect('batches:import_report', pk=batch.pk)
 
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             messages.error(request, f"Database transaction failed: {str(e)}")
             return redirect('batches:import_preview', pk=batch.pk)
 

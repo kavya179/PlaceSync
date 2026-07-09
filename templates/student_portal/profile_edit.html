@@ -1,0 +1,143 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Edit Profile | PlaceSync{% endblock %}
+{% block topbar_title %}Edit Profile{% endblock %}
+{% block nav_skills %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">Edit Profile</h1>
+    <p class="sp-page-subtitle">Update your personal information, skills, and links</p>
+  </div>
+  <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary">&larr; Back to Profile</a>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+  <div>
+    <!-- Personal Details -->
+    <div class="sp-card" style="margin-bottom:1.25rem;">
+      <div class="sp-card-header">
+        <span class="sp-card-title">👤 Personal Details</span>
+      </div>
+      <form method="post" class="sp-card-body">
+        {% csrf_token %}
+
+        <div class="sp-form-group">
+          <label class="sp-form-label">Phone Number</label>
+          <input type="tel" name="phone" class="sp-form-input"
+                 placeholder="e.g. +91 9876543210" value="{{ student.phone }}">
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label">Bio / Introduction</label>
+          <textarea name="bio" class="sp-form-input" rows="3"
+                    placeholder="Write a short bio about yourself...">{{ student.bio }}</textarea>
+          <div class="sp-form-hint">This appears on your profile. Keep it professional.</div>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label">Address / City</label>
+          <input type="text" name="address" class="sp-form-input"
+                 placeholder="e.g. Pune, Maharashtra" value="{{ student.address }}">
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label">Skills</label>
+          <textarea name="skills" class="sp-form-input" rows="2"
+                    placeholder="Python, Django, SQL, Machine Learning, ...">{{ student.skills }}</textarea>
+          <div class="sp-form-hint">Separate skills with commas. Improves your ATS score.</div>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label">LinkedIn URL</label>
+          <input type="url" name="linkedin_url" class="sp-form-input"
+                 placeholder="https://linkedin.com/in/yourname" value="{{ student.linkedin_url }}">
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label">GitHub URL</label>
+          <input type="url" name="github_url" class="sp-form-input"
+                 placeholder="https://github.com/yourname" value="{{ student.github_url }}">
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label">Portfolio URL</label>
+          <input type="url" name="portfolio_url" class="sp-form-input"
+                 placeholder="https://yourportfolio.com" value="{{ student.portfolio_url }}">
+        </div>
+
+        <div style="display:flex;gap:.75rem;margin-top:1.5rem;">
+          <button type="submit" class="sp-btn sp-btn-primary">Save Changes</button>
+          <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right: Tips panel -->
+  <div>
+    <div class="sp-card" style="margin-bottom:1.25rem;">
+      <div class="sp-card-header"><span class="sp-card-title">💡 Profile Tips</span></div>
+      <div class="sp-card-body" style="display:flex;flex-direction:column;gap:1rem;">
+        <div style="display:flex;gap:.75rem;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;">📄</div>
+          <div>
+            <div style="font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.2rem;">Upload Resume</div>
+            <div style="font-size:.78rem;color:var(--txt-2);">ATS score jumps from 30 → 55+ with a resume. Upload PDF from your profile page.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:.75rem;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">💡</div>
+          <div>
+            <div style="font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.2rem;">Add Skills</div>
+            <div style="font-size:.78rem;color:var(--txt-2);">Each skill adds +2 to your ATS score. List at least 5 relevant skills.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:.75rem;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(56,189,248,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">🔗</div>
+          <div>
+            <div style="font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.2rem;">Social Links</div>
+            <div style="font-size:.78rem;color:var(--txt-2);">LinkedIn + GitHub each add +10 to ATS score. Recruiters look for these.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:.75rem;align-items:flex-start;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✍</div>
+          <div>
+            <div style="font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.2rem;">Write a Bio</div>
+            <div style="font-size:.78rem;color:var(--txt-2);">A professional summary makes your profile stand out. Keep it under 3 sentences.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read-only academic info -->
+    <div class="sp-card">
+      <div class="sp-card-header"><span class="sp-card-title">🎓 Academic Info (Read Only)</span></div>
+      <div class="sp-profile-info-card" style="border:none;">
+        <div class="sp-info-row">
+          <div class="sp-info-label">Roll Number</div>
+          <div class="sp-info-value" style="font-weight:600;color:#c4b5fd;">{{ student.roll_number }}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Department</div>
+          <div class="sp-info-value">{{ student.department.name }}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">Batch</div>
+          <div class="sp-info-value">{{ student.batch.name }}</div>
+        </div>
+        <div class="sp-info-row">
+          <div class="sp-info-label">CGPA</div>
+          <div class="sp-info-value">{% if student.cgpa %}{{ student.cgpa }}{% else %}—{% endif %}</div>
+        </div>
+      </div>
+      <div style="padding:.75rem 1.375rem;font-size:.75rem;color:var(--txt-3);">Academic details are managed by your TPO.</div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

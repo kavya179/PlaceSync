@@ -1,74 +1,106 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
-from django.db.models import Avg, Max, Count, Q
-from django.utils import timezone
+from django.db.models import Avg, Max
+
+from students.models import Student
+from departments.models import Department
+from batches.models import Batch
+from companies.models import Company
+from placements.models import PlacementDrive, Application
+from communication.models import Notification
 
 
 class DashboardIndexView(LoginRequiredMixin, View):
     template_name = 'dashboard/index.html'
 
     def get(self, request, *args, **kwargs):
+        # 1. Role Redirect: If user is a student, redirect to student portal dashboard
+        if hasattr(request.user, 'role') and request.user.role == 'STUDENT':
+            return redirect('student_portal:dashboard')
+
         college = getattr(request.user, 'college', None)
         stats = {}
-        recent_drives = []
-        recent_applications = []
+        upcoming_drives = []
+        latest_applications = []
 
-        try:
-            from students.models import StudentProfile
-            qs = StudentProfile.objects.filter(batch__college=college) if college else StudentProfile.objects.none()
-            stats['total_students'] = qs.count()
-            stats['placed_students'] = qs.filter(placement_status='placed').count()
-            total = stats['total_students'] or 1
-            stats['placement_ratio'] = round(stats['placed_students'] / total * 100, 1)
-            stats['avg_cgpa'] = round(qs.aggregate(a=Avg('cgpa'))['a'] or 0, 2)
-        except Exception:
-            stats.setdefault('total_students', 0)
-            stats.setdefault('placed_students', 0)
-            stats.setdefault('placement_ratio', 0)
-            stats.setdefault('avg_cgpa', 0)
+        if college:
+            # Total Students
+            total_students = Student.objects.filter(college=college).count()
+            stats['total_students'] = total_students
 
-        try:
-            from companies.models import Company
-            stats['total_companies'] = Company.objects.filter(college=college).count() if college else 0
-            stats['verified_companies'] = Company.objects.filter(
-                college=college, verification_status='verified'
-            ).count() if college else 0
-        except Exception:
-            stats.setdefault('total_companies', 0)
-            stats.setdefault('verified_companies', 0)
+            # Total Departments
+            stats['total_departments'] = Department.objects.filter(college=college).count()
 
-        try:
-            from placements.models import PlacementDrive, Application
-            drives_qs = PlacementDrive.objects.filter(college=college) if college else PlacementDrive.objects.none()
-            stats['active_drives'] = drives_qs.filter(status='active').count()
-            stats['total_drives'] = drives_qs.count()
-            stats['total_applications'] = Application.objects.filter(drive__college=college).count() if college else 0
-            recent_drives = list(drives_qs.order_by('-created_at')[:5])
-        except Exception:
-            stats.setdefault('active_drives', 0)
-            stats.setdefault('total_drives', 0)
-            stats.setdefault('total_applications', 0)
+            # Total Batches
+            stats['total_batches'] = Batch.objects.filter(department__college=college).count()
 
-        try:
-            from opportunities.models import Opportunity
-            stats['active_opportunities'] = Opportunity.objects.filter(
-                college=college, status='active'
-            ).count() if college else 0
-        except Exception:
-            stats.setdefault('active_opportunities', 0)
+            # Total Companies
+            stats['total_companies'] = Company.objects.filter(college=college).count()
 
-        try:
-            from communication.models import Notification
-            stats['unread_notifications'] = Notification.objects.filter(
-                college=college, is_read=False
-            ).count() if college else 0
-        except Exception:
-            stats.setdefault('unread_notifications', 0)
+            # Active Placement Drives
+            stats['active_drives'] = PlacementDrive.objects.filter(college=college, status='ACTIVE').count()
+
+            # Placed & Internship counts
+            placed_students = Student.objects.filter(
+                college=college,
+                placement_status__in=['PLACED', 'PLACED_AND_INTERN']
+            ).count()
+            stats['placed_students'] = placed_students
+
+            internship_students = Student.objects.filter(
+                college=college,
+                placement_status__in=['INTERN', 'PLACED_AND_INTERN']
+            ).count()
+            stats['internship_students'] = internship_students
+
+            # Placement Percentage
+            stats['placement_ratio'] = round((placed_students / total_students * 100), 1) if total_students > 0 else 0.0
+
+            # Salary packages (LPA)
+            placed_qs = Student.objects.filter(college=college, placement_status__in=['PLACED', 'PLACED_AND_INTERN'])
+            stats['highest_package'] = round(placed_qs.aggregate(Max('package_amount'))['package_amount__max'] or 0.0, 2)
+            stats['average_package'] = round(placed_qs.aggregate(Avg('package_amount'))['package_amount__avg'] or 0.0, 2)
+
+            # Stipends
+            intern_qs = Student.objects.filter(college=college, placement_status__in=['INTERN', 'PLACED_AND_INTERN'])
+            stats['highest_stipend'] = round(intern_qs.aggregate(Max('stipend_amount'))['stipend_amount__max'] or 0.0, 2)
+            stats['average_stipend'] = round(intern_qs.aggregate(Avg('stipend_amount'))['stipend_amount__avg'] or 0.0, 2)
+
+            # Pending Notifications (for the logged in College Admin user)
+            stats['unread_notifications'] = Notification.objects.filter(user=request.user, is_read=False).count()
+
+            # Upcoming Drives (drives with status UPCOMING)
+            upcoming_drives = PlacementDrive.objects.filter(
+                college=college,
+                status='UPCOMING'
+            ).select_related('company').order_by('-created_at')[:5]
+
+            # Latest Applications
+            latest_applications = Application.objects.filter(
+                drive__college=college
+            ).select_related('drive', 'drive__company', 'student').order_by('-applied_at')[:5]
+
+        else:
+            stats = {
+                'total_students': 0,
+                'total_departments': 0,
+                'total_batches': 0,
+                'total_companies': 0,
+                'active_drives': 0,
+                'placed_students': 0,
+                'internship_students': 0,
+                'placement_ratio': 0.0,
+                'highest_package': 0.0,
+                'average_package': 0.0,
+                'highest_stipend': 0.0,
+                'average_stipend': 0.0,
+                'unread_notifications': 0,
+            }
 
         context = {
             'stats': stats,
-            'recent_drives': recent_drives,
-            'recent_applications': recent_applications,
+            'upcoming_drives': upcoming_drives,
+            'latest_applications': latest_applications,
         }
         return render(request, self.template_name, context)

@@ -13,6 +13,16 @@ class Batch(models.Model):
     graduation_year = models.PositiveIntegerField(
         help_text="e.g. 2027"
     )
+    semester = models.PositiveSmallIntegerField(
+        default=1,
+        help_text="Current Semester (e.g. 1 to 8)"
+    )
+    division = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="e.g. Division A"
+    )
+    description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

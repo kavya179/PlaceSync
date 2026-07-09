@@ -1,0 +1,119 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Smart Recommendations | PlaceSync{% endblock %}
+{% block topbar_title %}Smart Recommendations{% endblock %}
+{% block nav_recommendations %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">💡 AI Smart Recommendations</h1>
+    <p class="sp-page-subtitle">Personalized job matches comparing profile skills, resume analyses, CGPA, and project history</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Tabs Navigation (Pure URL parameters, No JS)
+════════════════════════════════════════════════════ -->
+{% with tab=request.GET.tab|default:"jobs" %}
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+  
+  <div style="display:flex;gap:.5rem;background:rgba(255,255,255,.02);border:1px solid var(--border);padding:.3rem;border-radius:var(--r-md);">
+    <a href="?tab=jobs" class="sp-btn sp-btn-sm {% if tab == 'jobs' %}sp-btn-primary{% else %}sp-btn-secondary{% endif %}" style="padding:.45rem 1.25rem;font-size:.85rem;">💻 Recommended Jobs ({{ total_jobs_count }})</a>
+    <a href="?tab=internships" class="sp-btn sp-btn-sm {% if tab == 'internships' %}sp-btn-primary{% else %}sp-btn-secondary{% endif %}" style="padding:.45rem 1.25rem;font-size:.85rem;">🚀 Recommended Internships ({{ total_interns_count }})</a>
+    <a href="?tab=companies" class="sp-btn sp-btn-sm {% if tab == 'companies' %}sp-btn-primary{% else %}sp-btn-secondary{% endif %}" style="padding:.45rem 1.25rem;font-size:.85rem;">🏢 Top Match Companies ({{ total_companies_count }})</a>
+  </div>
+
+  <div style="font-size:.76rem;color:var(--txt-3);display:flex;align-items:center;gap:.35rem;">
+    <span>⚡ Core Profile Analysis: Verified</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Tab Content rendering
+════════════════════════════════════════════════════ -->
+{% if tab == 'jobs' %}
+  <!-- RECOMMENDED JOBS LIST -->
+  {% if recommended_jobs %}
+    <div style="display:grid;grid-template-columns:1fr;gap:1.25rem;">
+      {% for item in recommended_jobs %}
+        {% include "student_portal/recommendation_card.html" with opp=item %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="sp-card">
+      <div class="sp-empty" style="padding:4rem 2rem;">
+        <div class="sp-empty-icon">💼</div>
+        <div class="sp-empty-text">No job recommendations yet</div>
+        <div class="sp-empty-sub">We could not find matching jobs. Ensure you complete your profile skills and upload a CV.</div>
+      </div>
+    </div>
+  {% endif %}
+
+{% elif tab == 'internships' %}
+  <!-- RECOMMENDED INTERNSHIPS LIST -->
+  {% if recommended_internships %}
+    <div style="display:grid;grid-template-columns:1fr;gap:1.25rem;">
+      {% for item in recommended_internships %}
+        {% include "student_portal/recommendation_card.html" with opp=item %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="sp-card">
+      <div class="sp-empty" style="padding:4rem 2rem;">
+        <div class="sp-empty-icon">🚀</div>
+        <div class="sp-empty-text">No internship recommendations yet</div>
+        <div class="sp-empty-sub">Ensure you fill in skills to see custom recommended internships.</div>
+      </div>
+    </div>
+  {% endif %}
+
+{% elif tab == 'companies' %}
+  <!-- RECOMMENDED COMPANIES LIST -->
+  {% if recommended_companies %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1.25rem;">
+      {% for comp in recommended_companies %}
+        <div class="sp-card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between; border-left:4px solid 
+          {% if comp.match_pct >= 85 %}var(--green){% elif comp.match_pct >= 70 %}var(--amber){% else %}var(--border){% endif %};">
+          <div class="sp-card-body" style="padding:1.25rem;">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:.75rem;">
+              <div>
+                <h4 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:.2rem;">{{ comp.name }}</h4>
+                <span style="font-size:.74rem;color:var(--txt-3);">📍 {{ comp.location }}</span>
+              </div>
+              <div style="font-size:1.05rem;font-weight:800;color:
+                {% if comp.match_pct >= 85 %}#34d399{% elif comp.match_pct >= 70 %}#fbbf24{% else %}var(--txt-2){% endif %}; font-family:'Space Grotesk',sans-serif;">
+                {{ comp.match_pct }}%
+              </div>
+            </div>
+            
+            <div style="border-top:1px solid rgba(255,255,255,.03);padding-top:.75rem;margin-top:.75rem;">
+              <span style="font-size:.7rem;text-transform:uppercase;color:var(--txt-3);font-weight:700;letter-spacing:.05em;display:block;margin-bottom:.35rem;">Why this company?</span>
+              <ul style="margin:0;padding-left:1rem;font-size:.76rem;color:var(--txt-2);line-height:1.45;display:flex;flex-direction:column;gap:.25rem;">
+                {% for r in comp.reasons %}
+                  <li>{{ r }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="sp-card">
+      <div class="sp-empty" style="padding:4rem 2rem;">
+        <div class="sp-empty-icon">🏢</div>
+        <div class="sp-empty-text">No companies mapped</div>
+        <div class="sp-empty-sub">Import companies or run opportunity scrapes to trigger analytics.</div>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+
+{% endwith %}
+
+{% endblock %}

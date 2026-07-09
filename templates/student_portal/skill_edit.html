@@ -1,0 +1,97 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Edit Skill | PlaceSync{% endblock %}
+{% block topbar_title %}Edit Skill{% endblock %}
+{% block nav_skills %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">✏️ Edit Skill</h1>
+    <p class="sp-page-subtitle">Update the details for <strong style="color:#c4b5fd;">{{ skill.name }}</strong></p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:skills' %}" class="sp-btn sp-btn-secondary">← Back to Skills</a>
+  </div>
+</div>
+
+<div style="max-width:540px;margin:0 auto;">
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">{{ skill.category_icon }} {{ skill.name }}</span>
+      <span class="sp-badge {{ skill.proficiency_css }}">{{ skill.get_proficiency_display }}</span>
+    </div>
+    <div class="sp-card-body">
+
+      <!-- Current Progress Preview -->
+      <div style="margin-bottom:1.5rem;padding:1rem;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.18);border-radius:var(--r-md);">
+        <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--txt-2);margin-bottom:.5rem;">
+          <span>Current Proficiency</span>
+          <span style="color:#c4b5fd;font-weight:600;">{{ skill.proficiency_pct }}%</span>
+        </div>
+        <div class="sp-bar-wrap">
+          <div class="sp-bar-fill {{ skill.bar_color_css }}" style="width:{{ skill.proficiency_pct }}%"></div>
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'student_portal:skill_edit' skill.pk %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="sp-alert sp-alert-error" style="margin-bottom:1rem;">
+          {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="{{ form.name.id_for_label }}">
+            Skill Name <span style="color:var(--red);">*</span>
+          </label>
+          {{ form.name }}
+          {% if form.name.errors %}
+          <div class="sp-form-error">{{ form.name.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="{{ form.category.id_for_label }}">
+            Category <span style="color:var(--red);">*</span>
+          </label>
+          {{ form.category }}
+          {% if form.category.errors %}
+          <div class="sp-form-error">{{ form.category.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="{{ form.proficiency.id_for_label }}">
+            Proficiency Level <span style="color:var(--red);">*</span>
+          </label>
+          {{ form.proficiency }}
+          {% if form.proficiency.errors %}
+          <div class="sp-form-error">{{ form.proficiency.errors.0 }}</div>
+          {% endif %}
+          <div class="sp-form-hint">Beginner → Intermediate → Advanced</div>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="{{ form.description.id_for_label }}">
+            Short Note <span style="color:var(--txt-3);font-weight:400;">(optional)</span>
+          </label>
+          {{ form.description }}
+          {% if form.description.errors %}
+          <div class="sp-form-error">{{ form.description.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div style="display:flex;gap:.75rem;margin-top:.5rem;">
+          <button type="submit" class="sp-btn sp-btn-primary" style="flex:1;">Save Changes</button>
+          <a href="{% url 'student_portal:skills' %}" class="sp-btn sp-btn-secondary" style="flex:1;text-align:center;">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

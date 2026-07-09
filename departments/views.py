@@ -21,11 +21,26 @@ class DepartmentListView(LoginRequiredMixin, View):
         q = request.GET.get('q', '').strip()
         if q:
             departments = departments.filter(
-                Q(name__icontains=q) | Q(code__icontains=q)
+                Q(name__icontains=q) | Q(code__icontains=q) | Q(department_head__icontains=q)
             )
             
+        departments_data = []
+        for dept in departments:
+            total_students = dept.students.count()
+            total_batches = dept.batches.count()
+            placed_students = dept.students.filter(
+                placement_status__in=['PLACED', 'PLACED_AND_INTERN']
+            ).count()
+            pct = round((placed_students / total_students * 100), 1) if total_students > 0 else 0.0
+            departments_data.append({
+                'dept': dept,
+                'total_students': total_students,
+                'total_batches': total_batches,
+                'placement_pct': pct
+            })
+
         return render(request, self.template_name, {
-            'departments': departments,
+            'departments_data': departments_data,
             'q': q
         })
 

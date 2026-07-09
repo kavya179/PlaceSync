@@ -4,8 +4,9 @@ from .models import Department
 class DepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
-        fields = ['name', 'code', 'description']
+        fields = ['name', 'code', 'department_head', 'description']
         widgets = {
+            'department_head': forms.TextInput(attrs={'placeholder': 'Name of Head of Department'}),
             'description': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Optional brief description'}),
         }
 

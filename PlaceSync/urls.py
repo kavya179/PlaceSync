@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import RedirectView
+from accounts.views import HomeView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,7 +34,8 @@ urlpatterns = [
     path('communication/', include('communication.urls')),
     path('reports/', include('reports.urls')),
     path('analytics/', include('analytics.urls')),
-    path('', RedirectView.as_view(pattern_name='dashboard:index', permanent=False)),
+    path('student/', include('student_portal.urls')),
+    path('', HomeView.as_view(), name='home'),
 ]
 
 

@@ -1,0 +1,193 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{% if is_edit %}Edit Project | PlaceSync{% else %}Add Project | PlaceSync{% endif %}{% endblock %}
+{% block topbar_title %}{% if is_edit %}Edit Project{% else %}Add Project{% endif %}{% endblock %}
+{% block nav_projects %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">{% if is_edit %}✏️ Edit Project{% else %}➕ Add New Project{% endif %}</h1>
+    <p class="sp-page-subtitle">Configure your developer portfolio showcase and calculate your score</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:projects_list' %}" class="sp-btn sp-btn-secondary">Cancel</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Form Grid
+════════════════════════════════════════════════════ -->
+<div style="max-width: 900px; margin: 0 auto 3rem;">
+  <form method="post" class="sp-card" style="box-shadow: 0 16px 40px rgba(0,0,0,0.3);">
+    {% csrf_token %}
+
+    <div class="sp-card-body" style="padding: 2rem; display:flex; flex-direction:column; gap:2rem;">
+      
+      <!-- Field errors if any -->
+      {% if form.non_field_errors %}
+      <div class="sp-alert sp-alert-error">
+        <span>{{ form.non_field_errors }}</span>
+      </div>
+      {% endif %}
+
+      <!-- SECTION 1: Core Details -->
+      <div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; color:#c4b5fd; font-size:1.1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem; margin-bottom:1.25rem;">
+          📋 Core Project Details
+        </h3>
+        
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_title">Project Title <span style="color:var(--red);">*</span></label>
+          {{ form.title }}
+          {% if form.title.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.title.errors }}</div>{% endif %}
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_category">Category <span style="color:var(--red);">*</span></label>
+            {{ form.category }}
+            {% if form.category.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.category.errors }}</div>{% endif %}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_project_type">Project Type <span style="color:var(--red);">*</span></label>
+            {{ form.project_type }}
+            {% if form.project_type.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.project_type.errors }}</div>{% endif %}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_status">Status <span style="color:var(--red);">*</span></label>
+            {{ form.status }}
+            {% if form.status.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.status.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_short_description">Short Tagline Description <span style="color:var(--red);">*</span></label>
+          {{ form.short_description }}
+          {% if form.short_description.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.short_description.errors }}</div>{% endif %}
+          <small style="color:var(--txt-3); font-size:0.72rem;">Maximum 500 characters. Summarize the target goal of your project.</small>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_detailed_description">Detailed Project Description <span style="color:var(--red);">*</span></label>
+          {{ form.detailed_description }}
+          {% if form.detailed_description.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.detailed_description.errors }}</div>{% endif %}
+          <small style="color:var(--txt-3); font-size:0.72rem;">Explain details of project architectures, deployment structure, and backend services. (+5 points to Score)</small>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_technologies">Technologies <span style="color:var(--red);">*</span></label>
+          {{ form.technologies }}
+          {% if form.technologies.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.technologies.errors }}</div>{% endif %}
+          <small style="color:var(--txt-3); font-size:0.72rem;">Comma-separated values e.g. Python, Django, PostgreSQL, HTML, CSS. (+5 points for 5+ technologies)</small>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:2rem; margin-top:0.5rem; background:rgba(124,58,237,0.05); padding:1rem; border-radius:var(--r-md); border:1px solid rgba(124,58,237,0.15);">
+          <div style="display:flex; align-items:center;">
+            {{ form.is_featured }}
+            <label for="id_featured" style="font-size:0.84rem; font-weight:600; color:#fff; cursor:pointer;">🌟 Mark as Featured Project</label>
+          </div>
+          <p style="font-size:0.72rem; color:var(--txt-2); margin-bottom:0; flex:1;">
+            Featured projects will appear first in recruiters' search results and count for +5 portfolio points. Only one project can be featured.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- SECTION 2: Project Links -->
+      <div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; color:#c4b5fd; font-size:1.1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem; margin-bottom:1.25rem;">
+          🔗 Project Showcase &amp; Repository Links
+        </h3>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_github_url">GitHub Repository URL</label>
+            {{ form.github_url }}
+            <small style="color:var(--txt-3); font-size:0.72rem;">(+10 points)</small>
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_live_url">Live Demo URL</label>
+            {{ form.live_url }}
+            <small style="color:var(--txt-3); font-size:0.72rem;">(+10 points)</small>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_youtube_url">YouTube Video Demo URL</label>
+            {{ form.youtube_url }}
+            <small style="color:var(--txt-3); font-size:0.72rem;">(+5 points)</small>
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_documentation_url">Documentation Website URL</label>
+            {{ form.documentation_url }}
+            <small style="color:var(--txt-3); font-size:0.72rem;">(+5 points)</small>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_figma_url">Figma Design URL</label>
+            {{ form.figma_url }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_google_drive_url">Google Drive folder/report URL</label>
+            {{ form.google_drive_url }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_portfolio_url">Portfolio Website URL</label>
+            {{ form.portfolio_url }}
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_play_store_url">Google Play Store App URL</label>
+            {{ form.play_store_url }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_app_store_url">Apple App Store App URL</label>
+            {{ form.app_store_url }}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 3: Features & Achievements -->
+      <div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; color:#c4b5fd; font-size:1.1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem; margin-bottom:1.25rem;">
+          💡 Key Features &amp; Project Achievements
+        </h3>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_key_features">Key Project Features</label>
+          {{ form.key_features }}
+          <small style="color:var(--txt-3); font-size:0.72rem;">Enter multiple features separated by commas e.g. User Authentication, REST API, Payment Gateway.</small>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_achievements">Achievements &amp; Accolades</label>
+          {{ form.achievements }}
+          <small style="color:var(--txt-3); font-size:0.72rem;">Comma-separated entries e.g. Hackathon Winner, Innovation Award, Final Year Project.</small>
+        </div>
+
+      </div>
+
+      <!-- SUBMIT BUTTONS -->
+      <div style="border-top:1px solid var(--border); padding-top:1.5rem; display:flex; gap:1rem; justify-content:flex-end;">
+        <a href="{% url 'student_portal:projects_list' %}" class="sp-btn sp-btn-secondary" style="padding:0.75rem 2rem;">Cancel</a>
+        <button type="submit" class="sp-btn sp-btn-primary" style="padding:0.75rem 2.5rem;">
+          {% if is_edit %}Save Project Changes{% else %}Publish Project Portfolio{% endif %}
+        </button>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+{% endblock %}

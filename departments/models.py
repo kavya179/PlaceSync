@@ -12,6 +12,11 @@ class Department(models.Model):
         help_text="e.g. CSE, ECE, ME"
     )
     description = models.TextField(blank=True)
+    department_head = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Name of Head of Department"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

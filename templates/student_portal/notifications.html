@@ -1,0 +1,54 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Notifications | PlaceSync{% endblock %}
+{% block topbar_title %}Notifications{% endblock %}
+{% block nav_notif %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">Notifications</h1>
+    <p class="sp-page-subtitle">
+      {% if unread_count %}{{ unread_count }} unread notification{{ unread_count|pluralize }}{% else %}All caught up!{% endif %}
+    </p>
+  </div>
+</div>
+
+{% if notifications %}
+<div class="sp-card">
+  {% for notif in notifications %}
+  <div class="sp-notif-item {% if not notif.is_read %}unread{% endif %}">
+    {% if not notif.is_read %}
+      <div class="sp-notif-dot-indicator"></div>
+    {% else %}
+      <div style="width:8px;flex-shrink:0;"></div>
+    {% endif %}
+    <div style="flex:1;">
+      <div class="sp-notif-title">{{ notif.title }}</div>
+      <div class="sp-notif-msg">{{ notif.message }}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;">
+        <div class="sp-notif-time">{{ notif.created_at|date:"M d, Y · H:i" }}</div>
+        {% if not notif.is_read %}
+        <form method="post" action="{% url 'student_portal:notification_read' notif.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="sp-btn sp-btn-secondary sp-btn-xs">Mark Read</button>
+        </form>
+        {% else %}
+          <span class="sp-badge sp-badge-gray" style="font-size:.65rem;">Read</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="sp-empty" style="padding:5rem 2rem;">
+  <div class="sp-empty-icon">🔔</div>
+  <div class="sp-empty-text">No notifications yet</div>
+  <div class="sp-empty-sub">Your TPO will send notifications about placement drives and updates here.</div>
+</div>
+{% endif %}
+
+{% endblock %}

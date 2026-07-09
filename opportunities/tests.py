@@ -174,9 +174,12 @@ class OpportunityDiscoveryTestCase(TestCase):
         # Submit drive creation form
         response = self.client.post(drive_url, {
             'company': company.pk,
+            'drive_type': 'JOB',
             'role': 'Production Engineer',
             'package_amount': '45.0',
             'job_mode': 'HYBRID',
+            'min_cgpa': '0.00',
+            'max_backlogs': '0',
             'deadline': '2026-11-20',
             'status': 'ACTIVE'
         })

@@ -139,8 +139,8 @@ class AnalyticsDashboardView(LoginRequiredMixin, View):
             'batch_chart': batch_chart,
             'student_chart': student_chart,
             'company_chart': company_chart,
-            'dept_data': zip(dept_names, dept_avg_packages, dept_ratios),
-            'batch_data': zip(batch_names, batch_ratios),
-            'company_data': zip(c_names, c_hires)
+            'dept_data': list(zip(dept_names, dept_avg_packages, dept_ratios)),
+            'batch_data': list(zip(batch_names, batch_ratios)),
+            'company_data': list(zip(c_names, c_hires))
         }
         return render(request, self.template_name, context)

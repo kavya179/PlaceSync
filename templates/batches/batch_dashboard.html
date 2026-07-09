@@ -9,7 +9,17 @@
     <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
         <div>
             <h1 class="dashboard-title">{{ batch.name }} Dashboard</h1>
-            <p class="dashboard-welcome">Department: <strong style="color: #fff;">{{ batch.department.name }} ({{ batch.department.code }})</strong> | Graduating Class of <strong style="color: var(--primary);">{{ batch.graduation_year }}</strong></p>
+            <p class="dashboard-welcome">
+                Department: <strong style="color: #fff;">{{ batch.department.name }} ({{ batch.department.code }})</strong> | 
+                Passing Year: <strong style="color: var(--primary);">{{ batch.graduation_year }}</strong> | 
+                Semester: <strong style="color: var(--info);">{{ batch.semester }}</strong> | 
+                Division: <strong style="color: var(--warning);">{% if batch.division %}{{ batch.division }}{% else %}—{% endif %}</strong>
+            </p>
+            {% if batch.description %}
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; max-width: 800px; line-height: 1.5;">
+                {{ batch.description }}
+            </p>
+            {% endif %}
         </div>
         <div>
             <a href="{% url 'batches:import_students' pk=batch.pk %}" class="btn btn-primary" style="margin-right: 0.5rem; background: var(--info); border-color: var(--info);">Import Students</a>

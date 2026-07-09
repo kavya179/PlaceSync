@@ -5,10 +5,13 @@ from departments.models import Department
 class BatchForm(forms.ModelForm):
     class Meta:
         model = Batch
-        fields = ['department', 'name', 'graduation_year']
+        fields = ['department', 'name', 'graduation_year', 'semester', 'division', 'description']
         widgets = {
             'graduation_year': forms.NumberInput(attrs={'placeholder': 'e.g. 2027'}),
             'name': forms.TextInput(attrs={'placeholder': 'e.g. 2027 Information Technology'}),
+            'semester': forms.NumberInput(attrs={'placeholder': 'e.g. 8', 'min': 1, 'max': 8}),
+            'division': forms.TextInput(attrs={'placeholder': 'e.g. A'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Optional brief description'}),
         }
 
     def __init__(self, *args, **kwargs):

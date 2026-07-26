@@ -3,6 +3,7 @@ from .views import (
     StudentDashboardView,
     StudentProfileView,
     StudentProfileEditView,
+    StudentAcademicProfileView,
     StudentDrivesView,
     StudentDriveDetailView,
     StudentBookmarkToggleView,
@@ -44,6 +45,14 @@ from .views import (
     DeleteJourneyActivityView,
     TechnicalLinksUpdateView,
     RecruiterDeveloperJourneyView,
+    # Certificates
+    StudentCertificatesListView,
+    StudentCertificateCreateView,
+    StudentCertificateDetailView,
+    StudentCertificateUpdateView,
+    StudentCertificateDeleteView,
+    RecruiterCertificatesListView,
+    RecruiterCertificateDetailView,
 )
 
 app_name = 'student_portal'
@@ -52,6 +61,7 @@ urlpatterns = [
     path('',                                  StudentDashboardView.as_view(),             name='dashboard'),
     path('profile/',                          StudentProfileView.as_view(),               name='profile'),
     path('profile/edit/',                     StudentProfileEditView.as_view(),           name='profile_edit'),
+    path('profile/academic/',                 StudentAcademicProfileView.as_view(),       name='academic_profile'),
     
     # Resume Management & ATS Analysis
     path('resume/',                           StudentResumeDashboardView.as_view(),       name='resume_dashboard'),
@@ -106,4 +116,13 @@ urlpatterns = [
     path('journey/edit/<str:activity_type>/<int:pk>/', EditJourneyActivityView.as_view(), name='journey_edit'),
     path('journey/delete/<str:activity_type>/<int:pk>/', DeleteJourneyActivityView.as_view(), name='journey_delete'),
     path('portfolio/journey/<int:student_id>/', RecruiterDeveloperJourneyView.as_view(),  name='recruiter_journey'),
+
+    # Certificates
+    path('certificates/',                     StudentCertificatesListView.as_view(),      name='certificates_list'),
+    path('certificates/add/',                 StudentCertificateCreateView.as_view(),     name='certificate_create'),
+    path('certificates/<int:pk>/',            StudentCertificateDetailView.as_view(),     name='certificate_detail'),
+    path('certificates/<int:pk>/edit/',       StudentCertificateUpdateView.as_view(),     name='certificate_edit'),
+    path('certificates/<int:pk>/delete/',     StudentCertificateDeleteView.as_view(),     name='certificate_delete'),
+    path('portfolio/certificates/<int:student_id>/', RecruiterCertificatesListView.as_view(), name='recruiter_certificates'),
+    path('portfolio/certificate/<int:pk>/',   RecruiterCertificateDetailView.as_view(),   name='recruiter_certificate_detail'),
 ]

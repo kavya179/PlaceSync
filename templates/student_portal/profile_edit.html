@@ -1,143 +1,231 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}Edit Profile | PlaceSync{% endblock %}
+{% block title %}Edit Personal Profile | PlaceSync{% endblock %}
 {% block topbar_title %}Edit Profile{% endblock %}
-{% block nav_skills %}active{% endblock %}
+{% block nav_profile_open %}open{% endblock %}{% block nav_profile_parent %}active{% endblock %}{% block nav_personal_profile %}active{% endblock %}
 
 {% block content %}
 
+<!-- Form Header -->
 <div class="sp-page-header">
   <div>
-    <h1 class="sp-page-title">Edit Profile</h1>
-    <p class="sp-page-subtitle">Update your personal information, skills, and links</p>
+    <h1 class="sp-page-title">✏️ Edit Personal Profile</h1>
+    <p class="sp-page-subtitle">Update your personal contact details, online profiles and career preferences.</p>
   </div>
-  <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary">&larr; Back to Profile</a>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary">⬅️ Back to Profile</a>
+  </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+<form method="post" enctype="multipart/form-data" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem; margin-bottom: 4rem; align-items: start;">
+  {% csrf_token %}
 
-  <div>
-    <!-- Personal Details -->
-    <div class="sp-card" style="margin-bottom:1.25rem;">
+  <!-- Left Side: Form Blocks -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    
+    {% if form.non_field_errors %}
+    <div class="sp-alert sp-alert-error">
+      <span>{{ form.non_field_errors }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Section 1: Personal Details -->
+    <div class="sp-card">
       <div class="sp-card-header">
         <span class="sp-card-title">👤 Personal Details</span>
       </div>
-      <form method="post" class="sp-card-body">
-        {% csrf_token %}
-
-        <div class="sp-form-group">
-          <label class="sp-form-label">Phone Number</label>
-          <input type="tel" name="phone" class="sp-form-input"
-                 placeholder="e.g. +91 9876543210" value="{{ student.phone }}">
-        </div>
-
-        <div class="sp-form-group">
-          <label class="sp-form-label">Bio / Introduction</label>
-          <textarea name="bio" class="sp-form-input" rows="3"
-                    placeholder="Write a short bio about yourself...">{{ student.bio }}</textarea>
-          <div class="sp-form-hint">This appears on your profile. Keep it professional.</div>
-        </div>
-
-        <div class="sp-form-group">
-          <label class="sp-form-label">Address / City</label>
-          <input type="text" name="address" class="sp-form-input"
-                 placeholder="e.g. Pune, Maharashtra" value="{{ student.address }}">
-        </div>
-
-        <div class="sp-form-group">
-          <label class="sp-form-label">Skills</label>
-          <textarea name="skills" class="sp-form-input" rows="2"
-                    placeholder="Python, Django, SQL, Machine Learning, ...">{{ student.skills }}</textarea>
-          <div class="sp-form-hint">Separate skills with commas. Improves your ATS score.</div>
-        </div>
-
-        <div class="sp-form-group">
-          <label class="sp-form-label">LinkedIn URL</label>
-          <input type="url" name="linkedin_url" class="sp-form-input"
-                 placeholder="https://linkedin.com/in/yourname" value="{{ student.linkedin_url }}">
-        </div>
-
-        <div class="sp-form-group">
-          <label class="sp-form-label">GitHub URL</label>
-          <input type="url" name="github_url" class="sp-form-input"
-                 placeholder="https://github.com/yourname" value="{{ student.github_url }}">
-        </div>
-
-        <div class="sp-form-group">
-          <label class="sp-form-label">Portfolio URL</label>
-          <input type="url" name="portfolio_url" class="sp-form-input"
-                 placeholder="https://yourportfolio.com" value="{{ student.portfolio_url }}">
-        </div>
-
-        <div style="display:flex;gap:.75rem;margin-top:1.5rem;">
-          <button type="submit" class="sp-btn sp-btn-primary">Save Changes</button>
-          <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary">Cancel</a>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Right: Tips panel -->
-  <div>
-    <div class="sp-card" style="margin-bottom:1.25rem;">
-      <div class="sp-card-header"><span class="sp-card-title">💡 Profile Tips</span></div>
-      <div class="sp-card-body" style="display:flex;flex-direction:column;gap:1rem;">
-        <div style="display:flex;gap:.75rem;align-items:flex-start;">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,.13);display:flex;align-items:center;justify-content:center;flex-shrink:0;">📄</div>
-          <div>
-            <div style="font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.2rem;">Upload Resume</div>
-            <div style="font-size:.78rem;color:var(--txt-2);">ATS score jumps from 30 → 55+ with a resume. Upload PDF from your profile page.</div>
+      <div class="sp-card-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.photo.id_for_label }}">Profile Picture</label>
+            {{ form.photo }}
+            {% if form.photo.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.photo.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.name.id_for_label }}">Full Name *</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.name.errors.0 }}</div>
+            {% endif %}
           </div>
         </div>
-        <div style="display:flex;gap:.75rem;align-items:flex-start;">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">💡</div>
-          <div>
-            <div style="font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.2rem;">Add Skills</div>
-            <div style="font-size:.78rem;color:var(--txt-2);">Each skill adds +2 to your ATS score. List at least 5 relevant skills.</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.email.id_for_label }}">Email Address *</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.email.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.phone.id_for_label }}">Phone Number</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.phone.errors.0 }}</div>
+            {% endif %}
           </div>
         </div>
-        <div style="display:flex;gap:.75rem;align-items:flex-start;">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(56,189,248,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">🔗</div>
-          <div>
-            <div style="font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.2rem;">Social Links</div>
-            <div style="font-size:.78rem;color:var(--txt-2);">LinkedIn + GitHub each add +10 to ATS score. Recruiters look for these.</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+            {{ form.date_of_birth }}
+            {% if form.date_of_birth.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.date_of_birth.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.gender.id_for_label }}">Gender</label>
+            {{ form.gender }}
+            {% if form.gender.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.gender.errors.0 }}</div>
+            {% endif %}
           </div>
         </div>
-        <div style="display:flex;gap:.75rem;align-items:flex-start;">
-          <div style="width:32px;height:32px;border-radius:8px;background:rgba(245,158,11,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">✍</div>
-          <div>
-            <div style="font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.2rem;">Write a Bio</div>
-            <div style="font-size:.78rem;color:var(--txt-2);">A professional summary makes your profile stand out. Keep it under 3 sentences.</div>
-          </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="{{ form.address.id_for_label }}">Contact Address</label>
+          {{ form.address }}
+          {% if form.address.errors %}
+          <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.address.errors.0 }}</div>
+          {% endif %}
         </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="{{ form.bio.id_for_label }}">Bio / About Me</label>
+          {{ form.bio }}
+          {% if form.bio.errors %}
+          <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.bio.errors.0 }}</div>
+          {% endif %}
+        </div>
+
       </div>
     </div>
 
-    <!-- Read-only academic info -->
+    <!-- Section 2: Social Profiles -->
     <div class="sp-card">
-      <div class="sp-card-header"><span class="sp-card-title">🎓 Academic Info (Read Only)</span></div>
-      <div class="sp-profile-info-card" style="border:none;">
-        <div class="sp-info-row">
-          <div class="sp-info-label">Roll Number</div>
-          <div class="sp-info-value" style="font-weight:600;color:#c4b5fd;">{{ student.roll_number }}</div>
-        </div>
-        <div class="sp-info-row">
-          <div class="sp-info-label">Department</div>
-          <div class="sp-info-value">{{ student.department.name }}</div>
-        </div>
-        <div class="sp-info-row">
-          <div class="sp-info-label">Batch</div>
-          <div class="sp-info-value">{{ student.batch.name }}</div>
-        </div>
-        <div class="sp-info-row">
-          <div class="sp-info-label">CGPA</div>
-          <div class="sp-info-value">{% if student.cgpa %}{{ student.cgpa }}{% else %}—{% endif %}</div>
-        </div>
+      <div class="sp-card-header">
+        <span class="sp-card-title">🌐 Social &amp; Coding Profiles</span>
       </div>
-      <div style="padding:.75rem 1.375rem;font-size:.75rem;color:var(--txt-3);">Academic details are managed by your TPO.</div>
+      <div class="sp-card-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.github_url.id_for_label }}">GitHub Profile URL</label>
+            {{ form.github_url }}
+            {% if form.github_url.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.github_url.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.linkedin_url.id_for_label }}">LinkedIn Profile URL</label>
+            {{ form.linkedin_url }}
+            {% if form.linkedin_url.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.linkedin_url.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.portfolio_url.id_for_label }}">Personal Portfolio Website</label>
+            {{ form.portfolio_url }}
+            {% if form.portfolio_url.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.portfolio_url.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.leetcode_url.id_for_label }}">LeetCode Profile URL</label>
+            {{ form.leetcode_url }}
+            {% if form.leetcode_url.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.leetcode_url.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section 3: Career Preferences -->
+    <div class="sp-card">
+      <div class="sp-card-header">
+        <span class="sp-card-title">💼 Career Preferences</span>
+      </div>
+      <div class="sp-card-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.preferred_job_role.id_for_label }}">Preferred Job Role</label>
+            {{ form.preferred_job_role }}
+            {% if form.preferred_job_role.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.preferred_job_role.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.preferred_work_location.id_for_label }}">Preferred Location</label>
+            {{ form.preferred_work_location }}
+            {% if form.preferred_work_location.errors %}
+            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.preferred_work_location.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="{{ form.higher_studies.id_for_label }}">Higher Studies Plan (Optional)</label>
+          {{ form.higher_studies }}
+          {% if form.higher_studies.errors %}
+          <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.higher_studies.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Form Submit Controls -->
+    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 2rem;">
+      <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2.25rem;">Cancel</a>
+      <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem 2.75rem;">Save Profile Settings</button>
+    </div>
+
+  </div>
+
+  <!-- Right Side: Tips Info Card -->
+  <div>
+    <div class="sp-card">
+      <div class="sp-card-header">
+        <span class="sp-card-title">💡 Editing Tips</span>
+      </div>
+      <div class="sp-card-body" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.82rem; color: var(--txt-2); line-height: 1.5;">
+        
+        <div>
+          <strong style="color: #fff; display: block; margin-bottom: 0.15rem;">Photo Aspect Ratio</strong>
+          Choose a square professional profile photo (JPG or PNG) for the best layout rendering.
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.04); padding-top: 0.75rem;">
+          <strong style="color: #fff; display: block; margin-bottom: 0.15rem;">Social Reach</strong>
+          Keeping your GitHub, LeetCode and LinkedIn links up-to-date helps recruiters verify your developer milestones easily.
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.04); padding-top: 0.75rem;">
+          <strong style="color: #fff; display: block; margin-bottom: 0.15rem;">Academic Info</strong>
+          Remember: Your academic details (CGPA, Course, Batch, Semester grades) are managed officially by your College Admin and are read-only.
+        </div>
+
+      </div>
     </div>
   </div>
 
-</div>
+</form>
 
 {% endblock %}

@@ -35,9 +35,10 @@ urlpatterns = [
     path('reports/', include('reports.urls')),
     path('analytics/', include('analytics.urls')),
     path('student/', include('student_portal.urls')),
+
+    path('dashboard/access/', include('staff_permissions.urls')),
     path('', HomeView.as_view(), name='home'),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

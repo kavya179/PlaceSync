@@ -10,6 +10,10 @@ class CompanyForm(forms.ModelForm):
             'website',
             'career_page',
             'industry',
+            'company_size',
+            'linkedin_url',
+            'about_company',
+            'registration_number',
             'hr_name',
             'hr_email',
             'hr_phone',
@@ -25,6 +29,7 @@ class CompanyForm(forms.ModelForm):
             'stipend_amount': forms.NumberInput(attrs={'placeholder': 'e.g. 25000 (monthly)'}),
             'hr_notes': forms.Textarea(attrs={'rows': 3, 'placeholder': 'e.g. Additional contact numbers, best time to call'}),
             'placement_history': forms.Textarea(attrs={'rows': 4, 'placeholder': 'e.g. 2025: 5 students recruited, 2026: 8 students recruited'}),
+            'about_company': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Brief description about the company...'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -35,6 +40,7 @@ class CompanyForm(forms.ModelForm):
                 field.widget.attrs.update({'class': 'form-input'})
             else:
                 field.widget.attrs.update({'class': 'form-input', 'style': 'padding: 0.5rem;'})
+
 
     def clean_name(self):
         name = self.cleaned_data.get('name', '').strip()

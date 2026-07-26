@@ -92,6 +92,27 @@ class Student(models.Model):
     )
 
     # ── Student Portal fields ──────────────────────────────
+    photo = models.ImageField(upload_to='student_photos/', blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    gender = models.CharField(max_length=20, blank=True)
+    leetcode_url = models.URLField(blank=True)
+    codechef_url = models.URLField(blank=True)
+    hackerrank_url = models.URLField(blank=True)
+    preferred_job_role = models.CharField(max_length=100, blank=True)
+    preferred_work_location = models.CharField(max_length=100, blank=True)
+    higher_studies = models.CharField(max_length=255, blank=True, help_text="e.g. MS in CS, MBA")
+    
+    # ── Academic fields managed by Admin ───────────────────
+    tenth_board = models.CharField(max_length=100, blank=True)
+    tenth_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    twelfth_board = models.CharField(max_length=100, blank=True)
+    twelfth_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name="12th/Diploma Percentage")
+    degree = models.CharField(max_length=100, blank=True, default="B.Tech")
+    current_academic_year = models.CharField(max_length=50, blank=True, help_text="e.g. 1st Year, 2nd Year, etc.")
+    admission_year = models.PositiveIntegerField(null=True, blank=True)
+    graduation_year = models.PositiveIntegerField(null=True, blank=True)
+    course = models.CharField(max_length=100, blank=True, default="Computer Science & Engineering")
+
     bio = models.TextField(blank=True, help_text="Short personal introduction")
     address = models.CharField(max_length=500, blank=True)
     skills = models.TextField(
@@ -127,6 +148,9 @@ class Student(models.Model):
             self.name, self.email, self.phone, self.bio,
             self.address, self.skills, self.linkedin_url,
             self.github_url, self.cgpa, self.resume,
+            self.photo, self.date_of_birth, self.gender,
+            self.leetcode_url, self.codechef_url, self.hackerrank_url,
+            self.preferred_job_role, self.preferred_work_location
         ]
         filled = sum(1 for f in fields if f)
         return round(filled / len(fields) * 100)
@@ -1121,5 +1145,66 @@ class DeveloperAchievement(models.Model):
         ct = ContentType.objects.get_for_model(self)
         Activity.objects.filter(content_type=ct, object_id=self.pk).delete()
         super().delete(*args, **kwargs)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Certificate Model
+# ─────────────────────────────────────────────────────────────────────────────
+
+class Certificate(models.Model):
+    class Purpose(models.TextChoices):
+        COURSE_COMPLETION = 'COURSE_COMPLETION', 'Course Completion'
+        HACKATHON = 'HACKATHON', 'Hackathon'
+        WORKSHOP = 'WORKSHOP', 'Workshop'
+        SEMINAR = 'SEMINAR', 'Seminar'
+        INTERNSHIP = 'INTERNSHIP', 'Internship'
+        COMPETITION = 'COMPETITION', 'Competition'
+        RESEARCH = 'RESEARCH', 'Research'
+        BOOTCAMP = 'BOOTCAMP', 'Bootcamp'
+        TRAINING_PROGRAM = 'TRAINING_PROGRAM', 'Training Program'
+        CERTIFICATION_EXAM = 'CERTIFICATION_EXAM', 'Certification Exam'
+        VOLUNTEER_PROGRAM = 'VOLUNTEER_PROGRAM', 'Volunteer Program'
+        LEADERSHIP_PROGRAM = 'LEADERSHIP_PROGRAM', 'Leadership Program'
+        COLLEGE_EVENT = 'COLLEGE_EVENT', 'College Event'
+        OTHER = 'OTHER', 'Other'
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='certificates')
+    title = models.CharField(max_length=255)
+    issuing_organization = models.CharField(max_length=255)
+    purpose = models.CharField(max_length=50, choices=Purpose.choices, default=Purpose.COURSE_COMPLETION)
+    issue_date = models.DateField()
+    certificate_url = models.URLField(blank=True, null=True)
+    certificate_file = models.FileField(upload_to='certificates/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-issue_date', '-created_at']
+
+    def __str__(self):
+        return f"{self.title} — {self.student.name}"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SemesterPerformance Model
+# ─────────────────────────────────────────────────────────────────────────────
+
+class SemesterPerformance(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='semester_performances')
+    semester = models.PositiveSmallIntegerField(help_text="e.g. 1 to 8")
+    spi = models.DecimalField(max_digits=4, decimal_places=2, help_text="Semester Performance Index (SPI/SGPA)")
+    status = models.CharField(max_length=20, default="Completed", choices=[
+        ("Completed", "Completed"),
+        ("Current", "Current"),
+        ("Upcoming", "Upcoming")
+    ])
+
+    class Meta:
+        ordering = ['semester']
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'semester'], name='unique_student_semester_performance')
+        ]
+
+    def __str__(self):
+        return f"Sem {self.semester}: {self.spi} ({self.status}) — {self.student.name}"
 
 

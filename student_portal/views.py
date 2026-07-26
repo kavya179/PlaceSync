@@ -12,7 +12,7 @@ from students.models import (
     Student, StudentSkill, StudentResume, Project,
     TechnicalLinks, Activity, WeeklySummary, MonthlySummary, ProjectMilestone,
     HackathonJournal, CodingPractice, LearningJournal, OpenSourceContribution,
-    LearningGoal, DeveloperAchievement
+    LearningGoal, DeveloperAchievement, Certificate
 )
 from placements.models import PlacementDrive, Application, DriveBookmark, PlacementCalendarEvent
 from communication.models import Notification
@@ -21,7 +21,7 @@ from .forms import (
     StudentSkillForm, ResumeUploadForm, ProjectForm,
     TechnicalLinksForm, ActivityForm, WeeklySummaryForm, MonthlySummaryForm, ProjectMilestoneForm,
     HackathonJournalForm, CodingPracticeForm, LearningJournalForm, OpenSourceContributionForm,
-    LearningGoalForm, DeveloperAchievementForm
+    LearningGoalForm, DeveloperAchievementForm, CertificateForm, PersonalProfileForm, AcademicProfileForm
 )
 from .resume_analyzer import extract_pdf_text, analyze_resume_text
 import json
@@ -150,10 +150,8 @@ class StudentProfileView(StudentRequiredMixin, View):
         student = _get_student(request)
         if not student:
             return redirect('accounts:logout')
-        skill_list = [s.strip() for s in student.skills.split(',') if s.strip()]
         return render(request, self.template_name, {
             **_base_ctx(request, student),
-            'skill_list': skill_list,
         })
 
 
@@ -168,24 +166,172 @@ class StudentProfileEditView(StudentRequiredMixin, View):
         student = _get_student(request)
         if not student:
             return redirect('accounts:logout')
-        return render(request, self.template_name, {**_base_ctx(request, student)})
+        form = PersonalProfileForm(instance=student)
+        return render(request, self.template_name, {
+            **_base_ctx(request, student),
+            'form': form,
+        })
 
     def post(self, request, *args, **kwargs):
         student = _get_student(request)
         if not student:
             return redirect('accounts:logout')
+        form = PersonalProfileForm(request.POST, request.FILES, instance=student)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Personal profile updated successfully.")
+            return redirect('student_portal:profile')
+        return render(request, self.template_name, {
+            **_base_ctx(request, student),
+            'form': form,
+        })
 
-        student.phone = request.POST.get('phone', student.phone).strip()
-        student.bio = request.POST.get('bio', '').strip()
-        student.address = request.POST.get('address', '').strip()
-        student.skills = request.POST.get('skills', '').strip()
-        student.linkedin_url = request.POST.get('linkedin_url', '').strip()
-        student.github_url = request.POST.get('github_url', '').strip()
-        student.portfolio_url = request.POST.get('portfolio_url', '').strip()
-        student.save()
 
-        messages.success(request, "Profile updated successfully.")
-        return redirect('student_portal:profile')
+class StudentAcademicProfileView(StudentRequiredMixin, View):
+    template_name = 'student_portal/academic_profile.html'
+
+    def get(self, request, *args, **kwargs):
+        student = _get_student(request)
+        if not student:
+            return redirect('accounts:logout')
+
+        is_edit = (request.GET.get('edit') == '1')
+        form = None
+        if is_edit:
+            form = AcademicProfileForm(instance=student)
+
+        # Academic Performance List
+        performances = list(student.semester_performances.all())
+        if not performances:
+            for sem in range(1, 9):
+                if sem < student.semester:
+                    status_val = "Completed"
+                elif sem == student.semester:
+                    status_val = "Current"
+                else:
+                    status_val = "Upcoming"
+                
+                performances.append({
+                    'semester': sem,
+                    'spi': None,
+                    'status': status_val,
+                })
+        else:
+            # Ensure semesters up to 8 are present in display list
+            sem_map = {p.semester: p for p in performances}
+            performances = []
+            for sem in range(1, 9):
+                if sem in sem_map:
+                    performances.append(sem_map[sem])
+                else:
+                    if sem < student.semester:
+                        status_val = "Completed"
+                    elif sem == student.semester:
+                        status_val = "Current"
+                    else:
+                        status_val = "Upcoming"
+                    performances.append({
+                        'semester': sem,
+                        'spi': None,
+                        'status': status_val,
+                    })
+
+        # Eligibility calculation
+        min_required_cgpa = 6.00
+        current_cgpa = float(student.cgpa or 0)
+        is_eligible = (current_cgpa >= min_required_cgpa) and (student.backlogs == 0)
+
+        # Academic Status description
+        academic_status = "Not Eligible"
+        if is_eligible:
+            academic_status = "Eligible"
+
+        # Calculate Completed Semesters count
+        # A semester is completed if it is less than current semester and has an SPI set
+        completed_count = student.semester_performances.filter(semester__lt=student.semester, spi__isnull=False).count()
+
+        # Current Year text based on semester
+        current_year_str = "1st Year"
+        if student.semester in [3, 4]:
+            current_year_str = "2nd Year"
+        elif student.semester in [5, 6]:
+            current_year_str = "3rd Year"
+        elif student.semester in [7, 8]:
+            current_year_str = "4th Year"
+
+        context = {
+            **_base_ctx(request, student),
+            'performances': performances,
+            'min_required_cgpa': min_required_cgpa,
+            'is_eligible': is_eligible,
+            'academic_status': academic_status,
+            'completed_count': completed_count,
+            'current_year_str': current_year_str,
+            'is_edit': is_edit,
+            'form': form,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        student = _get_student(request)
+        if not student:
+            return redirect('accounts:logout')
+        
+        form = AcademicProfileForm(request.POST, request.FILES, instance=student)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Academic profile updated successfully.")
+            return redirect('student_portal:academic_profile')
+        
+        # If invalid, render form with errors
+        # Academic Performance List
+        performances = list(student.semester_performances.all())
+        sem_map = {p.semester: p for p in performances}
+        performances = []
+        for sem in range(1, 9):
+            if sem in sem_map:
+                performances.append(sem_map[sem])
+            else:
+                if sem < student.semester:
+                    status_val = "Completed"
+                elif sem == student.semester:
+                    status_val = "Current"
+                else:
+                    status_val = "Upcoming"
+                performances.append({
+                    'semester': sem,
+                    'spi': None,
+                    'status': status_val,
+                })
+
+        min_required_cgpa = 6.00
+        current_cgpa = float(student.cgpa or 0)
+        is_eligible = (current_cgpa >= min_required_cgpa) and (student.backlogs == 0)
+        academic_status = "Not Eligible"
+        if is_eligible:
+            academic_status = "Eligible"
+
+        completed_count = student.semester_performances.filter(semester__lt=student.semester, spi__isnull=False).count()
+        current_year_str = "1st Year"
+        if student.semester in [3, 4]:
+            current_year_str = "2nd Year"
+        elif student.semester in [5, 6]:
+            current_year_str = "3rd Year"
+        elif student.semester in [7, 8]:
+            current_year_str = "4th Year"
+
+        context = {
+            **_base_ctx(request, student),
+            'performances': performances,
+            'min_required_cgpa': min_required_cgpa,
+            'is_eligible': is_eligible,
+            'academic_status': academic_status,
+            'completed_count': completed_count,
+            'current_year_str': current_year_str,
+            'is_edit': True,
+            'form': form,
+        }
+        return render(request, self.template_name, context)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2375,6 +2521,246 @@ class RecruiterDeveloperJourneyView(LoginRequiredMixin, View):
             **stats
         }
         return render(request, self.template_name, context)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Certificates Module Views
+# ─────────────────────────────────────────────────────────────────────────────
+from django.core.paginator import Paginator
+
+class StudentCertificatesListView(LoginRequiredMixin, View):
+    template_name = 'student_portal/certificates_list.html'
+
+    def get(self, request, *args, **kwargs):
+        student = request.user.student_profile
+        
+        # Get all student certificates
+        qs = Certificate.objects.filter(student=student)
+
+        # Calculate Summary Card Stats
+        total_count = qs.count()
+        courses_count = qs.filter(purpose='COURSE_COMPLETION').count()
+        hackathons_count = qs.filter(purpose='HACKATHON').count()
+        workshops_count = qs.filter(purpose='WORKSHOP').count()
+
+        # Handle Search
+        q = request.GET.get('q', '').strip()
+        if q:
+            qs = qs.filter(
+                Q(title__icontains=q) |
+                Q(issuing_organization__icontains=q) |
+                Q(purpose__icontains=q)
+            )
+
+        # Handle Filters
+        purpose = request.GET.get('purpose', '').strip()
+        if purpose:
+            qs = qs.filter(purpose=purpose)
+
+        year = request.GET.get('year', '').strip()
+        if year:
+            try:
+                qs = qs.filter(issue_date__year=int(year))
+            except ValueError:
+                pass
+
+        sort = request.GET.get('sort', 'newest').strip()
+        if sort == 'oldest':
+            qs = qs.order_by('issue_date', 'created_at')
+        else:
+            qs = qs.order_by('-issue_date', '-created_at')
+
+        # Pagination
+        paginator = Paginator(qs, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Get list of unique years for the filter dropdown
+        years = Certificate.objects.filter(student=student).values_list('issue_date__year', flat=True).distinct().order_by('-issue_date__year')
+
+        context = {
+            'student': student,
+            'page_obj': page_obj,
+            'total_count': total_count,
+            'courses_count': courses_count,
+            'hackathons_count': hackathons_count,
+            'workshops_count': workshops_count,
+            'q': q,
+            'selected_purpose': purpose,
+            'selected_year': year,
+            'selected_sort': sort,
+            'years': years,
+            'purposes': Certificate.Purpose.choices,
+            'is_recruiter': False,
+        }
+        return render(request, self.template_name, context)
+
+
+class StudentCertificateCreateView(LoginRequiredMixin, View):
+    form_class = CertificateForm
+    template_name = 'student_portal/certificate_form.html'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {
+            'form': form,
+            'title_prefix': 'Add Certificate',
+            'is_edit': False
+        })
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            certificate = form.save(commit=False)
+            certificate.student = request.user.student_profile
+            certificate.save()
+            messages.success(request, "Certificate added successfully!")
+            return redirect('student_portal:certificates_list')
+        return render(request, self.template_name, {
+            'form': form,
+            'title_prefix': 'Add Certificate',
+            'is_edit': False
+        })
+
+
+class StudentCertificateDetailView(LoginRequiredMixin, View):
+    template_name = 'student_portal/certificate_detail.html'
+
+    def get(self, request, pk, *args, **kwargs):
+        student = request.user.student_profile
+        certificate = get_object_or_404(Certificate, pk=pk, student=student)
+        return render(request, self.template_name, {
+            'certificate': certificate,
+            'is_recruiter': False
+        })
+
+
+class StudentCertificateUpdateView(LoginRequiredMixin, View):
+    form_class = CertificateForm
+    template_name = 'student_portal/certificate_form.html'
+
+    def get(self, request, pk, *args, **kwargs):
+        student = request.user.student_profile
+        certificate = get_object_or_404(Certificate, pk=pk, student=student)
+        form = self.form_class(instance=certificate)
+        return render(request, self.template_name, {
+            'form': form,
+            'title_prefix': 'Edit Certificate',
+            'is_edit': True,
+            'certificate': certificate
+        })
+
+    def post(self, request, pk, *args, **kwargs):
+        student = request.user.student_profile
+        certificate = get_object_or_404(Certificate, pk=pk, student=student)
+        form = self.form_class(request.POST, request.FILES, instance=certificate)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Certificate updated successfully!")
+            return redirect('student_portal:certificate_detail', pk=pk)
+        return render(request, self.template_name, {
+            'form': form,
+            'title_prefix': 'Edit Certificate',
+            'is_edit': True,
+            'certificate': certificate
+        })
+
+
+class StudentCertificateDeleteView(LoginRequiredMixin, View):
+    template_name = 'student_portal/certificate_confirm_delete.html'
+
+    def get(self, request, pk, *args, **kwargs):
+        student = request.user.student_profile
+        certificate = get_object_or_404(Certificate, pk=pk, student=student)
+        return render(request, self.template_name, {'object': certificate})
+
+    def post(self, request, pk, *args, **kwargs):
+        student = request.user.student_profile
+        certificate = get_object_or_404(Certificate, pk=pk, student=student)
+        certificate.delete()
+        messages.success(request, "Certificate removed successfully!")
+        return redirect('student_portal:certificates_list')
+
+
+# Recruiter Views (Read-Only)
+
+class RecruiterCertificatesListView(LoginRequiredMixin, View):
+    template_name = 'student_portal/certificates_list.html'
+
+    def get(self, request, student_id, *args, **kwargs):
+        student = get_object_or_404(Student, id=student_id)
+        
+        # Recruiter gets read-only list
+        qs = Certificate.objects.filter(student=student)
+
+        # Calculate Summary Card Stats
+        total_count = qs.count()
+        courses_count = qs.filter(purpose='COURSE_COMPLETION').count()
+        hackathons_count = qs.filter(purpose='HACKATHON').count()
+        workshops_count = qs.filter(purpose='WORKSHOP').count()
+
+        # Search
+        q = request.GET.get('q', '').strip()
+        if q:
+            qs = qs.filter(
+                Q(title__icontains=q) |
+                Q(issuing_organization__icontains=q) |
+                Q(purpose__icontains=q)
+            )
+
+        # Filters
+        purpose = request.GET.get('purpose', '').strip()
+        if purpose:
+            qs = qs.filter(purpose=purpose)
+
+        year = request.GET.get('year', '').strip()
+        if year:
+            try:
+                qs = qs.filter(issue_date__year=int(year))
+            except ValueError:
+                pass
+
+        sort = request.GET.get('sort', 'newest').strip()
+        if sort == 'oldest':
+            qs = qs.order_by('issue_date', 'created_at')
+        else:
+            qs = qs.order_by('-issue_date', '-created_at')
+
+        # Pagination
+        paginator = Paginator(qs, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        years = Certificate.objects.filter(student=student).values_list('issue_date__year', flat=True).distinct().order_by('-issue_date__year')
+
+        context = {
+            'student': student,
+            'page_obj': page_obj,
+            'total_count': total_count,
+            'courses_count': courses_count,
+            'hackathons_count': hackathons_count,
+            'workshops_count': workshops_count,
+            'q': q,
+            'selected_purpose': purpose,
+            'selected_year': year,
+            'selected_sort': sort,
+            'years': years,
+            'purposes': Certificate.Purpose.choices,
+            'is_recruiter': True,
+        }
+        return render(request, self.template_name, context)
+
+
+class RecruiterCertificateDetailView(LoginRequiredMixin, View):
+    template_name = 'student_portal/certificate_detail.html'
+
+    def get(self, request, pk, *args, **kwargs):
+        certificate = get_object_or_404(Certificate, pk=pk)
+        return render(request, self.template_name, {
+            'certificate': certificate,
+            'is_recruiter': True,
+            'student': certificate.student
+        })
 
 
 

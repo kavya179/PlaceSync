@@ -21,6 +21,10 @@ class Company(models.Model):
     website = models.URLField(blank=True)
     career_page = models.URLField(blank=True)
     industry = models.CharField(max_length=255, blank=True)
+    company_size = models.CharField(max_length=100, blank=True, null=True)
+    linkedin_url = models.URLField(blank=True, null=True)
+    about_company = models.TextField(blank=True, null=True)
+    registration_number = models.CharField(max_length=100, blank=True, null=True)
     
     # HR Details
     hr_name = models.CharField(max_length=255, blank=True)

@@ -50,17 +50,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- Website URL -->
-                    <div class="form-group">
-                        <label class="form-label" for="id_website">Website URL</label>
-                        {{ form.website }}
-                        {% if form.website.errors %}
-                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.website.errors.0 }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                     <!-- Industry -->
                     <div class="form-group">
                         <label class="form-label" for="id_industry">Industry Verticals</label>
@@ -69,13 +58,64 @@
                             <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.industry.errors.0 }}</span>
                         {% endif %}
                     </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <!-- Company Size -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_company_size">Company Size</label>
+                        {{ form.company_size }}
+                        {% if form.company_size.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.company_size.errors.0 }}</span>
+                        {% endif %}
+                    </div>
 
                     <!-- Location -->
                     <div class="form-group">
-                        <label class="form-label" for="id_location">Office Location</label>
+                        <label class="form-label" for="id_location">Head Office Location</label>
                         {{ form.location }}
                         {% if form.location.errors %}
                             <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.location.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <!-- Website URL -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_website">Website URL</label>
+                        {{ form.website }}
+                        {% if form.website.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.website.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- LinkedIn URL -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_linkedin_url">LinkedIn Company Page</label>
+                        {{ form.linkedin_url }}
+                        {% if form.linkedin_url.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.linkedin_url.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <!-- Career Page -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_career_page">Career Page URL</label>
+                        {{ form.career_page }}
+                        {% if form.career_page.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.career_page.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Registration Number -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_registration_number">Company Registration Number <span style="font-size: 0.7rem; color: var(--text-muted);">(Optional)</span></label>
+                        {{ form.registration_number }}
+                        {% if form.registration_number.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.registration_number.errors.0 }}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -90,6 +130,15 @@
                     <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
                         Image file (PNG, JPG, JPEG) to display in lists and dashboard.
                     </span>
+                </div>
+
+                <!-- About Company -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label" for="id_about_company">About Company</label>
+                    {{ form.about_company }}
+                    {% if form.about_company.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.about_company.errors.0 }}</span>
+                    {% endif %}
                 </div>
             </div>
 

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staff_tags %}
 
 {% block title %}Student Directory | PlaceSync{% endblock %}
 
@@ -163,6 +164,7 @@
                                         <td>
                                             <!-- Action Console Links -->
                                             <div class="table-actions" style="justify-content: flex-end; flex-wrap: wrap; gap: 0.35rem;">
+                                                {% if request.user|can_edit_filter %}
                                                 <a href="{% url 'students:edit' pk=student.pk %}" class="btn btn-secondary btn-xs" title="Edit Student">Edit</a>
                                                 <a href="{% url 'students:move' pk=student.pk %}" class="btn btn-secondary btn-xs" style="background: rgba(14, 165, 233, 0.05); color: var(--info); border-color: rgba(14, 165, 233, 0.2);" title="Move Batch">Move</a>
                                                 <a href="{% url 'students:reset_password' pk=student.pk %}" class="btn btn-secondary btn-xs" title="Reset Password">Keys</a>
@@ -176,6 +178,9 @@
                                                 </form>
 
                                                 <a href="{% url 'students:delete' pk=student.pk %}" class="btn btn-secondary btn-xs btn-danger-text" title="Delete Student">Delete</a>
+                                                {% else %}
+                                                <span style="color: var(--text-muted); font-size: 0.75rem; font-style: italic;">View Only</span>
+                                                {% endif %}
                                             </div>
                                         </td>
                                     </tr>

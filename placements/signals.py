@@ -36,11 +36,12 @@ def _send_drive_notifications(instance, created):
             # Notify applied students that the drive is closed / cancelled
             applications = instance.applications.all()
             for app in applications:
-                Notification.objects.get_or_create(
-                    user=app.student.user,
-                    title=f"Placement Drive Closed: {instance.role} at {instance.company.name}",
-                    message=f"The placement drive for {instance.role} at {instance.company.name} has been closed or completed.",
-                )
+                if app.student and app.student.user:
+                    Notification.objects.get_or_create(
+                        user=app.student.user,
+                        title=f"Placement Drive Closed: {instance.role} at {instance.company.name}",
+                        message=f"The placement drive for {instance.role} at {instance.company.name} has been closed or completed.",
+                    )
         return
 
     # Find all students in this college
@@ -79,11 +80,12 @@ def _send_drive_notifications(instance, created):
             )
 
             # Avoid duplicates on repeated edits
-            Notification.objects.get_or_create(
-                user=student.user,
-                title=title,
-                message=msg
-            )
+            if student.user:
+                Notification.objects.get_or_create(
+                    user=student.user,
+                    title=title,
+                    message=msg
+                )
 
 
 @receiver(post_save, sender=Application)
@@ -92,6 +94,9 @@ def notify_student_on_application_status_change(sender, instance, created, **kwa
     Triggers when a student's Application status changes.
     Dispatches: Interview Reminder / Offer Released.
     """
+    if not (instance.student and instance.student.user):
+        return
+
     if created:
         # Successfully Applied Notification
         Notification.objects.get_or_create(

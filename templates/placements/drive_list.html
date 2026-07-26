@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staff_tags %}
 
 {% block title %}Placement & Internship Drives | PlaceSync{% endblock %}
 
@@ -15,7 +16,9 @@
                 <p class="dashboard-welcome">Launch and manage placement drives, student applications, and selection lists.</p>
             </div>
             <div>
+                {% if request.user|can_edit_filter %}
                 <a href="{% url 'placements:create' %}" class="btn btn-primary">🚀 Launch Drive</a>
+                {% endif %}
             </div>
         </div>
 

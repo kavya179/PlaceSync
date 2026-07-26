@@ -1,0 +1,182 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Certificates | PlaceSync{% endblock %}
+{% block topbar_title %}{% if is_recruiter %}{{ student.name }}'s Certificates{% else %}Certificates{% endif %}{% endblock %}
+{% block nav_certs %}active{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">📜 Certificates</h1>
+    <p class="sp-page-subtitle">Store all your course, workshop, hackathon and internship certificates in one secure place.</p>
+  </div>
+  {% if not is_recruiter %}
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:certificate_create' %}" class="sp-btn sp-btn-primary">➕ Add Certificate</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Summary Cards -->
+<div class="sp-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem; gap: 1rem;">
+  
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-v">📜</div>
+    <div class="sp-stat-label">Total Certificates</div>
+    <div class="sp-stat-value">{{ total_count }}</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-g">🎓</div>
+    <div class="sp-stat-label">Courses</div>
+    <div class="sp-stat-value">{{ courses_count }}</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-s">🏆</div>
+    <div class="sp-stat-label">Hackathons</div>
+    <div class="sp-stat-value">{{ hackathons_count }}</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-a">🛠️</div>
+    <div class="sp-stat-label">Workshops</div>
+    <div class="sp-stat-value">{{ workshops_count }}</div>
+  </div>
+
+</div>
+
+<!-- Search & Filters -->
+<div class="sp-card" style="margin-bottom: 1.75rem;">
+  <div class="sp-card-body" style="padding: 1.25rem;">
+    <form method="get" 
+          action="{% if is_recruiter %}{% url 'student_portal:recruiter_certificates' student.id %}{% else %}{% url 'student_portal:certificates_list' %}{% endif %}" 
+          style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.75rem; align-items: end;">
+      
+      <!-- Search Query -->
+      <div class="sp-form-group" style="margin-bottom: 0;">
+        <label class="sp-form-label" for="filter_q">Search Certificates</label>
+        <input type="text" name="q" id="filter_q" class="sp-form-input" placeholder="Title, organization, purpose..." value="{{ q }}">
+      </div>
+
+      <!-- Filter by Purpose -->
+      <div class="sp-form-group" style="margin-bottom: 0;">
+        <label class="sp-form-label" for="filter_purpose">Purpose</label>
+        <select name="purpose" id="filter_purpose" class="sp-form-input">
+          <option value="">All Purposes</option>
+          {% for val, label in purposes %}
+          <option value="{{ val }}" {% if selected_purpose == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Filter by Year -->
+      <div class="sp-form-group" style="margin-bottom: 0;">
+        <label class="sp-form-label" for="filter_year">Year</label>
+        <select name="year" id="filter_year" class="sp-form-input">
+          <option value="">All Years</option>
+          {% for yr in years %}
+          <option value="{{ yr }}" {% if selected_year == yr|stringformat:"i" %}selected{% endif %}>{{ yr }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Sort By -->
+      <div class="sp-form-group" style="margin-bottom: 0;">
+        <label class="sp-form-label" for="filter_sort">Sort By</label>
+        <select name="sort" id="filter_sort" class="sp-form-input">
+          <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest Issue Date</option>
+          <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Oldest Issue Date</option>
+        </select>
+      </div>
+
+      <!-- Submit Form -->
+      <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem 1.25rem;">🔍 Apply</button>
+
+    </form>
+  </div>
+</div>
+
+<!-- Table list -->
+<div class="sp-card">
+  <div class="sp-card-body" style="padding: 0;">
+    {% if page_obj %}
+    <div style="overflow-x: auto;">
+      <table class="sp-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <th style="padding: 1rem 1.5rem;">Certificate Title</th>
+            <th style="padding: 1rem 1.5rem;">Organization</th>
+            <th style="padding: 1rem 1.5rem;">Purpose</th>
+            <th style="padding: 1rem 1.5rem;">Issue Date</th>
+            <th style="padding: 1rem 1.5rem; text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cert in page_obj %}
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.03); transition: var(--t);"
+              onmouseover="this.style.background='rgba(255,255,255,0.015)';"
+              onmouseout="this.style.background='none';">
+            <td style="padding: 1.1rem 1.5rem; font-weight: 600; color: #fff;">{{ cert.title }}</td>
+            <td style="padding: 1.1rem 1.5rem; color: var(--txt-2);">{{ cert.issuing_organization }}</td>
+            <td style="padding: 1.1rem 1.5rem;">
+              <span class="sp-badge sp-badge-violet" style="font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem;">
+                {{ cert.get_purpose_display }}
+              </span>
+            </td>
+            <td style="padding: 1.1rem 1.5rem; color: var(--txt-3); font-size: 0.85rem;">{{ cert.issue_date|date:"M d, Y" }}</td>
+            <td style="padding: 1.1rem 1.5rem; text-align: right;">
+              {% if is_recruiter %}
+              <a href="{% url 'student_portal:recruiter_certificate_detail' cert.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="padding: 0.35rem 0.75rem;">👁 View</a>
+              {% else %}
+              <a href="{% url 'student_portal:certificate_detail' cert.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="padding: 0.35rem 0.75rem;">👁 View</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-top: 1px solid var(--border);">
+      <span style="font-size: 0.82rem; color: var(--txt-3);">
+        Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      </span>
+      <div style="display: flex; gap: 0.5rem;">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_purpose %}&purpose={{ selected_purpose }}{% endif %}{% if selected_year %}&year={{ selected_year }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-xs">◀️ Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_purpose %}&purpose={{ selected_purpose }}{% endif %}{% if selected_year %}&year={{ selected_year }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-xs">Next ▶️</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="sp-empty" style="padding: 4.5rem 2rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1.25rem;">📜</div>
+      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem;">
+        No certificates found
+      </h3>
+      <p style="font-size: 0.88rem; color: var(--txt-3); max-width: 380px; margin: 0 auto 1.5rem; line-height: 1.6;">
+        {% if is_recruiter %}
+        This student has not uploaded any credentials matching your filters.
+        {% else %}
+        Keep all your course completions, hackathon participation, and internship verification credentials organized in one professional spot.
+        {% endif %}
+      </p>
+      {% if not is_recruiter %}
+      <a href="{% url 'student_portal:certificate_create' %}" class="sp-btn sp-btn-primary sp-btn-sm">Add Certificate</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

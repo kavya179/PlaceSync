@@ -80,7 +80,44 @@ class PlacementDrive(models.Model):
         blank=True,
         help_text="Details of selection rounds (e.g. Resume Shortlisting -> Test -> Technical -> HR)"
     )
-    
+
+    # Additional Post Details
+    location = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Job/Internship location"
+    )
+
+    class EmploymentType(models.TextChoices):
+        FULL_TIME = 'FULL_TIME', 'Full Time'
+        PART_TIME = 'PART_TIME', 'Part Time'
+        CONTRACT = 'CONTRACT', 'Contract'
+        FREELANCE = 'FREELANCE', 'Freelance'
+
+    employment_type = models.CharField(
+        max_length=20,
+        choices=EmploymentType.choices,
+        default=EmploymentType.FULL_TIME
+    )
+    vacancies = models.PositiveIntegerField(
+        default=1,
+        help_text="Number of open positions"
+    )
+    job_description = models.TextField(
+        blank=True,
+        help_text="Full description of the role"
+    )
+    responsibilities = models.TextField(
+        blank=True,
+        help_text="Key responsibilities for the role"
+    )
+    attachment = models.FileField(
+        upload_to='drive_attachments/',
+        blank=True,
+        null=True,
+        help_text="Optional supporting document (PDF, DOCX)"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

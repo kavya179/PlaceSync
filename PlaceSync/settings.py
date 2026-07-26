@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'analytics.apps.AnalyticsConfig',
     'reports.apps.ReportsConfig',
     'student_portal.apps.StudentPortalConfig',
+    'staff_permissions.apps.StaffPermissionsConfig',
 ]
 
 MIDDLEWARE = [
@@ -62,7 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'accounts.middleware.ForcePasswordChangeMiddleware',
+    'staff_permissions.middleware.SimpleAccessControlMiddleware',
 ]
 
 ROOT_URLCONF = 'PlaceSync.urls'

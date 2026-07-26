@@ -1,4 +1,5 @@
 {% load static %}
+{% load staff_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,46 +43,82 @@
         </div>
 
         <!-- Core -->
+        {% if request.user|has_perm_filter:"dashboard.view" or request.user|has_perm_filter:"system_settings.view" %}
         <div class="sidebar-section">
             <div class="sidebar-section-label">Core</div>
             <ul class="sidebar-nav">
+                {% if request.user|has_perm_filter:"dashboard.view" %}
                 <li><a href="{% url 'dashboard:index' %}"         class="sidebar-link"><span class="sidebar-link-icon">📊</span> Dashboard</a></li>
+                {% endif %}
+                {% if request.user|has_perm_filter:"system_settings.view" %}
                 <li><a href="{% url 'colleges:profile_detail' %}" class="sidebar-link"><span class="sidebar-link-icon">🏫</span> College Profile</a></li>
                 <li><a href="{% url 'departments:list' %}"        class="sidebar-link"><span class="sidebar-link-icon">📂</span> Departments</a></li>
                 <li><a href="{% url 'batches:list' %}"            class="sidebar-link"><span class="sidebar-link-icon">🎓</span> Batches</a></li>
+                {% endif %}
             </ul>
         </div>
+        {% endif %}
 
         <!-- People -->
+        {% if request.user|has_perm_filter:"students.view" or request.user|has_perm_filter:"opportunity_discovery.view" %}
         <div class="sidebar-section">
             <div class="sidebar-section-label">People</div>
             <ul class="sidebar-nav">
+                {% if request.user|has_perm_filter:"students.view" %}
                 <li><a href="{% url 'students:list' %}"                   class="sidebar-link"><span class="sidebar-link-icon">🧑</span> Students</a></li>
+                {% endif %}
+                {% if request.user|has_perm_filter:"opportunity_discovery.view" %}
                 <li><a href="{% url 'companies:list' %}"                  class="sidebar-link"><span class="sidebar-link-icon">🏢</span> Companies</a></li>
                 <li><a href="{% url 'companies:verification_dashboard' %}" class="sidebar-link"><span class="sidebar-link-icon">🛡</span> Verification</a></li>
+                {% endif %}
             </ul>
         </div>
+        {% endif %}
 
         <!-- Placements -->
+        {% if request.user|has_perm_filter:"placement_drives.view" or request.user|has_perm_filter:"opportunity_discovery.view" %}
         <div class="sidebar-section">
             <div class="sidebar-section-label">Placements</div>
             <ul class="sidebar-nav">
+                {% if request.user|has_perm_filter:"placement_drives.view" %}
                 <li><a href="{% url 'placements:list' %}"    class="sidebar-link"><span class="sidebar-link-icon">🚀</span> Drives</a></li>
+                {% endif %}
+                {% if request.user|has_perm_filter:"opportunity_discovery.view" %}
                 <li><a href="{% url 'opportunities:list' %}" class="sidebar-link"><span class="sidebar-link-icon">🔍</span> Discovery</a></li>
+                {% endif %}
             </ul>
         </div>
+        {% endif %}
 
         <!-- Insights -->
+        {% if request.user|has_perm_filter:"reports.view" or request.user|has_perm_filter:"messages.view" or request.user|has_perm_filter:"notifications.view" %}
         <div class="sidebar-section">
             <div class="sidebar-section-label">Insights</div>
             <ul class="sidebar-nav">
+                {% if request.user|has_perm_filter:"reports.view" %}
                 <li><a href="{% url 'analytics:dashboard' %}"         class="sidebar-link"><span class="sidebar-link-icon">📈</span> Analytics</a></li>
                 <li><a href="{% url 'reports:dashboard' %}"           class="sidebar-link"><span class="sidebar-link-icon">📋</span> Reports</a></li>
+                {% endif %}
+                {% if request.user|has_perm_filter:"messages.view" %}
                 <li><a href="{% url 'communication:dashboard' %}"     class="sidebar-link"><span class="sidebar-link-icon">✉</span> Comm Center</a></li>
+                {% endif %}
+                {% if request.user|has_perm_filter:"notifications.view" %}
                 <li><a href="{% url 'communication:notifications' %}" class="sidebar-link"><span class="sidebar-link-icon">🔔</span> Notifications</a></li>
+                {% endif %}
             </ul>
         </div>
-
+        {% endif %}
+        <!-- Settings -->
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Settings</div>
+            <ul class="sidebar-nav">
+                {% if request.user|is_college_admin_filter %}
+                <li><a href="{% url 'staff_permissions:settings' %}" class="sidebar-link"><span class="sidebar-link-icon">⚙️</span> Settings</a></li>
+                {% else %}
+                <li><a href="{% url 'staff_permissions:change_password' %}" class="sidebar-link"><span class="sidebar-link-icon">🔑</span> Change Password</a></li>
+                {% endif %}
+            </ul>
+        </div>
         <!-- Sign out -->
         <div class="sidebar-footer">
             <a href="{% url 'accounts:logout' %}" class="sidebar-logout">

@@ -3,7 +3,7 @@ from .models import (
     Student, StudentSkill, StudentResume, Project,
     TechnicalLinks, Activity, WeeklySummary, MonthlySummary, ProjectMilestone,
     HackathonJournal, CodingPractice, LearningJournal, OpenSourceContribution,
-    LearningGoal, DeveloperAchievement
+    LearningGoal, DeveloperAchievement, Certificate, SemesterPerformance
 )
 
 
@@ -113,3 +113,17 @@ class DeveloperAchievementAdmin(admin.ModelAdmin):
     list_display = ('title', 'student', 'category', 'date')
     list_filter = ('category', 'date')
     search_fields = ('title', 'student__name', 'student__roll_number')
+
+
+@admin.register(Certificate)
+class CertificateAdmin(admin.ModelAdmin):
+    list_display = ('title', 'student', 'issuing_organization', 'purpose', 'issue_date')
+    list_filter = ('purpose', 'issue_date')
+    search_fields = ('title', 'student__name', 'issuing_organization')
+
+
+@admin.register(SemesterPerformance)
+class SemesterPerformanceAdmin(admin.ModelAdmin):
+    list_display = ('student', 'semester', 'spi', 'status')
+    list_filter = ('semester', 'status')
+    search_fields = ('student__name', 'student__roll_number')

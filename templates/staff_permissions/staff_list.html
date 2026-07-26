@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Management | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding: 2rem 1.5rem;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="dashboard-title">🛡️ Staff Management</h1>
+            <p class="dashboard-welcome">Create, manage, and configure portal staff roles.</p>
+        </div>
+        <a href="{% url 'staff_permissions:staff_create' %}" class="btn btn-primary">+ Add Staff</a>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="dashboard-card card-panel" style="margin-top: 0; padding: 1.25rem;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em;">Total Staff</div>
+            <div style="font-size: 2rem; font-weight: 700; color: #fff; margin-top: 0.25rem;">{{ total_staff }}</div>
+        </div>
+        <div class="dashboard-card card-panel" style="margin-top: 0; padding: 1.25rem;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--success); font-weight: 600; letter-spacing: 0.05em;">Active Staff</div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--success); margin-top: 0.25rem;">{{ active_staff }}</div>
+        </div>
+        <div class="dashboard-card card-panel" style="margin-top: 0; padding: 1.25rem;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--danger); font-weight: 600; letter-spacing: 0.05em;">Inactive Staff</div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--danger); margin-top: 0.25rem;">{{ inactive_staff }}</div>
+        </div>
+    </div>
+
+    <!-- Filters Panel -->
+    <div class="card-panel" style="padding: 1.25rem; margin-bottom: 1.5rem; margin-top: 0;">
+        <form method="get" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+            
+            <!-- Search field -->
+            <div style="flex: 2; min-width: 200px;">
+                <label style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">Search</label>
+                <input type="text" name="q" value="{{ q }}" placeholder="Search by name, username, email..." class="form-control" style="width: 100%;">
+            </div>
+
+            <!-- Role filter -->
+            <div style="flex: 1; min-width: 150px;">
+                <label style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">Role</label>
+                <select name="role" class="form-control" style="width: 100%;">
+                    <option value="">All Roles</option>
+                    <option value="EDITOR" {% if selected_role == 'EDITOR' %}selected{% endif %}>Editor</option>
+                    <option value="VIEW_ONLY" {% if selected_role == 'VIEW_ONLY' %}selected{% endif %}>View Only</option>
+                </select>
+            </div>
+
+            <!-- Status filter -->
+            <div style="flex: 1; min-width: 150px;">
+                <label style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">Status</label>
+                <select name="status" class="form-control" style="width: 100%;">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem;">Apply</button>
+                <a href="{% url 'staff_permissions:staff_list' %}" class="btn btn-secondary" style="padding: 0.55rem 1.25rem;">Reset</a>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="card-panel" style="padding: 0; overflow: hidden; margin-top: 0;">
+        <div style="overflow-x: auto;">
+            <table class="dashboard-table" style="width: 100%; border-collapse: collapse; margin-bottom: 0;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--card-border); background: rgba(255, 255, 255, 0.01);">
+                        <th style="padding: 1rem 1.25rem; text-align: left; width: 64px;">Photo</th>
+                        <th style="padding: 1rem 1.25rem; text-align: left;">Name</th>
+                        <th style="padding: 1rem 1.25rem; text-align: left;">Username</th>
+                        <th style="padding: 1rem 1.25rem; text-align: left;">Email</th>
+                        <th style="padding: 1rem 1.25rem; text-align: center; width: 140px;">Role</th>
+                        <th style="padding: 1rem 1.25rem; text-align: center; width: 120px;">Status</th>
+                        <th style="padding: 1rem 1.25rem; text-align: center; width: 280px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in page_obj %}
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02); vertical-align: middle;">
+                            
+                            <!-- Photo -->
+                            <td style="padding: 1rem 1.25rem;">
+                                {% if staff.profile_picture %}
+                                    <img src="{{ staff.profile_picture.url }}" alt="Photo" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                                {% else %}
+                                    <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: bold; color: var(--text-muted);">
+                                        {{ staff.user.first_name|first|default:staff.user.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- Name -->
+                            <td style="padding: 1rem 1.25rem; font-weight: 600; color: #fff;">
+                                {{ staff.user.get_full_name|default:staff.user.username }}
+                            </td>
+
+                            <!-- Username -->
+                            <td style="padding: 1rem 1.25rem; color: var(--text-secondary);">
+                                @{{ staff.user.username }}
+                            </td>
+
+                            <!-- Email -->
+                            <td style="padding: 1rem 1.25rem; color: var(--text-secondary);">
+                                {{ staff.user.email }}
+                            </td>
+
+                            <!-- Role -->
+                            <td style="padding: 1rem 1.25rem; text-align: center;">
+                                {% if staff.role == 'EDITOR' %}
+                                    <span style="font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-sm); background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: var(--primary); font-weight: 600;">Editor</span>
+                                {% else %}
+                                    <span style="font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-secondary); font-weight: 600;">View Only</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Status -->
+                            <td style="padding: 1rem 1.25rem; text-align: center;">
+                                {% if staff.user.is_active %}
+                                    <span style="color: var(--success); font-weight: bold; font-size: 0.82rem;">🟢 Active</span>
+                                {% else %}
+                                    <span style="color: var(--danger); font-weight: bold; font-size: 0.82rem;">🔴 Inactive</span>
+                                {% endif %}
+                            </td>
+
+                            <td style="padding: 1rem 1.25rem; text-align: center;">
+                                <div style="display: flex; gap: 0.35rem; justify-content: center; align-items: center;">
+                                    <a href="{% url 'staff_permissions:staff_detail' pk=staff.pk %}" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">👁️ View</a>
+                                    <a href="{% url 'staff_permissions:staff_update' pk=staff.pk %}" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">✏️ Edit</a>
+                                    <a href="{% url 'staff_permissions:staff_reset_password' pk=staff.pk %}" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">🔑 Reset PW</a>
+                                    
+                                    <form method="post" action="{% url 'staff_permissions:staff_delete' pk=staff.pk %}" onsubmit="return confirm('Are you sure you want to permanently delete this staff member? This action cannot be undone.');" style="margin: 0; display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: var(--danger); border-color: var(--danger);">🗑️ Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" style="padding: 3rem 1.25rem; text-align: center; color: var(--text-muted);">
+                                No staff members found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+            <div style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.01); border-top: 1px solid var(--card-border);">
+                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    Showing staff page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">&larr; Previous</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">Next &rarr;</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}

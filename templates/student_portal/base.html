@@ -9,6 +9,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{% static 'css/student.css' %}">
+<style>
+  summary::-webkit-details-marker { display: none; }
+  summary { list-style: none; }
+  .sp-nav-details[open] .sp-dropdown-caret { transform: rotate(180deg); }
+  .sp-submenu-link:hover { color: #fff !important; background: rgba(255,255,255,0.03) !important; }
+  .sp-submenu-link.active { color: #fff !important; background: rgba(124,58,237,0.15) !important; font-weight: 600; }
+</style>
 {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -47,8 +54,28 @@
       <div class="sp-section-label">Main</div>
       <ul class="sp-nav">
         <li><a href="{% url 'student_portal:dashboard' %}"     class="sp-link {% block nav_dashboard %}{% endblock %}"><span class="sp-link-icon">📊</span> Dashboard</a></li>
-        <li><a href="{% url 'student_portal:profile' %}"       class="sp-link {% block nav_profile %}{% endblock %}"><span class="sp-link-icon">👤</span> My Profile</a></li>
-        <li><a href="{% url 'student_portal:profile' %}"       class="sp-link {% block nav_academic %}{% endblock %}"><span class="sp-link-icon">🎓</span> Academic Profile</a></li>
+        <li>
+          <details class="sp-nav-details" {% block nav_profile_open %}{% endblock %}>
+            <summary class="sp-link {% block nav_profile_parent %}{% endblock %}" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; outline: none; width: 100%;">
+              <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="sp-link-icon">👤</span> Profile
+              </span>
+              <span class="sp-dropdown-caret" style="font-size: 0.65rem; color: var(--txt-2); transition: var(--t);">▼</span>
+            </summary>
+            <ul class="sp-submenu" style="list-style: none; padding-left: 2.25rem; margin-top: 0.25rem; display: flex; flex-direction: column; gap: 0.25rem;">
+              <li>
+                <a href="{% url 'student_portal:profile' %}" class="sp-submenu-link {% block nav_personal_profile %}{% endblock %}" style="display: block; padding: 0.4rem 0.5rem; font-size: 0.82rem; color: var(--txt-2); text-decoration: none; border-radius: var(--r-sm); transition: var(--t);">
+                  Personal Profile
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'student_portal:academic_profile' %}" class="sp-submenu-link {% block nav_academic_profile %}{% endblock %}" style="display: block; padding: 0.4rem 0.5rem; font-size: 0.82rem; color: var(--txt-2); text-decoration: none; border-radius: var(--r-sm); transition: var(--t);">
+                  Academic Profile
+                </a>
+              </li>
+            </ul>
+          </details>
+        </li>
         <li><a href="{% url 'student_portal:skills' %}"        class="sp-link {% block nav_skills %}{% endblock %}"><span class="sp-link-icon">💡</span> Skills</a></li>
       </ul>
     </div>
@@ -73,7 +100,7 @@
     <div class="sp-section">
       <div class="sp-section-label">Resources</div>
       <ul class="sp-nav">
-        <li><a href="{% url 'student_portal:profile' %}"       class="sp-link {% block nav_certs %}{% endblock %}"><span class="sp-link-icon">🏆</span> Certificates</a></li>
+        <li><a href="{% url 'student_portal:certificates_list' %}"       class="sp-link {% block nav_certs %}{% endblock %}"><span class="sp-link-icon">🏆</span> Certificates</a></li>
         <li><a href="{% url 'student_portal:projects_list' %}"  class="sp-link {% block nav_projects %}{% endblock %}"><span class="sp-link-icon">🔨</span> Projects</a></li>
         <li><a href="{% url 'student_portal:journey' %}"  class="sp-link {% block nav_coding %}{% endblock %}"><span class="sp-link-icon">🚀</span> Developer Journey</a></li>
       </ul>

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staff_tags %}
 
 {% block title %}{{ college.name }} Profile | PlaceSync{% endblock %}
 
@@ -12,7 +13,9 @@
             <p class="dashboard-welcome">View and manage your college's public profile information</p>
         </div>
         <div>
+            {% if request.user|can_edit_filter %}
             <a href="{% url 'colleges:profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+            {% endif %}
         </div>
     </div>
 
@@ -133,7 +136,9 @@
                 {% else %}
                     <div style="text-align: center; padding: 3rem 0; border: 2px dashed var(--card-border); border-radius: var(--radius-md); background: rgba(255,255,255,0.01);">
                         <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">No campus photos uploaded yet.</p>
+                        {% if request.user|can_edit_filter %}
                         <a href="{% url 'colleges:profile_edit' %}" class="btn btn-secondary" style="font-size: 0.85rem;">Upload Photos</a>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>

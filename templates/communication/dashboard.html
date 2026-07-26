@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staff_tags %}
 
 {% block title %}Announcements & Communication | PlaceSync{% endblock %}
 
@@ -12,7 +13,9 @@
             <p class="dashboard-welcome">Broadcast emails to students or companies, manage prefill templates, and audit dispatch logs.</p>
         </div>
         <div>
+            {% if request.user|can_edit_filter %}
             <a href="{% url 'communication:compose' %}" class="btn btn-primary">✉️ Compose Announcement</a>
+            {% endif %}
         </div>
     </div>
 
@@ -23,7 +26,9 @@
         <div class="card-panel" style="margin-top: 0; padding: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
                 <h3 class="panel-title" style="margin: 0; border: none; padding: 0;">📋 Email Prefill Templates</h3>
+                {% if request.user|can_edit_filter %}
                 <a href="{% url 'communication:template_create' %}" class="btn btn-secondary btn-xs" style="background: rgba(99, 102, 241, 0.05); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.2);">➕ Create Template</a>
+                {% endif %}
             </div>
 
             {% if templates %}
@@ -52,12 +57,16 @@
                                         </td>
                                         <td style="text-align: right;">
                                             <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+                                                {% if request.user|can_edit_filter %}
                                                 <a href="{% url 'communication:compose' %}?template_id={{ tpl.pk }}" class="btn btn-secondary btn-xs" style="background: rgba(16, 185, 129, 0.05); color: var(--success); border-color: rgba(16, 185, 129, 0.2);" title="Prefill composer with this template">Compose</a>
                                                 <a href="{% url 'communication:template_edit' pk=tpl.pk %}" class="btn btn-secondary btn-xs" title="Edit Template Details">Edit</a>
                                                 <form action="{% url 'communication:template_delete' pk=tpl.pk %}" method="post" style="margin: 0;" onsubmit="return confirm('Delete this email template?');">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-secondary btn-xs btn-danger-text">Delete</button>
                                                 </form>
+                                                {% else %}
+                                                <span style="color: var(--text-muted); font-size: 0.75rem; font-style: italic;">View Only</span>
+                                                {% endif %}
                                             </div>
                                         </td>
                                     </tr>

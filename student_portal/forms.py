@@ -1,8 +1,8 @@
 from django import forms
 from students.models import (
-    StudentSkill, Project, TechnicalLinks, Activity, WeeklySummary, MonthlySummary,
+    Student, StudentSkill, Project, TechnicalLinks, Activity, WeeklySummary, MonthlySummary,
     ProjectMilestone, HackathonJournal, CodingPractice, LearningJournal, OpenSourceContribution,
-    LearningGoal, DeveloperAchievement
+    LearningGoal, DeveloperAchievement, Certificate, SemesterPerformance
 )
 
 
@@ -308,5 +308,186 @@ class DeveloperAchievementForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'sp-form-input', 'rows': 4, 'placeholder': 'Provide context, link, or verification details...'}),
             'certificate': forms.FileInput(attrs={'class': 'sp-form-input'}),
         }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CertificateForm
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CertificateForm(forms.ModelForm):
+    class Meta:
+        model = Certificate
+        exclude = ['student']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. AWS Certified Solutions Architect'}),
+            'issuing_organization': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Amazon Web Services (AWS)'}),
+            'purpose': forms.Select(attrs={'class': 'sp-form-input'}),
+            'issue_date': forms.DateInput(attrs={'class': 'sp-form-input', 'type': 'date'}),
+            'certificate_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'Optional URL link to verify credential'}),
+            'certificate_file': forms.FileInput(attrs={'class': 'sp-form-input', 'accept': '.pdf,image/*'}),
+        }
+
+    def clean_certificate_file(self):
+        file = self.cleaned_data.get('certificate_file')
+        if file:
+            # 1. Extension check
+            allowed_extensions = ['.pdf', '.jpg', '.jpeg', '.png', '.webp']
+            ext = '.' + file.name.lower().split('.')[-1]
+            if ext not in allowed_extensions:
+                raise forms.ValidationError("Only PDF documents and image files (JPG, PNG, WEBP) are allowed.")
+            # 2. File size check (5 MB)
+            if file.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("Certificate file size must be under 5 MB.")
+        return file
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PersonalProfileForm
+# ─────────────────────────────────────────────────────────────────────────────
+
+class PersonalProfileForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = [
+            'photo', 'name', 'email', 'phone', 'date_of_birth', 'gender', 'address',
+            'github_url', 'linkedin_url', 'portfolio_url', 'leetcode_url',
+            'bio', 'preferred_job_role', 'preferred_work_location', 'higher_studies'
+        ]
+        widgets = {
+            'photo': forms.FileInput(attrs={'class': 'sp-form-input', 'accept': 'image/*'}),
+            'name': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'Full Name'}),
+            'email': forms.EmailInput(attrs={'class': 'sp-form-input', 'placeholder': 'Email Address'}),
+            'phone': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'Phone Number'}),
+            'date_of_birth': forms.DateInput(attrs={'class': 'sp-form-input', 'type': 'date'}),
+            'gender': forms.Select(attrs={'class': 'sp-form-input'}, choices=[
+                ('', 'Select Gender'),
+                ('Male', 'Male'),
+                ('Female', 'Female'),
+                ('Other', 'Other')
+            ]),
+            'address': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'Full Contact Address'}),
+            'github_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'https://github.com/username'}),
+            'linkedin_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'https://linkedin.com/in/username'}),
+            'portfolio_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'https://portfolio.com'}),
+            'leetcode_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'https://leetcode.com/username'}),
+            'bio': forms.Textarea(attrs={'class': 'sp-form-input', 'rows': 4, 'placeholder': 'Write a short professional summary...'}),
+            'preferred_job_role': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Software Engineer, Data Analyst'}),
+            'preferred_work_location': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Bangalore, Pune, Remote'}),
+            'higher_studies': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'Optional: e.g. M.Tech, MS in CS'}),
+        }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AcademicProfileForm
+# ─────────────────────────────────────────────────────────────────────────────
+
+class AcademicProfileForm(forms.ModelForm):
+    # Dynamic decimal fields for 8 semesters
+    spi_sem_1 = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=0.0, max_value=10.0, widget=forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': '--'}))
+    spi_sem_2 = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=0.0, max_value=10.0, widget=forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': '--'}))
+    spi_sem_3 = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=0.0, max_value=10.0, widget=forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': '--'}))
+    spi_sem_4 = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=0.0, max_value=10.0, widget=forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': '--'}))
+    spi_sem_5 = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=0.0, max_value=10.0, widget=forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': '--'}))
+    spi_sem_6 = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=0.0, max_value=10.0, widget=forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': '--'}))
+    spi_sem_7 = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=0.0, max_value=10.0, widget=forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': '--'}))
+    spi_sem_8 = forms.DecimalField(max_digits=4, decimal_places=2, required=False, min_value=0.0, max_value=10.0, widget=forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': '--'}))
+
+    class Meta:
+        model = Student
+        fields = [
+            'college', 'department', 'course', 'batch',
+            'current_academic_year', 'semester', 'admission_year', 'graduation_year',
+            'tenth_board', 'tenth_percentage', 'twelfth_board', 'twelfth_percentage'
+        ]
+        widgets = {
+            'college': forms.Select(attrs={'class': 'sp-form-input'}),
+            'department': forms.Select(attrs={'class': 'sp-form-input'}),
+            'course': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Computer Science & Engineering'}),
+            'batch': forms.Select(attrs={'class': 'sp-form-input'}),
+            'current_academic_year': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. 3rd Year'}),
+            'semester': forms.NumberInput(attrs={'class': 'sp-form-input', 'min': 1, 'max': 8}),
+            'admission_year': forms.NumberInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. 2023'}),
+            'graduation_year': forms.NumberInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. 2027'}),
+            'tenth_board': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. CBSE, ICSE'}),
+            'tenth_percentage': forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': 'e.g. 92.50'}),
+            'twelfth_board': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. CBSE, State Board'}),
+            'twelfth_percentage': forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.01', 'placeholder': 'e.g. 88.00'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Disable/Read-only seeded fields if they are not empty (Admin CSV import protection)
+        if self.instance and self.instance.pk:
+            # Check fields:
+            if self.instance.college_id:
+                self.fields['college'].disabled = True
+                self.fields['college'].required = False
+            if self.instance.department_id:
+                self.fields['department'].disabled = True
+                self.fields['department'].required = False
+            if self.instance.course:
+                self.fields['course'].disabled = True
+                self.fields['course'].required = False
+            if self.instance.batch_id:
+                self.fields['batch'].disabled = True
+                self.fields['batch'].required = False
+            if self.instance.semester:
+                self.fields['semester'].disabled = True
+                self.fields['semester'].required = False
+            if self.instance.admission_year:
+                self.fields['admission_year'].disabled = True
+                self.fields['admission_year'].required = False
+            if self.instance.graduation_year:
+                self.fields['graduation_year'].disabled = True
+                self.fields['graduation_year'].required = False
+
+            # Populate initial SPI values from database
+            for sem in range(1, 9):
+                perf = self.instance.semester_performances.filter(semester=sem).first()
+                if perf:
+                    self.initial[f'spi_sem_{sem}'] = perf.spi
+
+    def save(self, commit=True):
+        student = super().save(commit=False)
+        if commit:
+            student.save()
+        
+        # Save semester performance records
+        spis = []
+        for sem in range(1, 9):
+            spi_val = self.cleaned_data.get(f'spi_sem_{sem}')
+            if spi_val is not None:
+                spis.append(float(spi_val))
+                # Set status: Completed if sem < student.semester, Current if sem == student.semester, Upcoming if sem > student.semester
+                if sem < student.semester:
+                    status_val = "Completed"
+                elif sem == student.semester:
+                    status_val = "Current"
+                else:
+                    status_val = "Upcoming"
+                
+                perf, created = SemesterPerformance.objects.get_or_create(
+                    student=student,
+                    semester=sem,
+                    defaults={'spi': spi_val, 'status': status_val}
+                )
+                if not created:
+                    perf.spi = spi_val
+                    perf.status = status_val
+                    perf.save()
+            else:
+                # If SPI is blank, delete it
+                student.semester_performances.filter(semester=sem).delete()
+
+        # Recalculate CGPA from SPIs using Python
+        if spis:
+            from decimal import Decimal
+            student.cgpa = Decimal(str(round(sum(spis) / len(spis), 2)))
+        else:
+            student.cgpa = None
+
+        if commit:
+            student.save()
+        return student
 
 

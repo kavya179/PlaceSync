@@ -17,9 +17,13 @@ class ProjectForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'sp-form-input'}),
             'project_type': forms.Select(attrs={'class': 'sp-form-input'}),
             'status': forms.Select(attrs={'class': 'sp-form-input'}),
+            'team_type': forms.Select(attrs={'class': 'sp-form-input'}),
+            'start_date': forms.DateInput(attrs={'class': 'sp-form-input', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'sp-form-input', 'type': 'date'}),
             'technologies': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Python, Django, PostgreSQL (comma-separated)'}),
             'github_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'https://github.com/...'}),
             'live_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'https://...'}),
+            'image': forms.FileInput(attrs={'class': 'sp-form-input', 'accept': 'image/*'}),
             'youtube_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'YouTube Demo Video URL'}),
             'documentation_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'Documentation website URL'}),
             'google_drive_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'Google Drive folder/report URL'}),
@@ -65,11 +69,25 @@ class StudentSkillForm(forms.ModelForm):
 
 
 class ResumeUploadForm(forms.Form):
-    """Form to upload/replace a PDF Resume or CV."""
+    """Form to upload a PDF Resume or CV."""
+    resume_name = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'sp-form-input',
+            'placeholder': 'e.g. Full Stack Developer Resume (optional)'
+        }),
+        label='Resume Name'
+    )
     resume_type = forms.ChoiceField(
         choices=[('RESUME', 'Resume'), ('CV', 'CV')],
         widget=forms.Select(attrs={'class': 'sp-form-input'}),
-        label='File Type'
+        label='Resume Type'
+    )
+    is_default = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'style': 'transform: scale(1.2); margin-right: 0.5rem;'}),
+        label='Set as Default Resume'
     )
     file = forms.FileField(
         widget=forms.FileInput(attrs={'class': 'sp-form-input', 'accept': '.pdf'}),
@@ -317,12 +335,15 @@ class DeveloperAchievementForm(forms.ModelForm):
 class CertificateForm(forms.ModelForm):
     class Meta:
         model = Certificate
-        exclude = ['student']
+        exclude = ['student', 'created_at']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. AWS Certified Solutions Architect'}),
             'issuing_organization': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Amazon Web Services (AWS)'}),
+            'category': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Cloud Computing, Web Development'}),
             'purpose': forms.Select(attrs={'class': 'sp-form-input'}),
+            'credential_id': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. AWS-948201'}),
             'issue_date': forms.DateInput(attrs={'class': 'sp-form-input', 'type': 'date'}),
+            'expiry_date': forms.DateInput(attrs={'class': 'sp-form-input', 'type': 'date'}),
             'certificate_url': forms.URLInput(attrs={'class': 'sp-form-input', 'placeholder': 'Optional URL link to verify credential'}),
             'certificate_file': forms.FileInput(attrs={'class': 'sp-form-input', 'accept': '.pdf,image/*'}),
         }
@@ -339,6 +360,31 @@ class CertificateForm(forms.ModelForm):
             if file.size > 5 * 1024 * 1024:
                 raise forms.ValidationError("Certificate file size must be under 5 MB.")
         return file
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CareerProfileForm
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CareerProfileForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = [
+            'preferred_job_role', 'preferred_industry', 'preferred_city', 'preferred_country',
+            'work_preference', 'expected_salary', 'career_objective', 'higher_studies',
+            'willing_to_relocate'
+        ]
+        widgets = {
+            'preferred_job_role': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Full Stack Developer, Data Scientist'}),
+            'preferred_industry': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Information Technology, FinTech, E-commerce'}),
+            'preferred_city': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Bangalore, Pune, Mumbai'}),
+            'preferred_country': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. India, USA, Germany'}),
+            'work_preference': forms.Select(attrs={'class': 'sp-form-input'}),
+            'expected_salary': forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.5', 'placeholder': 'Expected LPA e.g. 8.5'}),
+            'career_objective': forms.Select(attrs={'class': 'sp-form-input'}),
+            'higher_studies': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'Optional: e.g. MS in Computer Science'}),
+            'willing_to_relocate': forms.CheckboxInput(attrs={'style': 'margin-right: 0.5rem; transform: scale(1.15);'}),
+        }
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -489,5 +535,26 @@ class AcademicProfileForm(forms.ModelForm):
         if commit:
             student.save()
         return student
+
+
+class CareerProfileForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = [
+            'preferred_job_role', 'preferred_industry', 'preferred_city', 'preferred_country',
+            'work_preference', 'willing_to_relocate', 'expected_salary', 'career_objective', 'higher_studies'
+        ]
+        widgets = {
+            'preferred_job_role': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Full Stack Developer, Software Engineer'}),
+            'preferred_industry': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Information Technology, FinTech'}),
+            'preferred_city': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. Bangalore, Pune, Remote'}),
+            'preferred_country': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. India'}),
+            'work_preference': forms.Select(attrs={'class': 'sp-form-input'}),
+            'willing_to_relocate': forms.CheckboxInput(attrs={'style': 'transform: scale(1.2); margin-right: 0.5rem;'}),
+            'expected_salary': forms.NumberInput(attrs={'class': 'sp-form-input', 'step': '0.1', 'placeholder': 'e.g. 12.50'}),
+            'career_objective': forms.Select(attrs={'class': 'sp-form-input'}),
+            'higher_studies': forms.TextInput(attrs={'class': 'sp-form-input', 'placeholder': 'e.g. MS in CS, MBA'}),
+        }
+
 
 

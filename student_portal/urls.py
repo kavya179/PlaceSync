@@ -13,11 +13,16 @@ from .views import (
     StudentMarkNotificationReadView,
     StudentSettingsView,
     StudentResumeUploadView,
-    # Resume Version History & ATS Analysis
+    # Resume Management & ATS Analysis
     StudentResumeDashboardView,
-    StudentResumeDownloadView,
+    StudentResumeSetDefaultView,
+    StudentResumeRenameView,
     StudentResumeDeleteView,
+    StudentResumeDownloadView,
+    StudentResumePreviewView,
+    StudentATSAnalysisView,
     StudentResumeCompareView,
+    StudentAIResumeParserView,
     # Skills
     StudentSkillsView,
     StudentSkillAddView,
@@ -51,6 +56,9 @@ from .views import (
     StudentCertificateDetailView,
     StudentCertificateUpdateView,
     StudentCertificateDeleteView,
+    StudentCertificatePreviewView,
+    StudentCertificateDownloadView,
+    StudentCareerProfileView,
     RecruiterCertificatesListView,
     RecruiterCertificateDetailView,
 )
@@ -62,13 +70,21 @@ urlpatterns = [
     path('profile/',                          StudentProfileView.as_view(),               name='profile'),
     path('profile/edit/',                     StudentProfileEditView.as_view(),           name='profile_edit'),
     path('profile/academic/',                 StudentAcademicProfileView.as_view(),       name='academic_profile'),
+    path('profile/career/',                   StudentCareerProfileView.as_view(),         name='career_profile'),
     
-    # Resume Management & ATS Analysis
+    # Resume Management
     path('resume/',                           StudentResumeDashboardView.as_view(),       name='resume_dashboard'),
     path('resume/upload/',                    StudentResumeUploadView.as_view(),          name='resume_upload'),
-    path('resume/download/<int:pk>/',         StudentResumeDownloadView.as_view(),        name='resume_download'),
+    path('resume/set-default/<int:pk>/',     StudentResumeSetDefaultView.as_view(),      name='resume_set_default'),
+    path('resume/rename/<int:pk>/',          StudentResumeRenameView.as_view(),          name='resume_rename'),
     path('resume/delete/<int:pk>/',           StudentResumeDeleteView.as_view(),          name='resume_delete'),
-    path('resume/compare/',                   StudentResumeCompareView.as_view(),         name='resume_compare'),
+    path('resume/download/<int:pk>/',         StudentResumeDownloadView.as_view(),        name='resume_download'),
+    path('resume/preview/<int:pk>/',          StudentResumePreviewView.as_view(),         name='resume_preview'),
+
+    # ATS Analysis & Comparison
+    path('ats/',                              StudentATSAnalysisView.as_view(),           name='ats_analysis'),
+    path('ats/compare/',                      StudentResumeCompareView.as_view(),         name='resume_compare'),
+    path('resume-parser/',                    StudentAIResumeParserView.as_view(),        name='resume_parser'),
 
     # Skills
     path('skills/',                           StudentSkillsView.as_view(),                name='skills'),
@@ -123,6 +139,8 @@ urlpatterns = [
     path('certificates/<int:pk>/',            StudentCertificateDetailView.as_view(),     name='certificate_detail'),
     path('certificates/<int:pk>/edit/',       StudentCertificateUpdateView.as_view(),     name='certificate_edit'),
     path('certificates/<int:pk>/delete/',     StudentCertificateDeleteView.as_view(),     name='certificate_delete'),
+    path('certificates/<int:pk>/preview/',    StudentCertificatePreviewView.as_view(),    name='certificate_preview'),
+    path('certificates/<int:pk>/download/',   StudentCertificateDownloadView.as_view(),   name='certificate_download'),
     path('portfolio/certificates/<int:student_id>/', RecruiterCertificatesListView.as_view(), name='recruiter_certificates'),
     path('portfolio/certificate/<int:pk>/',   RecruiterCertificateDetailView.as_view(),   name='recruiter_certificate_detail'),
 ]

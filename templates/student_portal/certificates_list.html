@@ -3,6 +3,7 @@
 {% block title %}Certificates | PlaceSync{% endblock %}
 {% block topbar_title %}{% if is_recruiter %}{{ student.name }}'s Certificates{% else %}Certificates{% endif %}{% endblock %}
 {% block nav_certs %}active{% endblock %}
+{% block page_body_class %}page-certificates{% endblock %}
 
 {% block content %}
 
@@ -128,11 +129,16 @@
             </td>
             <td style="padding: 1.1rem 1.5rem; color: var(--txt-3); font-size: 0.85rem;">{{ cert.issue_date|date:"M d, Y" }}</td>
             <td style="padding: 1.1rem 1.5rem; text-align: right;">
-              {% if is_recruiter %}
-              <a href="{% url 'student_portal:recruiter_certificate_detail' cert.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="padding: 0.35rem 0.75rem;">👁 View</a>
-              {% else %}
-              <a href="{% url 'student_portal:certificate_detail' cert.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="padding: 0.35rem 0.75rem;">👁 View</a>
-              {% endif %}
+              <div style="display:flex;gap:.4rem;justify-content:flex-end;">
+                {% if cert.certificate_file %}
+                  <a href="{% url 'student_portal:certificate_preview' cert.pk %}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs">👁️ Preview</a>
+                  <a href="{% url 'student_portal:certificate_download' cert.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs">📥 Download</a>
+                {% endif %}
+                {% if not is_recruiter %}
+                  <a href="{% url 'student_portal:certificate_edit' cert.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs">✏️ Edit</a>
+                  <a href="{% url 'student_portal:certificate_delete' cert.pk %}" class="sp-btn sp-btn-danger sp-btn-xs">🗑️ Delete</a>
+                {% endif %}
+              </div>
             </td>
           </tr>
           {% endfor %}

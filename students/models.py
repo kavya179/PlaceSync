@@ -99,8 +99,39 @@ class Student(models.Model):
     codechef_url = models.URLField(blank=True)
     hackerrank_url = models.URLField(blank=True)
     preferred_job_role = models.CharField(max_length=100, blank=True)
+    preferred_industry = models.CharField(max_length=100, blank=True)
+    preferred_city = models.CharField(max_length=100, blank=True)
+    preferred_country = models.CharField(max_length=100, blank=True, default="India")
     preferred_work_location = models.CharField(max_length=100, blank=True)
+    work_preference = models.CharField(
+        max_length=20,
+        choices=[
+            ('REMOTE', 'Remote'),
+            ('HYBRID', 'Hybrid'),
+            ('ONSITE', 'Onsite'),
+            ('ANY', 'Open to Any')
+        ],
+        default='ANY'
+    )
+    expected_salary = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Expected Salary in LPA"
+    )
+    career_objective = models.CharField(
+        max_length=50,
+        choices=[
+            ('JOB', 'Placement Job'),
+            ('HIGHER_STUDIES', 'Higher Studies'),
+            ('ENTREPRENEURSHIP', 'Entrepreneurship'),
+            ('BOTH', 'Job & Higher Studies')
+        ],
+        default='JOB'
+    )
     higher_studies = models.CharField(max_length=255, blank=True, help_text="e.g. MS in CS, MBA")
+    willing_to_relocate = models.BooleanField(default=True)
     
     # ── Academic fields managed by Admin ───────────────────
     tenth_board = models.CharField(max_length=100, blank=True)
@@ -307,7 +338,13 @@ class StudentResume(models.Model):
         on_delete=models.CASCADE,
         related_name='resume_versions'
     )
+    resume_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Custom name for the resume"
+    )
     file = models.FileField(upload_to='student_resumes/')
+    file_size = models.PositiveIntegerField(default=0, help_text="File size in bytes")
     resume_type = models.CharField(
         max_length=10,
         choices=ResumeType.choices,
@@ -315,7 +352,9 @@ class StudentResume(models.Model):
     )
     version = models.PositiveIntegerField(default=1)
     is_active = models.BooleanField(default=True)
+    is_default = models.BooleanField(default=False, help_text="Mark as default resume")
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     # Analysis metrics
     extracted_text = models.TextField(blank=True)
@@ -333,22 +372,60 @@ class StudentResume(models.Model):
     missing_keywords = models.TextField(blank=True, default='[]')
     suggestions = models.TextField(blank=True, default='[]')
 
+    # AI Resume Parser extended fields
+    parser_status = models.CharField(
+        max_length=20,
+        default='PENDING',
+        choices=[('PENDING', 'Pending'), ('COMPLETED', 'Completed'), ('FAILED', 'Failed')]
+    )
+    parsed_at = models.DateTimeField(null=True, blank=True)
+    parser_confidence = models.PositiveIntegerField(default=0, help_text="0-100% confidence score")
+    programming_languages_found = models.TextField(blank=True, default='[]')
+    tools_found = models.TextField(blank=True, default='[]')
+    soft_skills_found = models.TextField(blank=True, default='[]')
+
     class Meta:
-        ordering = ['-version']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['student', 'resume_type', 'version'],
-                name='unique_student_resumetype_version'
-            )
-        ]
+        ordering = ['-is_default', '-uploaded_at']
 
     def __str__(self):
-        return f"{self.get_resume_type_display()} v{self.version} — {self.student.name}"
+        return f"{self.display_name} ({self.get_resume_type_display()}) — {self.student.name}"
+
+    @property
+    def display_name(self):
+        if self.resume_name and self.resume_name.strip():
+            return self.resume_name.strip()
+        import os
+        return os.path.basename(self.file.name)
 
     @property
     def filename(self):
         import os
         return os.path.basename(self.file.name)
+
+    @property
+    def formatted_file_size(self):
+        size = self.file_size
+        if not size:
+            try:
+                size = self.file.size
+            except Exception:
+                size = 0
+        if size < 1024:
+            return f"{size} B"
+        elif size < 1024 * 1024:
+            return f"{size / 1024:.1f} KB"
+        else:
+            return f"{size / (1024 * 1024):.1f} MB"
+
+    def set_as_default(self):
+        """Sets this resume as default and unsets default for all other resumes of this student."""
+        StudentResume.objects.filter(student=self.student).update(is_default=False)
+        self.is_default = True
+        self.is_active = True
+        self.save()
+        if self.resume_type == 'RESUME':
+            self.student.resume = self.file
+            self.student.save()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -411,6 +488,14 @@ class Project(models.Model):
         default=Status.COMPLETED
     )
     technologies = models.TextField(help_text="Comma-separated technologies e.g. Python, Django, PostgreSQL")
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    team_type = models.CharField(
+        max_length=20,
+        choices=[('INDIVIDUAL', 'Individual'), ('TEAM', 'Team Project')],
+        default='INDIVIDUAL'
+    )
+    image = models.ImageField(upload_to='project_images/', null=True, blank=True)
     
     # Project Links
     github_url = models.URLField(blank=True)
@@ -1172,8 +1257,11 @@ class Certificate(models.Model):
     title = models.CharField(max_length=255)
     issuing_organization = models.CharField(max_length=255)
     purpose = models.CharField(max_length=50, choices=Purpose.choices, default=Purpose.COURSE_COMPLETION)
+    category = models.CharField(max_length=100, blank=True, help_text="e.g. Web Development, Cloud, AI/ML")
     issue_date = models.DateField()
-    certificate_url = models.URLField(blank=True, null=True)
+    expiry_date = models.DateField(null=True, blank=True)
+    credential_id = models.CharField(max_length=100, blank=True)
+    certificate_url = models.URLField(blank=True, null=True, verbose_name="Credential URL")
     certificate_file = models.FileField(upload_to='certificates/')
     created_at = models.DateTimeField(auto_now_add=True)
 

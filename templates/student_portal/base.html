@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="PlaceSync Student Portal">
+<meta name="description" content="PlaceSync SaaS Career Intelligence Platform">
 <title>{% block title %}Student Portal | PlaceSync{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,12 +13,12 @@
   summary::-webkit-details-marker { display: none; }
   summary { list-style: none; }
   .sp-nav-details[open] .sp-dropdown-caret { transform: rotate(180deg); }
-  .sp-submenu-link:hover { color: #fff !important; background: rgba(255,255,255,0.03) !important; }
-  .sp-submenu-link.active { color: #fff !important; background: rgba(124,58,237,0.15) !important; font-weight: 600; }
+  .sp-submenu-link:hover { color: #fff !important; background: rgba(255,255,255,0.05) !important; }
+  .sp-submenu-link.active { color: #fff !important; background: rgba(99,102,241,0.18) !important; font-weight: 700; border-left: 2px solid var(--i1); }
 </style>
 {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="{% block page_body_class %}page-dashboard{% endblock %}">
 
 <!-- Pure-CSS sidebar toggle -->
 <input type="checkbox" id="sp-toggle" aria-hidden="true">
@@ -28,7 +28,7 @@
   <!-- Sidebar overlay (mobile) -->
   <label class="sp-overlay" for="sp-toggle" aria-hidden="true"></label>
 
-  <!-- ══════ SIDEBAR ══════ -->
+  <!-- ══════ FLOATING SAAS SIDEBAR ══════ -->
   <aside class="sp-sidebar" role="navigation" aria-label="Student navigation">
 
     <!-- Brand -->
@@ -53,56 +53,60 @@
     <div class="sp-section">
       <div class="sp-section-label">Main</div>
       <ul class="sp-nav">
-        <li><a href="{% url 'student_portal:dashboard' %}"     class="sp-link {% block nav_dashboard %}{% endblock %}"><span class="sp-link-icon">📊</span> Dashboard</a></li>
+        <li><a href="{% url 'student_portal:dashboard' %}" class="sp-link {% block nav_dashboard %}{% endblock %}"><span class="sp-link-icon">📊</span> Career Intelligence Center</a></li>
         <li>
           <details class="sp-nav-details" {% block nav_profile_open %}{% endblock %}>
             <summary class="sp-link {% block nav_profile_parent %}{% endblock %}" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; outline: none; width: 100%;">
-              <span style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="display: flex; align-items: center; gap: 0.65rem;">
                 <span class="sp-link-icon">👤</span> Profile
               </span>
-              <span class="sp-dropdown-caret" style="font-size: 0.65rem; color: var(--txt-2); transition: var(--t);">▼</span>
+              <span class="sp-dropdown-caret" style="font-size: 0.65rem; color: var(--txt-3); transition: var(--t);">▼</span>
             </summary>
             <ul class="sp-submenu" style="list-style: none; padding-left: 2.25rem; margin-top: 0.25rem; display: flex; flex-direction: column; gap: 0.25rem;">
               <li>
-                <a href="{% url 'student_portal:profile' %}" class="sp-submenu-link {% block nav_personal_profile %}{% endblock %}" style="display: block; padding: 0.4rem 0.5rem; font-size: 0.82rem; color: var(--txt-2); text-decoration: none; border-radius: var(--r-sm); transition: var(--t);">
+                <a href="{% url 'student_portal:profile' %}" class="sp-submenu-link {% block nav_personal_profile %}{% endblock %}" style="display: block; padding: 0.4rem 0.6rem; font-size: 0.82rem; color: var(--txt-2); text-decoration: none; border-radius: var(--r-sm); transition: var(--t);">
                   Personal Profile
                 </a>
               </li>
               <li>
-                <a href="{% url 'student_portal:academic_profile' %}" class="sp-submenu-link {% block nav_academic_profile %}{% endblock %}" style="display: block; padding: 0.4rem 0.5rem; font-size: 0.82rem; color: var(--txt-2); text-decoration: none; border-radius: var(--r-sm); transition: var(--t);">
+                <a href="{% url 'student_portal:academic_profile' %}" class="sp-submenu-link {% block nav_academic_profile %}{% endblock %}" style="display: block; padding: 0.4rem 0.6rem; font-size: 0.82rem; color: var(--txt-2); text-decoration: none; border-radius: var(--r-sm); transition: var(--t);">
                   Academic Profile
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'student_portal:career_profile' %}" class="sp-submenu-link {% block nav_career_profile %}{% endblock %}" style="display: block; padding: 0.4rem 0.6rem; font-size: 0.82rem; color: var(--txt-2); text-decoration: none; border-radius: var(--r-sm); transition: var(--t);">
+                  Career Preferences
                 </a>
               </li>
             </ul>
           </details>
         </li>
-        <li><a href="{% url 'student_portal:skills' %}"        class="sp-link {% block nav_skills %}{% endblock %}"><span class="sp-link-icon">💡</span> Skills</a></li>
+        <li><a href="{% url 'student_portal:skills' %}" class="sp-link {% block nav_skills %}{% endblock %}"><span class="sp-link-icon">💡</span> Skills</a></li>
       </ul>
     </div>
 
-
     <!-- Career -->
     <div class="sp-section">
-      <div class="sp-section-label">Career</div>
+      <div class="sp-section-label">Career Intelligence</div>
       <ul class="sp-nav">
-        <li><a href="{% url 'student_portal:resume_dashboard' %}" class="sp-link {% block nav_resume %}{% endblock %}"><span class="sp-link-icon">📄</span> Resume &amp; CV</a></li>
-        <li><a href="{% url 'student_portal:resume_dashboard' %}" class="sp-link {% block nav_ats %}{% endblock %}"><span class="sp-link-icon">🤖</span> ATS Analysis</a></li>
-        <li><a href="{% url 'student_portal:drives' %}"        class="sp-link {% block nav_drives %}{% endblock %}"><span class="sp-link-icon">🚀</span> Placement Drives</a></li>
-        <li><a href="{% url 'student_portal:applications' %}"  class="sp-link {% block nav_applications %}{% endblock %}"><span class="sp-link-icon">📋</span> Applications</a></li>
-        <li><a href="{% url 'student_portal:calendar' %}"      class="sp-link {% block nav_calendar %}{% endblock %}"><span class="sp-link-icon">📅</span> Placement Calendar</a></li>
-        <li><a href="{% url 'student_portal:recommendations' %}" class="sp-link {% block nav_recommendations %}{% endblock %}"><span class="sp-link-icon">💡</span> Smart Recommendations</a></li>
-        <li><a href="{% url 'student_portal:analytics' %}"       class="sp-link {% block nav_analytics %}{% endblock %}"><span class="sp-link-icon">📈</span> Career Analytics</a></li>
-        <li><a href="{% url 'student_portal:drives' %}"        class="sp-link {% block nav_companies %}{% endblock %}"><span class="sp-link-icon">🏢</span> Companies</a></li>
+        <li><a href="{% url 'student_portal:resume_dashboard' %}" class="sp-link {% block nav_resume %}{% endblock %}"><span class="sp-link-icon">📄</span> Resume Management</a></li>
+        <li><a href="{% url 'student_portal:ats_analysis' %}" class="sp-link {% block nav_ats %}{% endblock %}"><span class="sp-link-icon">🤖</span> ATS Intelligence</a></li>
+        <li><a href="{% url 'student_portal:resume_parser' %}" class="sp-link {% block nav_parser %}{% endblock %}"><span class="sp-link-icon">⚡</span> Resume Intelligence</a></li>
+        <li><a href="{% url 'student_portal:drives' %}" class="sp-link {% block nav_drives %}{% endblock %}"><span class="sp-link-icon">🚀</span> Placement Drives</a></li>
+        <li><a href="{% url 'student_portal:applications' %}" class="sp-link {% block nav_applications %}{% endblock %}"><span class="sp-link-icon">📋</span> Applications</a></li>
+        <li><a href="{% url 'student_portal:calendar' %}" class="sp-link {% block nav_calendar %}{% endblock %}"><span class="sp-link-icon">📅</span> Placement Calendar</a></li>
+        <li><a href="{% url 'student_portal:recommendations' %}" class="sp-link {% block nav_recommendations %}{% endblock %}"><span class="sp-link-icon">🎯</span> Career Blueprint</a></li>
+        <li><a href="{% url 'student_portal:analytics' %}" class="sp-link {% block nav_analytics %}{% endblock %}"><span class="sp-link-icon">📈</span> Career Insights</a></li>
       </ul>
     </div>
 
     <!-- Resources -->
     <div class="sp-section">
-      <div class="sp-section-label">Resources</div>
+      <div class="sp-section-label">Portfolio &amp; Work</div>
       <ul class="sp-nav">
-        <li><a href="{% url 'student_portal:certificates_list' %}"       class="sp-link {% block nav_certs %}{% endblock %}"><span class="sp-link-icon">🏆</span> Certificates</a></li>
-        <li><a href="{% url 'student_portal:projects_list' %}"  class="sp-link {% block nav_projects %}{% endblock %}"><span class="sp-link-icon">🔨</span> Projects</a></li>
-        <li><a href="{% url 'student_portal:journey' %}"  class="sp-link {% block nav_coding %}{% endblock %}"><span class="sp-link-icon">🚀</span> Developer Journey</a></li>
+        <li><a href="{% url 'student_portal:certificates_list' %}" class="sp-link {% block nav_certs %}{% endblock %}"><span class="sp-link-icon">🏆</span> Certificates</a></li>
+        <li><a href="{% url 'student_portal:projects_list' %}" class="sp-link {% block nav_projects %}{% endblock %}"><span class="sp-link-icon">🔨</span> Projects</a></li>
+        <li><a href="{% url 'student_portal:journey' %}" class="sp-link {% block nav_coding %}{% endblock %}"><span class="sp-link-icon">🚀</span> Developer Journey</a></li>
       </ul>
     </div>
 
@@ -114,11 +118,11 @@
           <a href="{% url 'student_portal:notifications' %}" class="sp-link {% block nav_notif %}{% endblock %}">
             <span class="sp-link-icon">🔔</span> Notifications
             {% if unread_count and unread_count > 0 %}
-              <span style="margin-left:auto;background:var(--v1);color:#fff;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:9999px;">{{ unread_count }}</span>
+              <span style="margin-left: auto; background: var(--i1); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 0.1rem 0.45rem; border-radius: 9999px;">{{ unread_count }}</span>
             {% endif %}
           </a>
         </li>
-        <li><a href="{% url 'student_portal:settings' %}"       class="sp-link {% block nav_settings %}{% endblock %}"><span class="sp-link-icon">⚙</span> Settings</a></li>
+        <li><a href="{% url 'student_portal:settings' %}" class="sp-link {% block nav_settings %}{% endblock %}"><span class="sp-link-icon">⚙</span> Settings</a></li>
       </ul>
     </div>
 
@@ -134,19 +138,26 @@
   <!-- ══════ MAIN AREA ══════ -->
   <div class="sp-main">
 
-    <!-- Topbar -->
+    <!-- Sticky Glass Topbar -->
     <header class="sp-topbar">
       <label class="sp-hamburger" for="sp-toggle" aria-label="Toggle menu">☰</label>
-      <span class="sp-topbar-title">{% block topbar_title %}Dashboard{% endblock %}</span>
+
+      <div class="sp-topbar-title">
+        <span>{% block topbar_title %}Dashboard{% endblock %}</span>
+      </div>
+
       <div class="sp-topbar-right">
         <a href="{% url 'student_portal:notifications' %}" class="sp-topbar-btn" title="Notifications">
           🔔
           {% if unread_count and unread_count > 0 %}<span class="sp-notif-dot"></span>{% endif %}
         </a>
         <a href="{% url 'student_portal:applications' %}" class="sp-topbar-btn" title="Applications">📋</a>
-        <a href="{% url 'student_portal:profile' %}"      class="sp-topbar-btn" title="Profile">👤</a>
+        <a href="{% url 'student_portal:profile' %}" class="sp-topbar-btn" title="Profile">👤</a>
       </div>
     </header>
+
+    <!-- Toast Notification Container -->
+    <div id="sp-toast-container" class="sp-toast-container"></div>
 
     <!-- Flash messages -->
     {% if messages %}
@@ -163,11 +174,33 @@
     </main>
 
     <footer class="sp-page-footer">
-      &copy; 2026 PlaceSync &mdash; Student Portal
+      &copy; 2026 PlaceSync &mdash; SaaS Career Intelligence Platform
     </footer>
 
   </div><!-- /.sp-main -->
 </div><!-- /.sp-layout -->
+
+<!-- Floating Back-to-Top Button -->
+<button id="sp-back-to-top" class="sp-back-to-top" title="Back to top">↑</button>
+
+<script src="{% static 'js/ui-interactions.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var currentPath = window.location.pathname;
+    var links = document.querySelectorAll('.sp-sidebar .sp-link, .sp-sidebar .sp-submenu-link');
+    var matched = false;
+    links.forEach(function(link) {
+      var href = link.getAttribute('href');
+      if (href && (href === currentPath || (href.length > 1 && currentPath.startsWith(href) && href !== '/student/'))) {
+        links.forEach(function(l) { l.classList.remove('active'); });
+        link.classList.add('active');
+        var details = link.closest('details');
+        if (details) details.open = true;
+        matched = true;
+      }
+    });
+  });
+</script>
 
 </body>
 </html>

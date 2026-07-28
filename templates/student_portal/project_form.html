@@ -23,7 +23,7 @@
      Form Grid
 ════════════════════════════════════════════════════ -->
 <div style="max-width: 900px; margin: 0 auto 3rem;">
-  <form method="post" class="sp-card" style="box-shadow: 0 16px 40px rgba(0,0,0,0.3);">
+  <form method="post" enctype="multipart/form-data" class="sp-card" style="box-shadow: 0 16px 40px rgba(0,0,0,0.3);">
     {% csrf_token %}
 
     <div class="sp-card-body" style="padding: 2rem; display:flex; flex-direction:column; gap:2rem;">
@@ -47,7 +47,7 @@
           {% if form.title.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.title.errors }}</div>{% endif %}
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem;">
           <div class="sp-form-group">
             <label class="sp-form-label" for="id_category">Category <span style="color:var(--red);">*</span></label>
             {{ form.category }}
@@ -62,6 +62,26 @@
             <label class="sp-form-label" for="id_status">Status <span style="color:var(--red);">*</span></label>
             {{ form.status }}
             {% if form.status.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.status.errors }}</div>{% endif %}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_team_type">Team or Individual <span style="color:var(--red);">*</span></label>
+            {{ form.team_type }}
+            {% if form.team_type.errors %}<div style="color:var(--red); font-size:0.75rem; margin-top:0.25rem;">{{ form.team_type.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_start_date">Start Date</label>
+            {{ form.start_date }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_end_date">End Date</label>
+            {{ form.end_date }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_image">Project Image</label>
+            {{ form.image }}
           </div>
         </div>
 

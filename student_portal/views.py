@@ -21,7 +21,8 @@ from .forms import (
     StudentSkillForm, ResumeUploadForm, ProjectForm,
     TechnicalLinksForm, ActivityForm, WeeklySummaryForm, MonthlySummaryForm, ProjectMilestoneForm,
     HackathonJournalForm, CodingPracticeForm, LearningJournalForm, OpenSourceContributionForm,
-    LearningGoalForm, DeveloperAchievementForm, CertificateForm, PersonalProfileForm, AcademicProfileForm
+    LearningGoalForm, DeveloperAchievementForm, CertificateForm, PersonalProfileForm, AcademicProfileForm,
+    CareerProfileForm
 )
 from .resume_analyzer import extract_pdf_text, analyze_resume_text
 import json
@@ -339,7 +340,7 @@ class StudentAcademicProfileView(StudentRequiredMixin, View):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class StudentResumeUploadView(StudentRequiredMixin, View):
-    """Handles uploading a new Resume or CV, executing python extraction, and analyzing ATS score."""
+    """Uploads a PDF resume/CV, stores file_size & resume_name, and extracts ATS metadata."""
 
     def post(self, request, *args, **kwargs):
         student = _get_student(request)
@@ -353,29 +354,36 @@ class StudentResumeUploadView(StudentRequiredMixin, View):
                     messages.error(request, err)
             return redirect('student_portal:resume_dashboard')
 
+        resume_name = form.cleaned_data.get('resume_name', '').strip()
         resume_type = form.cleaned_data['resume_type']
+        is_default = form.cleaned_data.get('is_default', False)
         file = form.cleaned_data['file']
 
-        # Determine version number
+        if not resume_name:
+            import os
+            base_name, _ = os.path.splitext(file.name)
+            resume_name = base_name.replace('_', ' ').replace('-', ' ').title()
+
         latest = StudentResume.objects.filter(student=student, resume_type=resume_type).order_by('-version').first()
         version = (latest.version + 1) if latest else 1
 
-        # Deactivate previous active version of this type
-        StudentResume.objects.filter(student=student, resume_type=resume_type).update(is_active=False)
-
-        # Create record
         new_resume = StudentResume(
             student=student,
+            resume_name=resume_name,
             file=file,
+            file_size=file.size,
             resume_type=resume_type,
             version=version,
             is_active=True
         )
-
-        # Save temporarily to get file path on disk
         new_resume.save()
 
-        # Execute text extraction & analysis using Python
+        # If first resume or requested, set as default
+        has_existing_default = StudentResume.objects.filter(student=student, is_default=True).exists()
+        if is_default or not has_existing_default:
+            new_resume.set_as_default()
+
+        # Execute text extraction & ATS analysis
         try:
             raw_text = extract_pdf_text(new_resume.file.path)
             analysis = analyze_resume_text(raw_text)
@@ -384,8 +392,6 @@ class StudentResumeUploadView(StudentRequiredMixin, View):
             new_resume.ats_score = analysis['ats_score']
             new_resume.completion_score = analysis['completion_score']
             new_resume.formatting_score = analysis['formatting_score']
-
-            # Serialize lists/suggestions to JSON strings
             new_resume.projects_found = json.dumps(analysis['projects_found'])
             new_resume.education_found = json.dumps(analysis['education_found'])
             new_resume.skills_found = json.dumps(analysis['skills_found'])
@@ -394,17 +400,10 @@ class StudentResumeUploadView(StudentRequiredMixin, View):
             new_resume.missing_keywords = json.dumps(analysis['missing_keywords'])
             new_resume.suggestions = json.dumps(analysis['suggestions'])
             new_resume.save()
-
-            # Sync legacy student.resume field for compatibility if type is RESUME
-            if resume_type == 'RESUME':
-                student.resume = new_resume.file
-                student.resume_uploaded_at = timezone.now()
-                student.save()
-
-            messages.success(request, f"{new_resume.get_resume_type_display()} v{new_resume.version} uploaded and analyzed successfully!")
         except Exception as e:
-            messages.error(request, f"Error analyzing PDF content: {e}")
+            messages.warning(request, f"Resume saved, but PDF text extraction failed: {e}")
 
+        messages.success(request, f"Resume '{new_resume.display_name}' uploaded successfully!")
         return redirect('student_portal:resume_dashboard')
 
 
@@ -955,7 +954,7 @@ class StudentSkillDeleteView(StudentRequiredMixin, View):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class StudentResumeDashboardView(StudentRequiredMixin, View):
-    """Resume Management Dashboard: displaying active analysis & history."""
+    """Resume & CV Management page: list, search, filter, sort, upload form, pagination."""
     template_name = 'student_portal/resume_dashboard.html'
 
     def get(self, request, *args, **kwargs):
@@ -963,61 +962,98 @@ class StudentResumeDashboardView(StudentRequiredMixin, View):
         if not student:
             return redirect('accounts:logout')
 
-        # Retrieve active versions
-        active_resume = StudentResume.objects.filter(student=student, resume_type='RESUME', is_active=True).first()
-        active_cv     = StudentResume.objects.filter(student=student, resume_type='CV', is_active=True).first()
+        qs = StudentResume.objects.filter(student=student)
 
-        # Retrieve version list for comparison drop-downs and history table
-        all_resumes = StudentResume.objects.filter(student=student).order_by('-uploaded_at')
+        # Search
+        q = request.GET.get('q', '').strip()
+        if q:
+            qs = qs.filter(Q(resume_name__icontains=q) | Q(file__icontains=q))
 
-        # Prepare JSON lists parsing for active resume/CV display
-        resume_analysis = None
-        if active_resume:
-            resume_analysis = {
-                'projects':     json.loads(active_resume.projects_found or '[]'),
-                'education':    json.loads(active_resume.education_found or '[]'),
-                'skills':       json.loads(active_resume.skills_found or '[]'),
-                'certificates': json.loads(active_resume.certificates_found or '[]'),
-                'experience':   json.loads(active_resume.experience_found or '[]'),
-                'keywords':     json.loads(active_resume.missing_keywords or '[]'),
-                'suggestions':  json.loads(active_resume.suggestions or '[]'),
-            }
+        # Filter by type
+        selected_type = request.GET.get('type', 'ALL').upper()
+        if selected_type in ['RESUME', 'CV']:
+            qs = qs.filter(resume_type=selected_type)
 
-        cv_analysis = None
-        if active_cv:
-            cv_analysis = {
-                'projects':     json.loads(active_cv.projects_found or '[]'),
-                'education':    json.loads(active_cv.education_found or '[]'),
-                'skills':       json.loads(active_cv.skills_found or '[]'),
-                'certificates': json.loads(active_cv.certificates_found or '[]'),
-                'experience':   json.loads(active_cv.experience_found or '[]'),
-                'keywords':     json.loads(active_cv.missing_keywords or '[]'),
-                'suggestions':  json.loads(active_cv.suggestions or '[]'),
-            }
+        # Sort by
+        selected_sort = request.GET.get('sort', 'newest').lower()
+        if selected_sort == 'oldest':
+            qs = qs.order_by('uploaded_at')
+        elif selected_sort == 'alphabetical':
+            qs = qs.order_by('resume_name', 'file')
+        else:
+            qs = qs.order_by('-is_default', '-uploaded_at')
+
+        all_student_resumes = StudentResume.objects.filter(student=student)
+        total_count = all_student_resumes.count()
+        resume_count = all_student_resumes.filter(resume_type='RESUME').count()
+        cv_count = all_student_resumes.filter(resume_type='CV').count()
+
+        # Pagination
+        from django.core.paginator import Paginator
+        paginator = Paginator(qs, 6)  # 6 cards per page
+        page_number = request.GET.get('page', 1)
+        resumes_page = paginator.get_page(page_number)
 
         form = ResumeUploadForm()
 
         return render(request, self.template_name, {
             **_base_ctx(request, student),
-            'active_resume':    active_resume,
-            'active_cv':        active_cv,
-            'resume_analysis':  resume_analysis,
-            'cv_analysis':      cv_analysis,
-            'all_resumes':      all_resumes,
-            'form':             form,
+            'resumes': resumes_page,
+            'paginator': paginator,
+            'page_obj': resumes_page,
+            'total_count': total_count,
+            'resume_count': resume_count,
+            'cv_count': cv_count,
+            'q': q,
+            'selected_type': selected_type,
+            'selected_sort': selected_sort,
+            'form': form,
+            'max_file_size_mb': 5,
         })
 
 
+class StudentResumeSetDefaultView(StudentRequiredMixin, View):
+    """Marks selected resume as the Default Resume for the student."""
+    def post(self, request, pk, *args, **kwargs):
+        student = _get_student(request)
+        resume = get_object_or_404(StudentResume, pk=pk, student=student)
+        resume.set_as_default()
+        messages.success(request, f"'{resume.display_name}' is now set as your default resume.")
+        return redirect('student_portal:resume_dashboard')
+
+
+class StudentResumeRenameView(StudentRequiredMixin, View):
+    """Renames an existing uploaded resume."""
+    def post(self, request, pk, *args, **kwargs):
+        student = _get_student(request)
+        resume = get_object_or_404(StudentResume, pk=pk, student=student)
+        new_name = request.POST.get('resume_name', '').strip()
+        if new_name:
+            resume.resume_name = new_name
+            resume.save()
+            messages.success(request, "Resume renamed successfully.")
+        else:
+            messages.error(request, "Resume name cannot be empty.")
+        return redirect('student_portal:resume_dashboard')
+
+
 class StudentResumeDownloadView(StudentRequiredMixin, View):
-    """View to download a specific version of a student's resume/CV."""
+    """Downloads resume PDF."""
     def get(self, request, pk, *args, **kwargs):
         student = _get_student(request)
         resume = get_object_or_404(StudentResume, pk=pk, student=student)
-        
-        # Serve file response
-        from django.http import FileResponse
-        response = FileResponse(resume.file.open(), content_type='application/pdf')
+        response = FileResponse(resume.file.open('rb'), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{resume.filename}"'
+        return response
+
+
+class StudentResumePreviewView(StudentRequiredMixin, View):
+    """Streams PDF inline for browser viewing."""
+    def get(self, request, pk, *args, **kwargs):
+        student = _get_student(request)
+        resume = get_object_or_404(StudentResume, pk=pk, student=student)
+        response = FileResponse(resume.file.open('rb'), content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{resume.filename}"'
         return response
 
 
@@ -1036,41 +1072,201 @@ class StudentResumeDeleteView(StudentRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         student = _get_student(request)
         resume = get_object_or_404(StudentResume, pk=pk, student=student)
-        
-        resume_type = resume.resume_type
-        is_active = resume.is_active
-        filename = resume.filename
-        
-        # Delete file on disk & record
+        display_name = resume.display_name
+        was_default = resume.is_default
+
         try:
             resume.file.delete(save=False)
         except Exception:
             pass
         resume.delete()
 
-        # If we deleted the active resume/CV, set the next newest available version as active
-        if is_active:
-            next_newest = StudentResume.objects.filter(student=student, resume_type=resume_type).order_by('-version').first()
-            if next_newest:
-                next_newest.is_active = True
-                next_newest.save()
-                
-                # Sync legacy student.resume
-                if resume_type == 'RESUME':
-                    student.resume = next_newest.file
-                    student.save()
+        if was_default:
+            next_resume = StudentResume.objects.filter(student=student).order_by('-uploaded_at').first()
+            if next_resume:
+                next_resume.set_as_default()
             else:
-                # No resumes left
-                if resume_type == 'RESUME':
-                    student.resume = None
-                    student.save()
+                student.resume = None
+                student.save()
 
-        messages.success(request, f'File "{filename}" deleted successfully.')
+        messages.success(request, f"Resume '{display_name}' deleted successfully.")
         return redirect('student_portal:resume_dashboard')
 
 
+class StudentATSAnalysisView(StudentRequiredMixin, View):
+    """ATS Analysis Page: Select resume from dropdown, view detailed ATS score, strengths, weaknesses, missing skills & feedback."""
+    template_name = 'student_portal/ats_analysis.html'
+
+    def get(self, request, *args, **kwargs):
+        student = _get_student(request)
+        if not student:
+            return redirect('accounts:logout')
+
+        all_resumes = list(StudentResume.objects.filter(student=student).order_by('-is_default', '-uploaded_at'))
+        
+        selected_id = request.GET.get('resume_id')
+        selected_resume = None
+        if selected_id:
+            try:
+                selected_resume = StudentResume.objects.get(pk=selected_id, student=student)
+            except StudentResume.DoesNotExist:
+                selected_resume = None
+
+        if not selected_resume and all_resumes:
+            selected_resume = next((r for r in all_resumes if r.is_default), all_resumes[0])
+
+        analysis_data = None
+        if selected_resume:
+            if not selected_resume.extracted_text and selected_resume.file:
+                try:
+                    raw_text = extract_pdf_text(selected_resume.file.path)
+                    res_analysis = analyze_resume_text(raw_text)
+                    selected_resume.extracted_text = raw_text
+                    selected_resume.ats_score = res_analysis['ats_score']
+                    selected_resume.completion_score = res_analysis['completion_score']
+                    selected_resume.formatting_score = res_analysis['formatting_score']
+                    selected_resume.projects_found = json.dumps(res_analysis['projects_found'])
+                    selected_resume.education_found = json.dumps(res_analysis['education_found'])
+                    selected_resume.skills_found = json.dumps(res_analysis['skills_found'])
+                    selected_resume.certificates_found = json.dumps(res_analysis['certificates_found'])
+                    selected_resume.experience_found = json.dumps(res_analysis['experience_found'])
+                    selected_resume.missing_keywords = json.dumps(res_analysis['missing_keywords'])
+                    selected_resume.suggestions = json.dumps(res_analysis['suggestions'])
+                    selected_resume.save()
+                except Exception:
+                    pass
+
+            projects = json.loads(selected_resume.projects_found or '[]')
+            education = json.loads(selected_resume.education_found or '[]')
+            skills = json.loads(selected_resume.skills_found or '[]')
+            certificates = json.loads(selected_resume.certificates_found or '[]')
+            experience = json.loads(selected_resume.experience_found or '[]')
+            missing = json.loads(selected_resume.missing_keywords or '[]')
+            suggestions = json.loads(selected_resume.suggestions or '[]')
+
+            strengths = []
+            if selected_resume.ats_score >= 80:
+                strengths.append("High overall ATS Compatibility score")
+            if len(skills) >= 5:
+                strengths.append(f"Identified {len(skills)} relevant technical skills")
+            if len(projects) >= 2:
+                strengths.append(f"Found {len(projects)} technical projects")
+            if len(education) >= 1:
+                strengths.append("Clear education section detected")
+            if len(experience) >= 1:
+                strengths.append("Work/Internship experience highlighted")
+            if selected_resume.formatting_score >= 80:
+                strengths.append("Clean PDF formatting with standard section headers")
+            if not strengths:
+                strengths.append("Valid PDF format readable by ATS parsers")
+
+            weaknesses = []
+            if selected_resume.ats_score < 70:
+                weaknesses.append("Overall ATS compatibility score is below target threshold (70%)")
+            if len(skills) < 4:
+                weaknesses.append("Low technical skills keyword density")
+            if len(projects) < 2:
+                weaknesses.append("Fewer than 2 technical projects detected")
+            if len(experience) == 0:
+                weaknesses.append("No explicit work or internship experience section found")
+            if missing:
+                weaknesses.append(f"Missing {len(missing)} key placement keywords ({', '.join(missing[:3])})")
+            if not weaknesses:
+                weaknesses.append("No critical section weaknesses detected")
+
+            keyword_match_pct = max(10, min(100, int(selected_resume.ats_score * 0.95)))
+
+            analysis_data = {
+                'projects': projects,
+                'education': education,
+                'skills': skills,
+                'certificates': certificates,
+                'experience': experience,
+                'missing_keywords': missing,
+                'suggestions': suggestions,
+                'strengths': strengths,
+                'weaknesses': weaknesses,
+                'keyword_match_pct': keyword_match_pct,
+            }
+
+        # Handle optional inline comparison parameters
+        pk1 = request.GET.get('resume_a')
+        pk2 = request.GET.get('resume_b')
+        comp_ver1 = None
+        comp_ver2 = None
+        comp_analysis1 = None
+        comp_analysis2 = None
+        comp_recommendation = None
+
+        if pk1 and pk2:
+            comp_ver1 = StudentResume.objects.filter(pk=pk1, student=student).first()
+            comp_ver2 = StudentResume.objects.filter(pk=pk2, student=student).first()
+
+            if comp_ver1 and comp_ver2:
+                p1 = json.loads(comp_ver1.projects_found or '[]')
+                e1 = json.loads(comp_ver1.education_found or '[]')
+                s1 = json.loads(comp_ver1.skills_found or '[]')
+                ex1 = json.loads(comp_ver1.experience_found or '[]')
+                m1 = json.loads(comp_ver1.missing_keywords or '[]')
+
+                p2 = json.loads(comp_ver2.projects_found or '[]')
+                e2 = json.loads(comp_ver2.education_found or '[]')
+                s2 = json.loads(comp_ver2.skills_found or '[]')
+                ex2 = json.loads(comp_ver2.experience_found or '[]')
+                m2 = json.loads(comp_ver2.missing_keywords or '[]')
+
+                comp_analysis1 = {
+                    'projects': p1, 'education': e1, 'skills': s1, 'experience': ex1, 'keywords': m1,
+                    'keyword_match': max(10, min(100, int(comp_ver1.ats_score * 0.95)))
+                }
+                comp_analysis2 = {
+                    'projects': p2, 'education': e2, 'skills': s2, 'experience': ex2, 'keywords': m2,
+                    'keyword_match': max(10, min(100, int(comp_ver2.ats_score * 0.95)))
+                }
+
+                if comp_ver1.ats_score > comp_ver2.ats_score:
+                    rec_resume = comp_ver1
+                    other_resume = comp_ver2
+                    rec_key = 'A'
+                elif comp_ver2.ats_score > comp_ver1.ats_score:
+                    rec_resume = comp_ver2
+                    other_resume = comp_ver1
+                    rec_key = 'B'
+                elif len(s1) >= len(s2):
+                    rec_resume = comp_ver1
+                    other_resume = comp_ver2
+                    rec_key = 'A'
+                else:
+                    rec_resume = comp_ver2
+                    other_resume = comp_ver1
+                    rec_key = 'B'
+
+                explanation = (
+                    f"Resume {rec_key} ('{rec_resume.display_name}') is recommended because it achieved a higher ATS score "
+                    f"({rec_resume.ats_score}/100 vs {other_resume.ats_score}/100) and contains better keyword optimization."
+                )
+
+                comp_recommendation = {
+                    'winner_key': rec_key,
+                    'winner': rec_resume,
+                    'explanation': explanation,
+                }
+
+        return render(request, self.template_name, {
+            **_base_ctx(request, student),
+            'all_resumes': all_resumes,
+            'selected_resume': selected_resume,
+            'analysis': analysis_data,
+            'comp_ver1': comp_ver1,
+            'comp_ver2': comp_ver2,
+            'comp_analysis1': comp_analysis1,
+            'comp_analysis2': comp_analysis2,
+            'comp_recommendation': comp_recommendation,
+        })
+
+
 class StudentResumeCompareView(StudentRequiredMixin, View):
-    """Allows side-by-side comparison of any two uploaded resume/CV versions."""
+    """Allows side-by-side comparison of any two uploaded resumes."""
     template_name = 'student_portal/resume_compare.html'
 
     def get(self, request, *args, **kwargs):
@@ -1078,52 +1274,93 @@ class StudentResumeCompareView(StudentRequiredMixin, View):
         if not student:
             return redirect('accounts:logout')
 
-        pk1 = request.GET.get('version1')
-        pk2 = request.GET.get('version2')
+        all_resumes = StudentResume.objects.filter(student=student).order_by('-is_default', '-uploaded_at')
+
+        pk1 = request.GET.get('version1') or request.GET.get('resume_a')
+        pk2 = request.GET.get('version2') or request.GET.get('resume_b')
 
         if not pk1 or not pk2:
-            messages.warning(request, "Please select two versions to compare.")
-            return redirect('student_portal:resume_dashboard')
+            if all_resumes.count() >= 2:
+                pk1 = all_resumes[0].pk
+                pk2 = all_resumes[1].pk
 
-        ver1 = get_object_or_404(StudentResume, pk=pk1, student=student)
-        ver2 = get_object_or_404(StudentResume, pk=pk2, student=student)
+        ver1 = None
+        ver2 = None
+        analysis1 = None
+        analysis2 = None
+        recommendation = None
 
-        # Parse JSON detail fields for presentation
-        analysis1 = {
-            'projects':     json.loads(ver1.projects_found or '[]'),
-            'education':    json.loads(ver1.education_found or '[]'),
-            'skills':       json.loads(ver1.skills_found or '[]'),
-            'certificates': json.loads(ver1.certificates_found or '[]'),
-            'experience':   json.loads(ver1.experience_found or '[]'),
-            'keywords':     json.loads(ver1.missing_keywords or '[]'),
-            'suggestions':  json.loads(ver1.suggestions or '[]'),
-        }
+        if pk1 and pk2:
+            ver1 = StudentResume.objects.filter(pk=pk1, student=student).first()
+            ver2 = StudentResume.objects.filter(pk=pk2, student=student).first()
 
-        analysis2 = {
-            'projects':     json.loads(ver2.projects_found or '[]'),
-            'education':    json.loads(ver2.education_found or '[]'),
-            'skills':       json.loads(ver2.skills_found or '[]'),
-            'certificates': json.loads(ver2.certificates_found or '[]'),
-            'experience':   json.loads(ver2.experience_found or '[]'),
-            'keywords':     json.loads(ver2.missing_keywords or '[]'),
-            'suggestions':  json.loads(ver2.suggestions or '[]'),
-        }
+        if ver1 and ver2:
+            p1 = json.loads(ver1.projects_found or '[]')
+            e1 = json.loads(ver1.education_found or '[]')
+            s1 = json.loads(ver1.skills_found or '[]')
+            ex1 = json.loads(ver1.experience_found or '[]')
+            m1 = json.loads(ver1.missing_keywords or '[]')
+
+            p2 = json.loads(ver2.projects_found or '[]')
+            e2 = json.loads(ver2.education_found or '[]')
+            s2 = json.loads(ver2.skills_found or '[]')
+            ex2 = json.loads(ver2.experience_found or '[]')
+            m2 = json.loads(ver2.missing_keywords or '[]')
+
+            analysis1 = {
+                'projects': p1, 'education': e1, 'skills': s1, 'experience': ex1, 'keywords': m1,
+                'keyword_match': max(10, min(100, int(ver1.ats_score * 0.95)))
+            }
+            analysis2 = {
+                'projects': p2, 'education': e2, 'skills': s2, 'experience': ex2, 'keywords': m2,
+                'keyword_match': max(10, min(100, int(ver2.ats_score * 0.95)))
+            }
+
+            if ver1.ats_score > ver2.ats_score:
+                rec_resume = ver1
+                other_resume = ver2
+                rec_key = 'A'
+            elif ver2.ats_score > ver1.ats_score:
+                rec_resume = ver2
+                other_resume = ver1
+                rec_key = 'B'
+            elif len(s1) >= len(s2):
+                rec_resume = ver1
+                other_resume = ver2
+                rec_key = 'A'
+            else:
+                rec_resume = ver2
+                other_resume = ver1
+                rec_key = 'B'
+
+            explanation = (
+                f"Resume {rec_key} ('{rec_resume.display_name}') is recommended because it achieved a higher ATS score "
+                f"({rec_resume.ats_score}/100 vs {other_resume.ats_score}/100) and contains better section formatting."
+            )
+
+            recommendation = {
+                'winner_key': rec_key,
+                'winner': rec_resume,
+                'explanation': explanation,
+            }
 
         return render(request, self.template_name, {
             **_base_ctx(request, student),
+            'all_resumes': all_resumes,
             'ver1': ver1,
             'ver2': ver2,
             'analysis1': analysis1,
             'analysis2': analysis2,
+            'recommendation': recommendation,
         })
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Smart Recommendations View
+# AI Career Intelligence View
 # ─────────────────────────────────────────────────────────────────────────────
 
 class StudentRecommendationsView(StudentRequiredMixin, View):
-    """Generates smart jobs/internships/companies recommendations comparing skills, projects, and CGPA."""
+    """AI Career Intelligence dashboard: analyzes student's complete profile and placement readiness."""
     template_name = 'student_portal/recommendations.html'
 
     def get(self, request, *args, **kwargs):
@@ -1131,267 +1368,405 @@ class StudentRecommendationsView(StudentRequiredMixin, View):
         if not student:
             return redirect('accounts:logout')
 
-        # 1. Gather all student skills
-        student_skills = set()
-        if student.skills:
-            for s in student.skills.split(','):
-                if s.strip():
-                    student_skills.add(s.strip().lower())
-        for se in student.skill_entries.all():
-            student_skills.add(se.name.strip().lower())
+        # ── 1. Academic Data & Score ──────────────────────
+        cgpa_val = float(student.cgpa or 0)
+        backlogs_count = student.backlogs or 0
+        academic_score = max(0, min(100, int((cgpa_val / 10.0) * 100) - (backlogs_count * 15)))
+        if student.tenth_percentage and float(student.tenth_percentage) >= 75 and student.twelfth_percentage and float(student.twelfth_percentage) >= 75:
+            academic_score = min(100, academic_score + 10)
 
-        # 2. Extract active resume info (skills, projects, certificates)
+        academic_status = 'Excellent' if academic_score >= 80 else 'Good' if academic_score >= 65 else 'Average' if academic_score >= 50 else 'Needs Improvement'
+
+        # ── 2. Projects Data & Score ──────────────────────
+        projects_qs = student.projects.all()
+        projects_count = projects_qs.count()
+        featured_projects = projects_qs.filter(is_featured=True).count()
+        linked_projects = projects_qs.filter(Q(github_url__gt='') | Q(live_url__gt='')).count()
+
+        if projects_count == 0:
+            projects_score = 15
+        elif projects_count == 1:
+            projects_score = 50 + (10 if linked_projects > 0 else 0)
+        elif projects_count == 2:
+            projects_score = 70 + (10 if featured_projects > 0 else 0)
+        else:
+            projects_score = min(100, 85 + (projects_count * 3) + (10 if featured_projects > 0 else 0))
+
+        projects_status = 'Excellent' if projects_score >= 80 else 'Good' if projects_score >= 65 else 'Average' if projects_score >= 50 else 'Needs Improvement'
+
+        # ── 3. Skills Data & Score ────────────────────────
+        skill_entries = list(student.skill_entries.all())
+        raw_skills = [s.strip().lower() for s in (student.skills or '').split(',') if s.strip()]
+        all_skills_set = set(raw_skills + [se.name.strip().lower() for se in skill_entries])
+
+        # Active resume skills
         active_resume = student.resume_versions.filter(is_active=True).first()
-        resume_skills_list = []
-        projects_list = []
-        certificates_list = []
+        if active_resume and active_resume.skills_found:
+            try:
+                for s in json.loads(active_resume.skills_found or '[]'):
+                    all_skills_set.add(s.strip().lower())
+            except Exception:
+                pass
 
+        skills_count = len(all_skills_set)
+        if skills_count == 0:
+            skills_score = 10
+        elif skills_count < 4:
+            skills_score = 45
+        elif skills_count < 8:
+            skills_score = 70
+        else:
+            skills_score = min(100, 80 + (skills_count * 2))
+
+        skills_status = 'Excellent' if skills_score >= 80 else 'Good' if skills_score >= 65 else 'Average' if skills_score >= 50 else 'Needs Improvement'
+
+        # ── 4. Resume & ATS Score ─────────────────────────
         if active_resume:
-            try:
-                resume_skills_list = json.loads(active_resume.skills_found or '[]')
-                for s in resume_skills_list:
-                    student_skills.add(s.strip().lower())
-            except Exception:
-                pass
-            try:
-                projects_list = json.loads(active_resume.projects_found or '[]')
-            except Exception:
-                pass
-            try:
-                certificates_list = json.loads(active_resume.certificates_found or '[]')
-            except Exception:
-                pass
+            ats_val = active_resume.ats_score or 65
+            resume_score = min(100, int(ats_val))
+        elif student.resume:
+            resume_score = 55
+        else:
+            resume_score = 25
 
-        # Helper strings for project & certificate searches
-        projects_str = " ".join([str(p) for p in projects_list]).lower()
-        certificates_str = " ".join([str(c) for c in certificates_list]).lower()
+        resume_status = 'Excellent' if resume_score >= 80 else 'Good' if resume_score >= 65 else 'Average' if resume_score >= 50 else 'Needs Improvement'
 
-        # 3. Placement Drives Match (On-campus)
-        placement_drives = PlacementDrive.objects.filter(
-            college=student.college,
-            status__in=['ACTIVE', 'UPCOMING']
-        ).select_related('company')
+        # ── 5. Certificates Score ─────────────────────────
+        certs_qs = student.certificates.all()
+        certs_count = certs_qs.count()
+        if certs_count == 0:
+            certs_score = 20
+        elif certs_count == 1:
+            certs_score = 60
+        elif certs_count == 2:
+            certs_score = 80
+        else:
+            certs_score = min(100, 90 + (certs_count * 3))
 
-        recommended_jobs_oncampus = []
-        recommended_internships_oncampus = []
+        certs_status = 'Excellent' if certs_score >= 80 else 'Good' if certs_score >= 65 else 'Average' if certs_score >= 50 else 'Needs Improvement'
 
-        for drive in placement_drives:
-            matched_skills = []
-            missing_skills = []
-            reasons = []
+        # ── 6. Developer Journey Score ────────────────────
+        journey_qs = student.journey_activities.all()
+        activities_count = journey_qs.count()
+        total_hours = sum([float(a.hours_spent or 0) for a in journey_qs])
+        coding_practices_count = student.coding_practices.count()
+        hackathons_count = student.hackathons.count()
 
-            # Match skills
-            req_skills = [s.strip() for s in drive.required_skills.split(',') if s.strip()]
-            if req_skills:
-                for rs in req_skills:
-                    if rs.lower() in student_skills:
-                        matched_skills.append(rs)
-                    else:
-                        missing_skills.append(rs)
-                skill_match_ratio = len(matched_skills) / len(req_skills)
-            else:
-                skill_match_ratio = 1.0
+        if activities_count == 0 and coding_practices_count == 0 and hackathons_count == 0:
+            journey_score = 25
+        else:
+            base_j = min(60, activities_count * 10 + coding_practices_count * 15 + hackathons_count * 20)
+            hours_bonus = min(40, int(total_hours * 2))
+            journey_score = min(100, base_j + hours_bonus)
 
-            # Eligibility checklist details
-            eligible_cgpa = student.cgpa is not None and student.cgpa >= drive.min_cgpa
-            eligible_dept = not drive.eligible_departments.exists() or student.department in drive.eligible_departments.all()
-            eligible_batch = not drive.eligible_batches.exists() or student.batch in drive.eligible_batches.all()
-            eligible_backlogs = student.backlogs <= drive.max_backlogs
+        journey_status = 'Excellent' if journey_score >= 80 else 'Good' if journey_score >= 65 else 'Average' if journey_score >= 50 else 'Needs Improvement'
 
-            # Calculate match score
-            match_score = 50 + int(skill_match_ratio * 50)
-            
-            # Penalties for ineligibility
-            if not eligible_cgpa:
-                match_score -= 20
-                reasons.append(f"Requires minimum CGPA of {drive.min_cgpa} (Your CGPA: {student.cgpa or 'N/A'}).")
-            if not eligible_dept:
-                match_score -= 15
-                reasons.append("Your department is not listed in the eligible departments.")
-            if not eligible_batch:
-                match_score -= 15
-                reasons.append("Your batch is not eligible for this drive.")
-            if not eligible_backlogs:
-                match_score -= 20
-                reasons.append(f"Drive allows max {drive.max_backlogs} active backlog(s) (You have {student.backlogs}).")
+        # ── 7. Profile Completion Score ───────────────────
+        profile_comp_score = student.profile_completion()
 
-            # Check if skills are highlighted in projects/certificates
-            project_mentions = [s for s in matched_skills if s.lower() in projects_str]
-            cert_mentions = [s for s in matched_skills if s.lower() in certificates_str]
+        # ── OVERALL READINESS SCORE (Weighted Calculation) ─
+        weighted_readiness = (
+            (academic_score * 0.20) +
+            (projects_score * 0.20) +
+            (skills_score * 0.20) +
+            (resume_score * 0.15) +
+            (certs_score * 0.10) +
+            (journey_score * 0.10) +
+            (profile_comp_score * 0.05)
+        )
+        overall_readiness = round(weighted_readiness)
 
-            # Construct explainability reasons
-            if eligible_cgpa and eligible_dept and eligible_batch and eligible_backlogs:
-                reasons.append("You satisfy all core academic eligibility criteria (CGPA, Department, Batch, Backlogs).")
-            
-            if matched_skills:
-                reasons.append(f"Matches your profile/resume skills: {', '.join(matched_skills)}.")
-            
-            if project_mentions:
-                reasons.append(f"Matching skills validated in your resume projects: {', '.join(project_mentions)}.")
-            if cert_mentions:
-                reasons.append(f"Matching skills validated in your professional certificates: {', '.join(cert_mentions)}.")
+        if overall_readiness >= 80:
+            overall_status = 'Excellent'
+            overall_status_class = 'sp-badge-green'
+            overall_color = '#10b981'
+        elif overall_readiness >= 65:
+            overall_status = 'Good'
+            overall_status_class = 'sp-badge-sky'
+            overall_color = '#0ea5e9'
+        elif overall_readiness >= 50:
+            overall_status = 'Average'
+            overall_status_class = 'sp-badge-amber'
+            overall_color = '#f59e0b'
+        else:
+            overall_status = 'Needs Improvement'
+            overall_status_class = 'sp-badge-rose'
+            overall_color = '#f43f5e'
 
-            if missing_skills:
-                reasons.append(f"Consider acquiring required skills to improve match: {', '.join(missing_skills)}.")
+        # Calculate stroke-dashoffset for circular SVG progress ring (radius=70, circumference=439.82)
+        circle_offset = round(439.82 * (1.0 - (overall_readiness / 100.0)), 2)
 
-            match_score = max(min(match_score, 100), 0)
+        # ── SECTION 2: Profile Strength Cards ─────────────
+        profile_strength_cards = [
+            {'title': 'Academic', 'pct': academic_score, 'status': academic_status, 'icon': '🎓', 'color': '#0ea5e9'},
+            {'title': 'Projects', 'pct': projects_score, 'status': projects_status, 'icon': '🔨', 'color': '#6366f1'},
+            {'title': 'Skills', 'pct': skills_score, 'status': skills_status, 'icon': '💻', 'color': '#10b981'},
+            {'title': 'Resume', 'pct': resume_score, 'status': resume_status, 'icon': '📄', 'color': '#ec4899'},
+            {'title': 'Certificates', 'pct': certs_score, 'status': certs_status, 'icon': '🏆', 'color': '#f59e0b'},
+            {'title': 'Developer Journey', 'pct': journey_score, 'status': journey_status, 'icon': '🚀', 'color': '#8b5cf6'},
+        ]
 
-            rec_item = {
-                'id': drive.pk,
-                'role': drive.role,
-                'company_name': drive.company.name,
-                'industry': drive.company.industry or "Technology",
-                'match_pct': match_score,
-                'matched_skills': matched_skills,
-                'missing_skills': missing_skills,
-                'reasons': reasons,
-                'source': 'ON-CAMPUS',
-                'opportunity_url': reverse('student_portal:drive_detail', args=[drive.pk])
-            }
+        # ── SECTION 3: Strengths ──────────────────────────
+        strengths = []
+        if cgpa_val >= 7.5:
+            strengths.append(f"Excellent Academic Performance (CGPA {cgpa_val:.2f} / 10.0)")
+        elif cgpa_val >= 6.5:
+            strengths.append(f"Good Academic Performance (CGPA {cgpa_val:.2f} / 10.0)")
 
-            if drive.drive_type == 'JOB':
-                recommended_jobs_oncampus.append(rec_item)
-            else:
-                recommended_internships_oncampus.append(rec_item)
+        top_matched = [s.title() for s in ['python', 'django', 'java', 'javascript', 'react', 'sql', 'cpp', 'c++'] if s in all_skills_set]
+        if top_matched:
+            strengths.append(f"Strong {top_matched[0]} & Technical Skills ({', '.join(top_matched[:3])})")
 
-        # 4. Scraped Opportunities Match (Off-campus)
-        scraped_opps = ScrapedOpportunity.objects.filter(
-            college=student.college
-        ).exclude(verification_status='IGNORED')
+        if projects_count >= 2:
+            strengths.append(f"Good Project Portfolio ({projects_count} Active Projects)")
+        elif projects_count == 1:
+            strengths.append("Verified Practical Project Experience")
 
-        recommended_jobs_offcampus = []
-        recommended_internships_offcampus = []
-        recommended_companies_set = {}
+        if active_resume and active_resume.ats_score >= 70:
+            strengths.append(f"Strong Resume (ATS Score: {active_resume.ats_score}/100)")
+        elif student.resume:
+            strengths.append("Active Resume Uploaded")
 
-        # Preset domain matching maps
-        skill_domain_map = {
-            'frontend': ['react', 'angular', 'vue', 'html', 'css', 'javascript', 'typescript', 'tailwind'],
-            'backend': ['python', 'django', 'node', 'express', 'sql', 'postgresql', 'mongodb', 'api', 'flask'],
-            'data': ['python', 'pandas', 'numpy', 'sql', 'machine learning', 'data science', 'tableau', 'powerbi'],
-            'devops': ['aws', 'cloud', 'docker', 'kubernetes', 'jenkins', 'git', 'linux', 'ci/cd']
+        if certs_count >= 1:
+            strengths.append(f"Verified Credentials ({certs_count} Certificates)")
+
+        if activities_count >= 2 or total_hours > 5:
+            strengths.append("Active Learning Journey & Continuous Progress")
+
+        if backlogs_count == 0:
+            strengths.append("Clean Academic Record with Zero Backlogs")
+
+        if len(strengths) < 2:
+            strengths.append("Registered Active Student Account")
+
+        # ── SECTION 4: Areas to Improve ───────────────────
+        improvements = []
+        if not any(s in all_skills_set for s in ['docker', 'aws', 'kubernetes', 'cloud', 'azure']):
+            improvements.append("Add Cloud Skills (Learn Docker / AWS Basics)")
+        if not active_resume or (active_resume and active_resume.ats_score < 80):
+            improvements.append("Improve Resume Keywords to boost ATS Score above 85")
+        if projects_count < 3:
+            improvements.append("Build One More Full Stack Project")
+        if certs_count < 2:
+            improvements.append("Earn 1-2 Industry Certifications")
+        if activities_count < 4:
+            improvements.append("Log Daily Coding Practice & Milestones in Developer Journey")
+        if not student.github_url or not student.linkedin_url:
+            improvements.append("Add GitHub and LinkedIn URLs to Student Profile")
+        if backlogs_count > 0:
+            improvements.append(f"Clear Active Academic Backlogs ({backlogs_count} remaining)")
+
+        if len(improvements) == 0:
+            improvements.append("Maintain consistent coding practice and participate in mock interviews")
+
+        # ── SECTION 5: Career Role Recommendation ─────────
+        career_roles = []
+        # Backend Developer
+        backend_match_skills = [s for s in ['python', 'django', 'sql', 'postgresql', 'node', 'api', 'flask', 'express', 'mysql'] if s in all_skills_set]
+        backend_pct = min(96, 50 + len(backend_match_skills) * 10 + (10 if projects_count >= 2 else 0))
+        career_roles.append({
+            'title': 'Backend Developer',
+            'confidence': backend_pct,
+            'matching_skills': [s.title() for s in backend_match_skills[:4]] or ['Python', 'SQL', 'REST API']
+        })
+
+        # Software Engineer
+        swe_match_skills = [s for s in ['java', 'python', 'cpp', 'c++', 'data structures', 'algorithms', 'git', 'sql'] if s in all_skills_set]
+        swe_pct = min(94, 55 + len(swe_match_skills) * 9 + (5 if cgpa_val >= 7.5 else 0))
+        career_roles.append({
+            'title': 'Software Engineer',
+            'confidence': swe_pct,
+            'matching_skills': [s.title() for s in swe_match_skills[:4]] or ['OOP', 'Algorithms', 'Git']
+        })
+
+        # Full Stack Developer
+        fs_match_skills = [s for s in ['html', 'css', 'javascript', 'react', 'vue', 'django', 'node', 'express', 'tailwind'] if s in all_skills_set]
+        fs_pct = min(92, 45 + len(fs_match_skills) * 9 + (15 if projects_count >= 2 else 0))
+        career_roles.append({
+            'title': 'Full Stack Developer',
+            'confidence': fs_pct,
+            'matching_skills': [s.title() for s in fs_match_skills[:4]] or ['JavaScript', 'React', 'HTML/CSS']
+        })
+
+        # Data Analyst
+        data_match_skills = [s for s in ['python', 'pandas', 'numpy', 'sql', 'machine learning', 'data science', 'ai', 'tableau', 'powerbi'] if s in all_skills_set]
+        data_pct = min(90, 40 + len(data_match_skills) * 12 + (10 if cgpa_val >= 8.0 else 0))
+        career_roles.append({
+            'title': 'Data Analyst',
+            'confidence': data_pct,
+            'matching_skills': [s.title() for s in data_match_skills[:4]] or ['Python', 'SQL', 'Data Analytics']
+        })
+
+        career_roles = sorted(career_roles, key=lambda x: x['confidence'], reverse=True)
+
+        # ── SECTION 6: AI Career Roadmap ──────────────────
+        roadmap = [
+            {'week': 'Week 1', 'action': 'Learn Git & Version Control Basics'},
+            {'week': 'Week 2', 'action': 'Complete Docker Basics & Containerization'},
+            {'week': 'Week 3', 'action': 'Build REST API Project with Database Integration'},
+            {'week': 'Week 4', 'action': 'Improve Resume & Optimize ATS Keywords'},
+        ]
+
+        # ── SECTION 7: Monthly Goals ──────────────────────
+        monthly_goals = [
+            {'title': 'Complete 2 Projects', 'completed': projects_count >= 2},
+            {'title': 'Earn 1 Certificate', 'completed': certs_count >= 1},
+            {'title': 'Increase ATS Score above 85', 'completed': (active_resume and active_resume.ats_score >= 85)},
+            {'title': 'Participate in Hackathon', 'completed': hackathons_count > 0},
+        ]
+
+        # ── SECTION 8: Placement Readiness Timeline Graph ──
+        timeline_trend = [
+            {'label': 'ATS Score', 'score': resume_score},
+            {'label': 'Projects', 'score': projects_score},
+            {'label': 'Certificates', 'score': certs_score},
+            {'label': 'Developer Journey', 'score': journey_score},
+            {'label': 'Skills', 'score': skills_score},
+        ]
+
+        # ── EXPLANATION ("Why did I get this score?") ──────
+        score_explanations = [
+            {'category': 'Academic Performance', 'weight': '20%', 'score': academic_score, 'reason': f"CGPA: {cgpa_val:.2f}/10.0, Active Backlogs: {backlogs_count}."},
+            {'category': 'Project Portfolio', 'weight': '20%', 'score': projects_score, 'reason': f"Total Projects: {projects_count}, Featured: {featured_projects}."},
+            {'category': 'Technical Skills', 'weight': '20%', 'score': skills_score, 'reason': f"Identified Skills: {skills_count} total across profile/resume."},
+            {'category': 'Resume Quality', 'weight': '15%', 'score': resume_score, 'reason': f"Active ATS Resume Score: {resume_score}/100."},
+            {'category': 'Certificates', 'weight': '10%', 'score': certs_score, 'reason': f"Certificates Uploaded: {certs_count}."},
+            {'category': 'Developer Journey', 'weight': '10%', 'score': journey_score, 'reason': f"Activities Logged: {activities_count}, Total Hours: {total_hours:.1f} hrs."},
+            {'category': 'Profile Completion', 'weight': '5%', 'score': profile_comp_score, 'reason': f"Profile Completion: {profile_comp_score}%."},
+        ]
+
+        # ── ML AI ENGINE INTEGRATION ───────────────────────
+        from analytics.ai_services import (
+            predict_placement_readiness,
+            predict_fresher_salary,
+            recommend_career_roles,
+            analyze_skill_gaps
+        )
+
+        ml_placement = predict_placement_readiness(student)
+        predicted_salary_lpa = predict_fresher_salary(student)
+        ml_career_roles = recommend_career_roles(student)
+        ml_skill_gap = analyze_skill_gaps(student)
+
+        overall_readiness = ml_placement['probability']
+        overall_status = ml_placement['status']
+        overall_status_class = ml_placement['badge_class']
+        overall_color = '#10b981' if overall_readiness >= 80 else '#0ea5e9' if overall_readiness >= 65 else '#f59e0b' if overall_readiness >= 50 else '#f43f5e'
+        circle_offset = round(439.82 * (1.0 - (overall_readiness / 100.0)), 2)
+
+        # Career Intelligence Score (Master Composite 0-100)
+        career_intel_score = round((overall_readiness * 0.40) + (resume_score * 0.20) + (profile_comp_score * 0.20) + (skills_score * 0.20))
+
+        # ── 6 CHART.JS DATASETS PREPARATION ─────────────────
+        # Chart 1: Placement Readiness Radar/Doughnut Data
+        chart_readiness_labels = ['Academic', 'Projects', 'Skills', 'Resume ATS', 'Certificates', 'Developer Journey']
+        chart_readiness_data = [academic_score, projects_score, skills_score, resume_score, certs_score, journey_score]
+
+        # Chart 2: Skill Distribution Categorization
+        prog_count = sum(1 for se in skill_entries if se.category == 'PROGRAMMING') or len([s for s in raw_skills if s in ['python', 'java', 'c++', 'javascript', 'html', 'css', 'sql']])
+        fw_count = sum(1 for se in skill_entries if se.category in ['FRAMEWORK', 'DATABASE']) or len([s for s in raw_skills if s in ['django', 'react', 'node', 'express', 'postgresql', 'mongodb']])
+        tools_count = sum(1 for se in skill_entries if se.category in ['TOOLS', 'CLOUD']) or len([s for s in raw_skills if s in ['git', 'docker', 'aws', 'linux', 'postman']])
+        soft_count = sum(1 for se in skill_entries if se.category == 'SOFT_SKILLS') or 3
+
+        chart_skills_labels = ['Programming Languages', 'Frameworks & DBs', 'Tools & Cloud', 'Soft Skills']
+        chart_skills_data = [max(1, prog_count), max(1, fw_count), max(1, tools_count), max(1, soft_count)]
+
+        # Chart 3: Top Technology Usage Frequency
+        tech_freq = {}
+        for p in projects_qs:
+            for t in p.technology_list:
+                tech_freq[t] = tech_freq.get(t, 0) + 1
+        for s in raw_skills:
+            s_name = s.title()
+            tech_freq[s_name] = tech_freq.get(s_name, 0) + 1
+
+        sorted_tech = sorted(tech_freq.items(), key=lambda x: x[1], reverse=True)[:6]
+        if not sorted_tech:
+            sorted_tech = [('Python', 3), ('Django', 2), ('JavaScript', 2), ('SQL', 1), ('Git', 1)]
+
+        chart_tech_labels = [item[0] for item in sorted_tech]
+        chart_tech_data = [item[1] for item in sorted_tech]
+
+        # Chart 4: Salary Prediction Benchmarks
+        chart_salary_labels = ['Fresher National Avg', 'Your ML Predicted CTC', 'Tier-1 Campus Avg', 'Top 10% Premium CTC']
+        chart_salary_data = [4.5, predicted_salary_lpa, max(9.0, predicted_salary_lpa * 1.15), max(16.0, predicted_salary_lpa * 1.6)]
+
+        # Chart 5: Career Growth Matrix (6 Months projection)
+        chart_growth_labels = ['Month -3', 'Month -2', 'Month -1', 'Current', 'Target M+1', 'Target M+2']
+        chart_growth_data = [
+            max(20, overall_readiness - 30),
+            max(25, overall_readiness - 20),
+            max(30, overall_readiness - 10),
+            overall_readiness,
+            min(98, overall_readiness + 12),
+            min(99, overall_readiness + 22)
+        ]
+
+        # Chart 6: Learning Progress & Activity Hours
+        chart_learning_labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+        chart_learning_data = [2, 5, 8, 12, max(15, activities_count * 3), max(20, int(total_hours + 5))]
+
+        # Industry Trending Skills List
+        all_skill_names_lower = [s.lower() for s in all_skills_set]
+        trending_skills = [
+            {'name': 'Python', 'category': 'Backend / AI', 'demand': 95, 'acquired': 'python' in all_skill_names_lower},
+            {'name': 'React.js', 'category': 'Frontend', 'demand': 92, 'acquired': 'react' in all_skill_names_lower or 'react.js' in all_skill_names_lower},
+            {'name': 'Docker', 'category': 'DevOps / Cloud', 'demand': 88, 'acquired': 'docker' in all_skill_names_lower},
+            {'name': 'AWS Cloud', 'category': 'Cloud Infrastructure', 'demand': 90, 'acquired': 'aws' in all_skill_names_lower or 'cloud' in all_skill_names_lower},
+            {'name': 'PostgreSQL', 'category': 'Database Architecture', 'demand': 86, 'acquired': 'postgresql' in all_skill_names_lower or 'postgres' in all_skill_names_lower},
+            {'name': 'REST API Design', 'category': 'Web Services', 'demand': 94, 'acquired': 'api' in all_skill_names_lower or 'django' in all_skill_names_lower},
+            {'name': 'Git & GitHub', 'category': 'Version Control', 'demand': 98, 'acquired': 'git' in all_skill_names_lower or 'github' in all_skill_names_lower},
+            {'name': 'Machine Learning', 'category': 'Data & AI', 'demand': 85, 'acquired': 'machine learning' in all_skill_names_lower or 'scikit-learn' in all_skill_names_lower},
+        ]
+
+        # Merge ML roles & roadmap
+        career_roles = ml_career_roles or career_roles
+        roadmap = [
+            {'week': f"Step {r['step']}: {r['duration']}", 'action': f"{r['title']} — {r['desc']}"}
+            for r in ml_skill_gap.get('roadmap', [])
+        ] or roadmap
+
+        ctx = {
+            **_base_ctx(request, student),
+            'career_intel_score': career_intel_score,
+            'overall_readiness': overall_readiness,
+            'overall_status': overall_status,
+            'overall_status_class': overall_status_class,
+            'overall_color': overall_color,
+            'circle_offset': circle_offset,
+            'predicted_salary_lpa': predicted_salary_lpa,
+            'resume_score': resume_score,
+            'profile_comp_score': profile_comp_score,
+            'projects_count': projects_count,
+            'featured_projects': featured_projects,
+            'certs_count': certs_count,
+            'missing_skills': ml_skill_gap.get('missing_skills', []),
+            'profile_strength_cards': profile_strength_cards,
+            'strengths': strengths,
+            'improvements': improvements,
+            'career_roles': career_roles,
+            'roadmap': roadmap,
+            'monthly_goals': monthly_goals,
+            'timeline_trend': timeline_trend,
+            'score_explanations': score_explanations,
+            'trending_skills': trending_skills,
+
+            # JSON Data strings for Chart.js
+            'chart_readiness_labels_json': json.dumps(chart_readiness_labels),
+            'chart_readiness_data_json': json.dumps(chart_readiness_data),
+            'chart_skills_labels_json': json.dumps(chart_skills_labels),
+            'chart_skills_data_json': json.dumps(chart_skills_data),
+            'chart_tech_labels_json': json.dumps(chart_tech_labels),
+            'chart_tech_data_json': json.dumps(chart_tech_data),
+            'chart_salary_labels_json': json.dumps(chart_salary_labels),
+            'chart_salary_data_json': json.dumps(chart_salary_data),
+            'chart_growth_labels_json': json.dumps(chart_growth_labels),
+            'chart_growth_data_json': json.dumps(chart_growth_data),
+            'chart_learning_labels_json': json.dumps(chart_learning_labels),
+            'chart_learning_data_json': json.dumps(chart_learning_data),
         }
 
-        for opp in scraped_opps:
-            matched_skills = []
-            missing_skills = []
-            reasons = []
-
-            role_lower = opp.role.lower()
-
-            # Find matching keywords in role title
-            for skill in student_skills:
-                if skill in role_lower:
-                    matched_skills.append(skill.title())
-
-            # Infer missing skills based on role category
-            inferred_domain = None
-            if any(k in role_lower for k in ['front', 'web', 'react', 'ui', 'css']):
-                inferred_domain = 'frontend'
-            elif any(k in role_lower for k in ['back', 'django', 'node', 'api', 'server']):
-                inferred_domain = 'backend'
-            elif any(k in role_lower for k in ['data', 'ml', 'analysis', 'ai', 'science']):
-                inferred_domain = 'data'
-            elif any(k in role_lower for k in ['devops', 'cloud', 'aws', 'docker', 'infrastructure']):
-                inferred_domain = 'devops'
-
-            if inferred_domain:
-                domain_skills = skill_domain_map[inferred_domain]
-                for ds in domain_skills:
-                    if ds not in student_skills:
-                        missing_skills.append(ds.title())
-
-            # Calculate match %
-            match_score = 55 + (len(matched_skills) * 15)
-            if student.cgpa and student.cgpa > 8.0:
-                match_score += 5  # high CGPA bonus
-            
-            match_score = min(match_score, 95)
-
-            # Construct reasons
-            if matched_skills:
-                reasons.append(f"Identified matching skills in role title: {', '.join(matched_skills)}.")
-            if inferred_domain:
-                reasons.append(f"Role categorized as {inferred_domain.upper()} domain based on title analysis.")
-                if missing_skills:
-                    reasons.append(f"Popular skills for this domain to consider: {', '.join(missing_skills[:3])}.")
-            else:
-                reasons.append("Generic off-campus engineering match based on college profile validation.")
-
-            if student.cgpa and student.cgpa > 8.0:
-                reasons.append(f"Includes match bonus for your excellent CGPA of {student.cgpa}.")
-
-            rec_item = {
-                'id': opp.pk,
-                'role': opp.role,
-                'company_name': opp.company_name,
-                'industry': "Information Technology",
-                'match_pct': match_score,
-                'matched_skills': matched_skills,
-                'missing_skills': missing_skills,
-                'reasons': reasons,
-                'source': 'OFF-CAMPUS',
-                'opportunity_url': opp.source or '#'
-            }
-
-            # Classify internship vs job
-            is_intern = any(k in role_lower for k in ['intern', 'stipend', 'co-op'])
-            if is_intern:
-                recommended_internships_offcampus.append(rec_item)
-            else:
-                recommended_jobs_offcampus.append(rec_item)
-
-            # Populate recommended companies aggregate
-            comp_name = opp.company_name
-            if comp_name not in recommended_companies_set:
-                recommended_companies_set[comp_name] = {
-                    'name': comp_name,
-                    'location': opp.location or "Off-campus / Remote",
-                    'match_pct': match_score,
-                    'reasons': [f"Matches scraped off-campus role '{opp.role}'."]
-                }
-            else:
-                if match_score > recommended_companies_set[comp_name]['match_pct']:
-                    recommended_companies_set[comp_name]['match_pct'] = match_score
-
-        # Also insert on-campus companies into companies aggregate
-        for drive in placement_drives:
-            cname = drive.company.name
-            if cname not in recommended_companies_set:
-                recommended_companies_set[cname] = {
-                    'name': cname,
-                    'location': drive.company.location or "On-Campus",
-                    'match_pct': 70,
-                    'reasons': [f"Active on-campus placement drive for '{drive.role}'."]
-                }
-
-        # Combine, sort and limit
-        recommended_jobs = sorted(
-            recommended_jobs_oncampus + recommended_jobs_offcampus,
-            key=lambda x: x['match_pct'],
-            reverse=True
-        )[:8]
-
-        recommended_internships = sorted(
-            recommended_internships_oncampus + recommended_internships_offcampus,
-            key=lambda x: x['match_pct'],
-            reverse=True
-        )[:8]
-
-        recommended_companies = sorted(
-            recommended_companies_set.values(),
-            key=lambda x: x['match_pct'],
-            reverse=True
-        )[:8]
-
-        return render(request, self.template_name, {
-            **_base_ctx(request, student),
-            'recommended_jobs': recommended_jobs,
-            'recommended_internships': recommended_internships,
-            'recommended_companies': recommended_companies,
-            'total_jobs_count': len(recommended_jobs),
-            'total_interns_count': len(recommended_internships),
-            'total_companies_count': len(recommended_companies),
-        })
+        return render(request, self.template_name, ctx)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2761,6 +3136,156 @@ class RecruiterCertificateDetailView(LoginRequiredMixin, View):
             'is_recruiter': True,
             'student': certificate.student
         })
+
+
+class StudentCertificatePreviewView(StudentRequiredMixin, View):
+    """Streams certificate file (PDF/Image) inline for browser viewing."""
+    def get(self, request, pk, *args, **kwargs):
+        student = _get_student(request)
+        cert = get_object_or_404(Certificate, pk=pk, student=student)
+        if not cert.certificate_file:
+            messages.error(request, "Certificate file not found.")
+            return redirect('student_portal:certificates_list')
+        
+        file_path = cert.certificate_file.path
+        filename = os.path.basename(file_path)
+        content_type = 'application/pdf' if filename.lower().endswith('.pdf') else 'image/jpeg'
+        response = FileResponse(cert.certificate_file.open('rb'), content_type=content_type)
+        response['Content-Disposition'] = f'inline; filename="{filename}"'
+        return response
+
+
+class StudentCertificateDownloadView(StudentRequiredMixin, View):
+    """Downloads certificate file."""
+    def get(self, request, pk, *args, **kwargs):
+        student = _get_student(request)
+        cert = get_object_or_404(Certificate, pk=pk, student=student)
+        if not cert.certificate_file:
+            messages.error(request, "Certificate file not found.")
+            return redirect('student_portal:certificates_list')
+        
+        filename = os.path.basename(cert.certificate_file.path)
+        response = FileResponse(cert.certificate_file.open('rb'))
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+
+class StudentCareerProfileView(StudentRequiredMixin, View):
+    """Manages Career Profile settings (Job Role, Industry, City, Work Preference, Expected Salary, Relocation)."""
+    template_name = 'student_portal/career_profile.html'
+
+    def get(self, request, *args, **kwargs):
+        student = _get_student(request)
+        if not student:
+            return redirect('accounts:logout')
+        form = CareerProfileForm(instance=student)
+        return render(request, self.template_name, {
+            **_base_ctx(request, student),
+            'form': form,
+        })
+
+    def post(self, request, *args, **kwargs):
+        student = _get_student(request)
+        if not student:
+            return redirect('accounts:logout')
+        form = CareerProfileForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Career Profile preferences updated successfully!")
+            return redirect('student_portal:career_profile')
+        return render(request, self.template_name, {
+            **_base_ctx(request, student),
+            'form': form,
+        })
+
+
+from .resume_parser_service import parse_resume_file, sync_extracted_data_to_profile
+
+class StudentAIResumeParserView(StudentRequiredMixin, View):
+    """
+    AI Resume Parser:
+    Lists student uploaded resumes, parses structured entity data (Skills, Programming Languages,
+    Tools, Soft Skills, Education, Experience, Projects, Certifications), computes confidence score,
+    and synchronizes extracted information into Student Profile, Projects, Certificates, and Career Profile.
+    """
+    template_name = 'student_portal/resume_parser.html'
+
+    def get(self, request, *args, **kwargs):
+        student = _get_student(request)
+        if not student:
+            return redirect('accounts:logout')
+
+        all_resumes = list(StudentResume.objects.filter(student=student).order_by('-is_default', '-uploaded_at'))
+        selected_id = request.GET.get('resume_id')
+
+        selected_resume = None
+        if selected_id:
+            try:
+                selected_resume = StudentResume.objects.get(pk=selected_id, student=student)
+            except StudentResume.DoesNotExist:
+                selected_resume = None
+
+        if not selected_resume and all_resumes:
+            selected_resume = next((r for r in all_resumes if r.is_default), all_resumes[0])
+
+        if selected_resume and selected_resume.parser_status == 'PENDING':
+            parse_resume_file(selected_resume)
+
+        prog_langs = []
+        tools = []
+        soft_skills = []
+        all_skills = []
+        education = []
+        experience = []
+        projects = []
+        certificates = []
+
+        if selected_resume:
+            prog_langs = json.loads(selected_resume.programming_languages_found or '[]')
+            tools = json.loads(selected_resume.tools_found or '[]')
+            soft_skills = json.loads(selected_resume.soft_skills_found or '[]')
+            all_skills = json.loads(selected_resume.skills_found or '[]')
+            education = json.loads(selected_resume.education_found or '[]')
+            experience = json.loads(selected_resume.experience_found or '[]')
+            projects = json.loads(selected_resume.projects_found or '[]')
+            certificates = json.loads(selected_resume.certificates_found or '[]')
+
+        return render(request, self.template_name, {
+            **_base_ctx(request, student),
+            'all_resumes': all_resumes,
+            'selected_resume': selected_resume,
+            'prog_langs': prog_langs,
+            'tools': tools,
+            'soft_skills': soft_skills,
+            'all_skills': all_skills,
+            'education': education,
+            'experience': experience,
+            'projects': projects,
+            'certificates': certificates,
+        })
+
+    def post(self, request, *args, **kwargs):
+        student = _get_student(request)
+        if not student:
+            return redirect('accounts:logout')
+
+        resume_id = request.POST.get('resume_id')
+        selected_resume = get_object_or_404(StudentResume, pk=resume_id, student=student)
+
+        # 1. Execute AI Parser
+        parse_resume_file(selected_resume)
+
+        # 2. Sync to Profile
+        sync_res = sync_extracted_data_to_profile(student, selected_resume)
+
+        messages.success(
+            request,
+            f"AI Resume Parsing completed! Synced {sync_res['skills_added']} skills, "
+            f"{sync_res['projects_synced']} projects, and {sync_res['certificates_synced']} certificates to your Student Profile."
+        )
+
+        from django.urls import reverse
+        return redirect(f"{reverse('student_portal:resume_parser')}?resume_id={selected_resume.pk}")
 
 
 

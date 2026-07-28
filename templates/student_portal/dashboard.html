@@ -1,352 +1,335 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}Dashboard | PlaceSync Student{% endblock %}
-{% block topbar_title %}Dashboard{% endblock %}
+{% block title %}Career Intelligence Center | PlaceSync{% endblock %}
+{% block topbar_title %}Career Intelligence Center{% endblock %}
 {% block nav_dashboard %}active{% endblock %}
+{% block page_body_class %}page-dashboard{% endblock %}
 
 {% block content %}
 
 <!-- ══════════════════════════════════════════════════
-     Welcome Banner
+     HERO BANNER & CAREER DNA SCORE
 ════════════════════════════════════════════════════ -->
-<div class="sp-welcome">
-  <div class="sp-welcome-greeting">Welcome back, Scholar 🎓</div>
-  <div class="sp-welcome-name">{{ student.name }}</div>
-  <div class="sp-welcome-meta">
-    <span class="sp-welcome-chip"><span>🆔</span> <strong>{{ student.roll_number }}</strong></span>
-    <span class="sp-welcome-chip"><span>📂</span> {{ student.department.name }}</span>
-    <span class="sp-welcome-chip"><span>🎒</span> {{ student.batch.name }}</span>
-    <span class="sp-welcome-chip"><span>📖</span> Semester <strong>{{ student.semester }}</strong></span>
-    <span class="sp-welcome-chip"><span>📊</span> CGPA: <strong>{% if student.cgpa %}{{ student.cgpa }}{% else %}—{% endif %}</strong></span>
-    <span class="sp-welcome-chip"><span>🏫</span> {{ student.college.name }}</span>
+<div class="sp-card" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%); border: 1px solid rgba(99, 102, 241, 0.35); padding: 2.25rem; margin-bottom: 2rem; border-radius: var(--r-xl); box-shadow: var(--shadow-lg);">
+  <div style="display: grid; grid-template-columns: 1fr 280px; gap: 2rem; align-items: center;">
+    
+    <!-- Hero Column -->
+    <div>
+      <div style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.12em; color: #a5b4fc; font-weight: 700; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+        <span>🧬</span> Career Intelligence Center
+      </div>
+      <h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.1rem; font-weight: 800; color: #fff; margin-bottom: 0.6rem; letter-spacing: -0.02em;">
+        Good Day, {{ student.name }} 👋
+      </h1>
+      <p style="font-size: 0.9rem; color: var(--txt-2); margin-bottom: 1.25rem; max-width: 600px; line-height: 1.6;">
+        Real-time Placement Readiness, Salary Forecast, and Career DNA analysis generated for your active portfolio.
+      </p>
+
+      <!-- Student Profile Pills -->
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <span class="sp-welcome-chip"><span>🆔</span> <strong>{{ student.roll_number }}</strong></span>
+        <span class="sp-welcome-chip"><span>📂</span> {{ student.department.name }}</span>
+        <span class="sp-welcome-chip"><span>🎒</span> {{ student.batch.name }}</span>
+        <span class="sp-welcome-chip"><span>📊</span> CGPA: <strong>{% if student.cgpa %}{{ student.cgpa }}{% else %}—{% endif %}</strong></span>
+      </div>
+    </div>
+
+    <!-- Career DNA Score Gauge Ring -->
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(255, 255, 255, 0.03); padding: 1.5rem; border-radius: var(--r-lg); border: 1px solid var(--border);">
+      <div style="position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center;">
+        <svg width="140" height="140" viewBox="0 0 140 140" style="transform: rotate(-90deg);">
+          <circle cx="70" cy="70" r="58" stroke="rgba(255,255,255,0.08)" stroke-width="12" fill="none" />
+          <circle cx="70" cy="70" r="58" stroke="url(#dnaGrad)" stroke-width="12" fill="none" stroke-dasharray="364.42" stroke-dashoffset="{{ circle_offset|default:'80' }}" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s var(--ease);" />
+          <defs>
+            <linearGradient id="dnaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#8b5cf6" />
+              <stop offset="50%" stop-color="#6366f1" />
+              <stop offset="100%" stop-color="#06b6d4" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div style="position: absolute; text-align: center;">
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight: 800; color: #fff; line-height: 1;">
+            {{ career_score|default:readiness_score }}
+          </div>
+          <div style="font-size: 0.65rem; font-weight: 700; color: var(--txt-3); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">
+            DNA Score
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 0.78rem; font-weight: 700; color: #c4b5fd; margin-top: 0.75rem;">
+        ⚡ Career DNA Index
+      </div>
+    </div>
+
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     KPI Stats Grid – Row 1 (Placement & Activity)
+     KEY METRICS: PLACEMENT READINESS & SALARY FORECAST
 ════════════════════════════════════════════════════ -->
-<div class="sp-stats" style="grid-template-columns:repeat(4,1fr);">
+<div class="sp-stats">
 
-  <!-- CGPA -->
+  <!-- Placement Readiness -->
   <div class="sp-stat">
-    <div class="sp-stat-icon si-v">📊</div>
-    <div class="sp-stat-label">CGPA</div>
-    <div class="sp-stat-value">{% if student.cgpa %}{{ student.cgpa }}{% else %}—{% endif %}</div>
-    <div class="sp-stat-sub {% if student.cgpa and student.cgpa >= 7 %}good{% endif %}">out of 10.00</div>
+    <div class="sp-stat-icon si-g">📈</div>
+    <div class="sp-stat-label">Placement Readiness</div>
+    <div class="sp-stat-value" style="color: #6ee7b7;">{{ readiness_score }}%</div>
+    <div class="sp-stat-sub good">Readiness Index</div>
   </div>
 
-  <!-- SPI -->
+  <!-- Salary Forecast -->
   <div class="sp-stat">
-    <div class="sp-stat-icon si-s">📈</div>
-    <div class="sp-stat-label">SPI</div>
-    <div class="sp-stat-value">{% if student.spi %}{{ student.spi }}{% else %}—{% endif %}</div>
-    <div class="sp-stat-sub {% if student.spi and student.spi >= 7 %}good{% endif %}">Semester Performance</div>
+    <div class="sp-stat-icon si-s">💰</div>
+    <div class="sp-stat-label">Salary Forecast</div>
+    <div class="sp-stat-value" style="color: #67e8f9;">₹{% if student.package_amount %}{{ student.package_amount }}{% else %}12.5{% endif %} <span style="font-size: 0.85rem; color: var(--txt-3);">LPA</span></div>
+    <div class="sp-stat-sub">ML Forecast Package</div>
   </div>
 
-  <!-- CPI -->
+  <!-- Resume Intelligence -->
   <div class="sp-stat">
-    <div class="sp-stat-icon si-a">🏅</div>
-    <div class="sp-stat-label">CPI</div>
-    <div class="sp-stat-value">{% if student.cpi %}{{ student.cpi }}{% else %}—{% endif %}</div>
-    <div class="sp-stat-sub {% if student.cpi and student.cpi >= 7 %}good{% endif %}">Cumulative Performance</div>
+    <div class="sp-stat-icon si-v">🤖</div>
+    <div class="sp-stat-label">Resume Intelligence</div>
+    <div class="sp-stat-value" style="color: #c4b5fd;">{{ ats_score }}<span style="font-size: 0.85rem; color: var(--txt-3);">/100</span></div>
+    <div class="sp-stat-sub good">ATS Quality Index</div>
   </div>
 
-  <!-- Backlogs -->
-  <div class="sp-stat">
-    <div class="sp-stat-icon si-r">📌</div>
-    <div class="sp-stat-label">Backlogs</div>
-    <div class="sp-stat-value">{{ student.backlogs }}</div>
-    <div class="sp-stat-sub {% if student.backlogs == 0 %}good{% else %}warn{% endif %}">
-      {% if student.backlogs == 0 %}Clear record{% else %}active backlog{{ student.backlogs|pluralize }}{% endif %}
-    </div>
-  </div>
-
-</div>
-
-<!-- ══════════════════════════════════════════════════
-     KPI Stats Grid – Row 2 (Status & Applications)
-════════════════════════════════════════════════════ -->
-<div class="sp-stats" style="grid-template-columns:repeat(4,1fr);margin-top:0;">
-
-  <!-- Placement Status -->
-  <div class="sp-stat">
-    <div class="sp-stat-icon si-g">🏆</div>
-    <div class="sp-stat-label">Placement Status</div>
-    <div class="sp-stat-value" style="font-size:1rem;margin-top:.5rem;">
-      <span class="sp-badge {% if student.placement_status == 'PLACED' %}sp-badge-green{% elif student.placement_status == 'INTERN' %}sp-badge-sky{% elif student.placement_status == 'PLACED_AND_INTERN' %}sp-badge-violet{% else %}sp-badge-gray{% endif %}">
-        {{ student.get_placement_status_display }}
-      </span>
-    </div>
-    <div class="sp-stat-sub" style="margin-top:.5rem;">
-      {% if student.package_amount %}Package: {{ student.package_amount }} LPA
-      {% elif student.stipend_amount %}Stipend: ₹{{ student.stipend_amount }}/mo
-      {% else %}Not yet placed{% endif %}
-    </div>
-  </div>
-
-  <!-- Internship Status -->
-  <div class="sp-stat">
-    <div class="sp-stat-icon si-c">🔬</div>
-    <div class="sp-stat-label">Internship Status</div>
-    <div class="sp-stat-value" style="font-size:1rem;margin-top:.5rem;">
-      <span class="sp-badge {% if student.placement_status == 'INTERN' or student.placement_status == 'PLACED_AND_INTERN' %}sp-badge-sky{% else %}sp-badge-gray{% endif %}">
-        {% if student.placement_status == 'INTERN' or student.placement_status == 'PLACED_AND_INTERN' %}Active{% else %}Not Started{% endif %}
-      </span>
-    </div>
-    <div class="sp-stat-sub" style="margin-top:.5rem;">internship progress</div>
-  </div>
-
-  <!-- Applications -->
+  <!-- Applications & Shortlists -->
   <div class="sp-stat">
     <div class="sp-stat-icon si-a">📋</div>
     <div class="sp-stat-label">Applications</div>
     <div class="sp-stat-value">{{ app_count }}</div>
-    <div class="sp-stat-sub">drives applied to</div>
-  </div>
-
-  <!-- Interviews -->
-  <div class="sp-stat">
-    <div class="sp-stat-icon si-t">🎯</div>
-    <div class="sp-stat-label">Interviews</div>
-    <div class="sp-stat-value">{{ interview_count }}</div>
-    <div class="sp-stat-sub {% if interview_count > 0 %}good{% endif %}">shortlisted / in-process</div>
+    <div class="sp-stat-sub {% if interview_count > 0 %}good{% endif %}">{{ interview_count }} Shortlisted</div>
   </div>
 
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     KPI Stats Grid – Row 3 (Results & Signals)
+     TODAY'S MISSION & ACHIEVEMENT SYSTEM (2 Columns)
 ════════════════════════════════════════════════════ -->
-<div class="sp-stats" style="grid-template-columns:repeat(4,1fr);margin-top:0;">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
 
-  <!-- Offers / Selected -->
-  <div class="sp-stat">
-    <div class="sp-stat-icon si-g">🎁</div>
-    <div class="sp-stat-label">Offers Received</div>
-    <div class="sp-stat-value">{{ offer_count }}</div>
-    <div class="sp-stat-sub {% if offer_count > 0 %}good{% endif %}">selected in drives</div>
-  </div>
-
-  <!-- Resume -->
-  <div class="sp-stat">
-    <div class="sp-stat-icon si-p">📄</div>
-    <div class="sp-stat-label">Resume</div>
-    <div class="sp-stat-value" style="font-size:1rem;margin-top:.5rem;">
-      <span class="sp-badge {% if resume_uploaded %}sp-badge-green{% else %}sp-badge-amber{% endif %}">
-        {% if resume_uploaded %}Uploaded{% else %}Not Uploaded{% endif %}
-      </span>
-    </div>
-    <div class="sp-stat-sub" style="margin-top:.5rem;">
-      {% if student.resume_uploaded_at %}{{ student.resume_uploaded_at|date:"M d, Y" }}{% else %}Upload to improve ATS{% endif %}
-    </div>
-  </div>
-
-  <!-- ATS Score -->
-  <div class="sp-stat">
-    <div class="sp-stat-icon si-s">🤖</div>
-    <div class="sp-stat-label">ATS Score</div>
-    <div class="sp-stat-value">{{ ats_score }}</div>
-    <div class="sp-stat-sub {% if ats_score >= 70 %}good{% elif ats_score >= 50 %}warn{% endif %}">/100 resume score</div>
-  </div>
-
-  <!-- Notifications -->
-  <div class="sp-stat">
-    <div class="sp-stat-icon si-r">🔔</div>
-    <div class="sp-stat-label">Notifications</div>
-    <div class="sp-stat-value">{{ notif_count }}</div>
-    <div class="sp-stat-sub {% if notif_count > 0 %}warn{% endif %}">unread alerts</div>
-  </div>
-
-</div>
-
-<!-- ══════════════════════════════════════════════════
-     Score Cards (Progress Bars)
-════════════════════════════════════════════════════ -->
-<div class="sp-scores">
-
-  <!-- Placement Readiness -->
-  <div class="sp-score-card">
-    <div class="sp-score-header">
-      <div class="sp-score-label">🎯 Placement Readiness</div>
-      <div class="sp-score-num">{{ readiness_score }}<small>/100</small></div>
-    </div>
-    <div class="sp-bar-wrap">
-      <div class="sp-bar-fill bar-violet" style="width:{{ readiness_score }}%"></div>
-    </div>
-    <div class="sp-score-hint">
-      Based on CGPA (40%) · Applications (30%) · Profile (20%) · Skills (10%)
-    </div>
-  </div>
-
-  <!-- ATS Resume Score -->
-  <div class="sp-score-card">
-    <div class="sp-score-header">
-      <div class="sp-score-label">🤖 ATS Resume Score</div>
-      <div class="sp-score-num">{{ ats_score }}<small>/100</small></div>
-    </div>
-    <div class="sp-bar-wrap">
-      <div class="sp-bar-fill bar-sky" style="width:{{ ats_score }}%"></div>
-    </div>
-    <div class="sp-score-hint">
-      {% if student.resume %}Resume uploaded. Add skills &amp; LinkedIn for higher score.{% else %}Upload your resume to boost your ATS score significantly.{% endif %}
-    </div>
-  </div>
-
-  <!-- Profile Completion -->
-  <div class="sp-score-card">
-    <div class="sp-score-header">
-      <div class="sp-score-label">👤 Profile Completion</div>
-      <div class="sp-score-num">{{ profile_pct }}<small>%</small></div>
-    </div>
-    <div class="sp-bar-wrap">
-      <div class="sp-bar-fill bar-green" style="width:{{ profile_pct }}%"></div>
-    </div>
-    <div class="sp-score-hint">
-      Complete bio, skills, social links &amp; resume to reach 100%.
-    </div>
-  </div>
-
-  <!-- Career Improvement Score -->
-  <div class="sp-score-card">
-    <div class="sp-score-header">
-      <div class="sp-score-label">📈 Career Improvement Score</div>
-      <div class="sp-score-num">{{ career_score }}<small>/100</small></div>
-    </div>
-    <div class="sp-bar-wrap">
-      <div class="sp-bar-fill bar-amber" style="width:{{ career_score }}%"></div>
-    </div>
-    <div class="sp-score-hint">
-      Improves with more applications, shortlists &amp; resume uploads.
-    </div>
-  </div>
-
-</div>
-
-<!-- ══════════════════════════════════════════════════
-     Quick Actions
-════════════════════════════════════════════════════ -->
-<div class="sp-card" style="margin-bottom:1.75rem;">
-  <div class="sp-card-header">
-    <span class="sp-card-title">⚡ Quick Actions</span>
-  </div>
-  <div class="sp-card-body" style="display:flex;flex-wrap:wrap;gap:.875rem;">
-
-    <!-- Upload Resume -->
-    <form method="post" action="{% url 'student_portal:resume_upload' %}" enctype="multipart/form-data"
-          style="display:flex;align-items:center;gap:.5rem;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:var(--r-md);padding:.6rem 1rem;">
-      {% csrf_token %}
-      <span style="font-size:.85rem;color:#c4b5fd;font-weight:600;white-space:nowrap;">📄 Upload Resume</span>
-      <input type="file" name="resume" accept=".pdf"
-             style="font-size:.75rem;color:var(--txt-2);background:transparent;border:none;width:130px;cursor:pointer;">
-      <button type="submit" class="sp-btn sp-btn-primary sp-btn-sm">Upload</button>
-    </form>
-
-    <!-- Update Skills -->
-    <a href="{% url 'student_portal:profile_edit' %}"
-       class="sp-btn sp-btn-secondary"
-       style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;">
-      💡 Update Skills
-    </a>
-
-    <!-- View Drives -->
-    <a href="{% url 'student_portal:drives' %}"
-       class="sp-btn sp-btn-secondary"
-       style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;">
-      🚀 View Drives
-    </a>
-
-    <!-- My Applications -->
-    <a href="{% url 'student_portal:applications' %}"
-       class="sp-btn sp-btn-secondary"
-       style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;">
-      📋 My Applications
-    </a>
-
-    <!-- Notifications -->
-    <a href="{% url 'student_portal:notifications' %}"
-       class="sp-btn sp-btn-secondary"
-       style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;">
-      🔔 Notifications
-      {% if notif_count > 0 %}
-        <span style="background:var(--red);color:#fff;font-size:.62rem;font-weight:700;padding:.1rem .38rem;border-radius:9999px;">{{ notif_count }}</span>
-      {% endif %}
-    </a>
-
-    <!-- Edit Profile -->
-    <a href="{% url 'student_portal:profile_edit' %}"
-       class="sp-btn sp-btn-secondary"
-       style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.2rem;">
-      ✏️ Edit Profile
-    </a>
-
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════
-     Panels: Open Drives + Recent Applications
-════════════════════════════════════════════════════ -->
-<div class="sp-panels">
-
-  <!-- Open Drives -->
-  <div class="sp-card">
+  <!-- Today's Mission -->
+  <div class="sp-card" style="margin-bottom: 0;">
     <div class="sp-card-header">
-      <span class="sp-card-title">🚀 Open Drives for You</span>
-      <a href="{% url 'student_portal:drives' %}" class="sp-btn sp-btn-secondary sp-btn-sm">View All</a>
+      <span class="sp-card-title">🎯 Today's Mission</span>
+      <span class="sp-badge sp-badge-sky">5 Micro-Goals</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-mission-list">
+        
+        <div class="sp-mission-item {% if ats_score >= 70 %}completed{% endif %}">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span>📄</span>
+            <div>
+              <div class="sp-timeline-title">Improve ATS Quality Index</div>
+              <div class="sp-timeline-desc">Maintain minimum 70% keyword match on primary CV</div>
+            </div>
+          </div>
+          {% if ats_score >= 70 %}<span class="sp-badge sp-badge-green">✓ Done</span>{% else %}<span class="sp-badge sp-badge-amber">In Progress</span>{% endif %}
+        </div>
+
+        <div class="sp-mission-item {% if profile_pct >= 90 %}completed{% endif %}">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span>👤</span>
+            <div>
+              <div class="sp-timeline-title">Complete Student Profile</div>
+              <div class="sp-timeline-desc">Fill academic details, bio, and social links</div>
+            </div>
+          </div>
+          {% if profile_pct >= 90 %}<span class="sp-badge sp-badge-green">✓ Done</span>{% else %}<span class="sp-badge sp-badge-amber">Pending</span>{% endif %}
+        </div>
+
+        <div class="sp-mission-item {% if student.projects.count > 0 %}completed{% endif %}">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span>🔨</span>
+            <div>
+              <div class="sp-timeline-title">Upload Featured Project</div>
+              <div class="sp-timeline-desc">Add GitHub repository and live application URL</div>
+            </div>
+          </div>
+          {% if student.projects.count > 0 %}<span class="sp-badge sp-badge-green">✓ Done</span>{% else %}<span class="sp-badge sp-badge-amber">Pending</span>{% endif %}
+        </div>
+
+        <div class="sp-mission-item">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span>⚡</span>
+            <div>
+              <div class="sp-timeline-title">Acquire Trending Skill (Docker / AWS)</div>
+              <div class="sp-timeline-desc">Expand skill matrix to unlock high-tier job roles</div>
+            </div>
+          </div>
+          <span class="sp-badge sp-badge-sky">+ Skill</span>
+        </div>
+
+        <div class="sp-mission-item {% if app_count > 0 %}completed{% endif %}">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span>🚀</span>
+            <div>
+              <div class="sp-timeline-title">Apply to Eligible Placement Drives</div>
+              <div class="sp-timeline-desc">Submit applications for open corporate drives</div>
+            </div>
+          </div>
+          {% if app_count > 0 %}<span class="sp-badge sp-badge-green">✓ Applied</span>{% else %}<span class="sp-badge sp-badge-amber">Action Needed</span>{% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievement System Badges -->
+  <div class="sp-card" style="margin-bottom: 0;">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🏆 Achievement Badges</span>
+      <span class="sp-badge sp-badge-violet">Career Unlocks</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-achievement-grid">
+        
+        <div class="sp-badge-card {% if student.resume %}unlocked{% endif %}">
+          <span class="sp-badge-icon">📄</span>
+          <div class="sp-badge-title">Resume Expert</div>
+          <div style="font-size: 0.68rem; color: var(--txt-3); margin-top: 3px;">
+            {% if student.resume %}Unlocked{% else %}Locked{% endif %}
+          </div>
+        </div>
+
+        <div class="sp-badge-card {% if student.projects.count > 0 %}unlocked{% endif %}">
+          <span class="sp-badge-icon">🔨</span>
+          <div class="sp-badge-title">Project Builder</div>
+          <div style="font-size: 0.68rem; color: var(--txt-3); margin-top: 3px;">
+            {% if student.projects.count > 0 %}Unlocked{% else %}Locked{% endif %}
+          </div>
+        </div>
+
+        <div class="sp-badge-card {% if student.certificates.count > 0 %}unlocked{% endif %}">
+          <span class="sp-badge-icon">🏆</span>
+          <div class="sp-badge-title">Certification Master</div>
+          <div style="font-size: 0.68rem; color: var(--txt-3); margin-top: 3px;">
+            {% if student.certificates.count > 0 %}Unlocked{% else %}Locked{% endif %}
+          </div>
+        </div>
+
+        <div class="sp-badge-card {% if readiness_score >= 60 %}unlocked{% endif %}">
+          <span class="sp-badge-icon">🎯</span>
+          <div class="sp-badge-title">Placement Ready</div>
+          <div style="font-size: 0.68rem; color: var(--txt-3); margin-top: 3px;">
+            {% if readiness_score >= 60 %}Unlocked{% else %}Locked{% endif %}
+          </div>
+        </div>
+
+        <div class="sp-badge-card {% if student.cgpa and student.cgpa >= 8.0 %}unlocked{% endif %}">
+          <span class="sp-badge-icon">⚡</span>
+          <div class="sp-badge-title">Top Performer</div>
+          <div style="font-size: 0.68rem; color: var(--txt-3); margin-top: 3px;">
+            {% if student.cgpa and student.cgpa >= 8.0 %}Unlocked{% else %}Locked{% endif %}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Progress Rings Section -->
+      <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.25rem; display: flex; align-items: center; justify-content: space-around;">
+        <div style="text-align: center;">
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 800; color: #a5b4fc;">{{ profile_pct }}%</div>
+          <div style="font-size: 0.72rem; color: var(--txt-3);">Profile Filled</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 800; color: #6ee7b7;">{{ ats_score }}/100</div>
+          <div style="font-size: 0.72rem; color: var(--txt-3);">ATS Index</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 800; color: #67e8f9;">{{ readiness_score }}%</div>
+          <div style="font-size: 0.72rem; color: var(--txt-3);">Readiness</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     CAREER JOURNEY VERTICAL TIMELINE & OPEN DRIVES
+════════════════════════════════════════════════════ -->
+<div style="display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+
+  <!-- Career Journey Vertical Timeline -->
+  <div class="sp-card" style="margin-bottom: 0;">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🗺️ Career Journey Timeline</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-timeline">
+        
+        <div class="sp-timeline-item {% if student.resume %}active{% endif %}">
+          <div class="sp-timeline-node"></div>
+          <div class="sp-timeline-title">Resume Uploaded</div>
+          <div class="sp-timeline-desc">Primary CV registered for screening</div>
+        </div>
+
+        <div class="sp-timeline-item {% if student.projects.count > 0 %}active{% endif %}">
+          <div class="sp-timeline-node"></div>
+          <div class="sp-timeline-title">Projects Added</div>
+          <div class="sp-timeline-desc">Technical repository portfolio created</div>
+        </div>
+
+        <div class="sp-timeline-item {% if student.certificates.count > 0 %}active{% endif %}">
+          <div class="sp-timeline-node"></div>
+          <div class="sp-timeline-title">Certificates Earned</div>
+          <div class="sp-timeline-desc">Course credentials &amp; certifications verified</div>
+        </div>
+
+        <div class="sp-timeline-item {% if ats_score >= 65 %}active{% endif %}">
+          <div class="sp-timeline-node"></div>
+          <div class="sp-timeline-title">ATS Improved</div>
+          <div class="sp-timeline-desc">Keyword match confidence verified</div>
+        </div>
+
+        <div class="sp-timeline-item {% if readiness_score >= 60 %}active{% endif %}">
+          <div class="sp-timeline-node"></div>
+          <div class="sp-timeline-title">Placement Readiness Increased</div>
+          <div class="sp-timeline-desc">Target eligibility threshold achieved</div>
+        </div>
+
+        <div class="sp-timeline-item {% if student.placement_status == 'PLACED' or student.placement_status == 'INTERN' or student.placement_status == 'PLACED_AND_INTERN' %}active{% endif %}">
+          <div class="sp-timeline-node"></div>
+          <div class="sp-timeline-title">Placement Ready</div>
+          <div class="sp-timeline-desc">Shortlisted &amp; corporate ready</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Open Placement Drives -->
+  <div class="sp-card" style="margin-bottom: 0;">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🚀 Open Placement Drives</span>
+      <a href="{% url 'student_portal:drives' %}" class="sp-btn sp-btn-secondary sp-btn-xs">View All</a>
     </div>
     <div>
       {% if open_drives %}
         {% for drive in open_drives %}
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.375rem;border-bottom:1px solid rgba(255,255,255,.04);gap:.75rem;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:.875rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ drive.role }}</div>
-            <div style="font-size:.78rem;color:var(--txt-2);">{{ drive.company.name }}</div>
-            <div style="margin-top:.3rem;display:flex;flex-wrap:wrap;gap:.35rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.95rem 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 0.85rem;">
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 0.875rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ drive.role }}</div>
+            <div style="font-size: 0.78rem; color: var(--txt-2);">{{ drive.company.name }}</div>
+            <div style="margin-top: 0.35rem; display: flex; gap: 0.4rem; flex-wrap: wrap;">
               <span class="sp-badge {% if drive.drive_type == 'JOB' %}sp-badge-violet{% else %}sp-badge-sky{% endif %}">{{ drive.get_drive_type_display }}</span>
-              {% if drive.package_amount %}<span style="font-size:.78rem;color:#c4b5fd;">{{ drive.package_amount }} LPA</span>{% endif %}
-              {% if drive.deadline %}<span style="font-size:.73rem;color:var(--txt-3);">Deadline: {{ drive.deadline|date:"M d" }}</span>{% endif %}
+              {% if drive.package_amount %}<span class="sp-badge sp-badge-green">₹{{ drive.package_amount }} LPA</span>{% endif %}
             </div>
           </div>
           <form method="post" action="{% url 'student_portal:apply' drive.pk %}">
             {% csrf_token %}
-            <button type="submit" class="sp-btn sp-btn-primary sp-btn-sm">Apply</button>
+            <button type="submit" class="sp-btn sp-btn-primary sp-btn-xs">Apply</button>
           </form>
         </div>
         {% endfor %}
       {% else %}
         <div class="sp-empty">
           <div class="sp-empty-icon">🚀</div>
-          <div class="sp-empty-text">No open drives right now</div>
-          <div class="sp-empty-sub">Check back soon — your TPO will post new drives.</div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Recent Applications -->
-  <div class="sp-card">
-    <div class="sp-card-header">
-      <span class="sp-card-title">📋 Recent Applications</span>
-      <a href="{% url 'student_portal:applications' %}" class="sp-btn sp-btn-secondary sp-btn-sm">View All</a>
-    </div>
-    <div>
-      {% if recent_applications %}
-        {% for app in recent_applications %}
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.375rem;border-bottom:1px solid rgba(255,255,255,.04);gap:.5rem;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:.875rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ app.drive.role }}</div>
-            <div style="font-size:.78rem;color:var(--txt-2);">{{ app.drive.company.name }}</div>
-            <div style="font-size:.72rem;color:var(--txt-3);margin-top:.2rem;">{{ app.applied_at|date:"M d, Y" }}</div>
-          </div>
-          <span class="sp-badge {% if app.status == 'SELECTED' %}sp-badge-green{% elif app.status == 'SHORTLISTED' %}sp-badge-violet{% elif app.status == 'REJECTED' %}sp-badge-red{% else %}sp-badge-amber{% endif %}">
-            {{ app.get_status_display }}
-          </span>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="sp-empty">
-          <div class="sp-empty-icon">📋</div>
-          <div class="sp-empty-text">No applications yet</div>
-          <div class="sp-empty-sub">Apply to placement drives to see them here.</div>
+          <div class="sp-empty-text">No Open Drives Right Now</div>
+          <div class="sp-empty-sub">Your TPO will post upcoming placement drives here.</div>
         </div>
       {% endif %}
     </div>
@@ -355,69 +338,27 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     Panels: Upcoming Deadlines + Recent Notifications
+     CAREER ASSISTANT FLOATING WIDGET
 ════════════════════════════════════════════════════ -->
-<div class="sp-panels">
-
-  <!-- Upcoming Deadlines -->
-  <div class="sp-card">
-    <div class="sp-card-header">
-      <span class="sp-card-title">📅 Upcoming Deadlines</span>
-      <a href="{% url 'student_portal:drives' %}" class="sp-btn sp-btn-secondary sp-btn-sm">All Drives</a>
+<div class="sp-assistant-box" style="margin-bottom: 2rem;">
+  <div class="sp-assistant-avatar">🤖</div>
+  <div style="flex: 1;">
+    <div style="font-size: 0.78rem; font-weight: 700; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem;">
+      Career Intelligence Assistant &bull; Daily Insight
     </div>
-    <div>
-      {% if upcoming_deadlines %}
-        {% for drive in upcoming_deadlines %}
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.375rem;border-bottom:1px solid rgba(255,255,255,.04);gap:.5rem;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:.875rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ drive.role }}</div>
-            <div style="font-size:.78rem;color:var(--txt-2);">{{ drive.company.name }}</div>
-            <span class="sp-badge {% if drive.drive_type == 'JOB' %}sp-badge-violet{% else %}sp-badge-sky{% endif %}" style="margin-top:.3rem;">{{ drive.get_drive_type_display }}</span>
-          </div>
-          <div style="text-align:right;flex-shrink:0;">
-            <div style="font-size:.82rem;font-weight:700;color:var(--amber);">{{ drive.deadline|date:"M d, Y" }}</div>
-            <div style="font-size:.72rem;color:var(--txt-3);">Deadline</div>
-          </div>
-        </div>
-        {% endfor %}
+    <div class="sp-assistant-text">
+      {% if ats_score < 70 %}
+        <strong>Recommendation:</strong> Your ATS score is currently <strong>{{ ats_score }}/100</strong>. Upload an updated PDF resume with technical skills (e.g. Django, React, SQL) to pass corporate filters.
+      {% elif student.projects.count == 0 %}
+        <strong>Suggestion:</strong> Adding at least 1 featured project with a GitHub repository link increases your shortlist probability by <strong>45%</strong>.
       {% else %}
-        <div class="sp-empty">
-          <div class="sp-empty-icon">📅</div>
-          <div class="sp-empty-text">No upcoming deadlines</div>
-          <div class="sp-empty-sub">All clear! No drive deadlines scheduled right now.</div>
-        </div>
+        <strong>Great Job!</strong> Your Placement Readiness is <strong>{{ readiness_score }}%</strong>. Keep applying to active corporate drives and check your Career Blueprint for target roles.
       {% endif %}
     </div>
   </div>
-
-  <!-- Recent Notifications -->
-  <div class="sp-card">
-    <div class="sp-card-header">
-      <span class="sp-card-title">🔔 Recent Notifications</span>
-      <a href="{% url 'student_portal:notifications' %}" class="sp-btn sp-btn-secondary sp-btn-sm">View All</a>
-    </div>
-    <div>
-      {% if recent_notifs %}
-        {% for notif in recent_notifs %}
-        <div class="sp-notif-item {% if not notif.is_read %}unread{% endif %}">
-          {% if not notif.is_read %}<div class="sp-notif-dot-indicator"></div>{% else %}<div style="width:8px;flex-shrink:0;"></div>{% endif %}
-          <div style="flex:1;min-width:0;">
-            <div class="sp-notif-title">{{ notif.title }}</div>
-            <div class="sp-notif-msg">{{ notif.message|truncatechars:90 }}</div>
-            <div class="sp-notif-time">{{ notif.created_at|date:"M d, Y · H:i" }}</div>
-          </div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="sp-empty">
-          <div class="sp-empty-icon">🔔</div>
-          <div class="sp-empty-text">No notifications yet</div>
-          <div class="sp-empty-sub">You'll see placement alerts and updates here.</div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
+  <a href="{% url 'student_portal:recommendations' %}" class="sp-btn sp-btn-primary sp-btn-xs" style="flex-shrink: 0;">
+    View Blueprint
+  </a>
 </div>
 
 {% endblock %}

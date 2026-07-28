@@ -1,8 +1,9 @@
 {% extends 'student_portal/base.html' %}
 
-{% block title %}Resume &amp; CV Management | PlaceSync{% endblock %}
-{% block topbar_title %}Resume &amp; CV Management{% endblock %}
+{% block title %}Resume & CV Management | PlaceSync{% endblock %}
+{% block topbar_title %}Resume & CV Management{% endblock %}
 {% block nav_resume %}active{% endblock %}
+{% block page_body_class %}page-resume{% endblock %}
 
 {% block content %}
 
@@ -11,346 +12,247 @@
 ════════════════════════════════════════════════════ -->
 <div class="sp-page-header">
   <div>
-    <h1 class="sp-page-title">📄 Resume &amp; CV Hub</h1>
-    <p class="sp-page-subtitle">Analyze, optimize, compare, and manage your placement documents</p>
+    <h1 class="sp-page-title">📄 Resume &amp; CV Management</h1>
+    <p class="sp-page-subtitle">Upload, organize, and manage your PDF resumes. Mark your primary resume as default for placement drives.</p>
+  </div>
+  <div style="display:flex;gap:.75rem;">
+    <a href="{% url 'student_portal:ats_analysis' %}" class="sp-btn sp-btn-secondary">🤖 ATS Analysis</a>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     Two-Column Main Section: Active Document Details
+     Stats Summary
 ════════════════════════════════════════════════════ -->
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;align-items:start;">
-
-  <!-- ─── Active Resume Card ─── -->
-  <div class="sp-card">
-    <div class="sp-card-header" style="background:linear-gradient(135deg,rgba(124,58,237,.12) 0%,transparent 100%);">
-      <span class="sp-card-title">📝 Active Resume (For Drives)</span>
-      {% if active_resume %}
-        <span class="sp-badge sp-badge-violet">v{{ active_resume.version }}</span>
-      {% else %}
-        <span class="sp-badge sp-badge-gray">Missing</span>
-      {% endif %}
-    </div>
-    <div class="sp-card-body">
-      {% if active_resume %}
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
-          <div style="min-width:0;flex:1;">
-            <div style="font-weight:700;color:#fff;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ active_resume.filename }}</div>
-            <div style="font-size:.78rem;color:var(--txt-3);margin-top:.2rem;">Uploaded on {{ active_resume.uploaded_at|date:"M d, Y · H:i" }}</div>
-          </div>
-          <a href="{% url 'student_portal:resume_download' active_resume.pk %}" class="sp-btn sp-btn-secondary sp-btn-sm" style="flex-shrink:0;margin-left:.75rem;">📥 Download</a>
-        </div>
-
-        <!-- Scores Breakdown Grid -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem;">
-          <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:.75rem;text-align:center;">
-            <div style="font-size:.7rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">ATS Score</div>
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:800;color:#c4b5fd;margin:.25rem 0;">{{ active_resume.ats_score }}<span style="font-size:.8rem;font-weight:500;color:var(--txt-3);">/100</span></div>
-            <div class="sp-bar-wrap" style="height:4px;"><div class="sp-bar-fill bar-violet" style="width:{{ active_resume.ats_score }}%"></div></div>
-          </div>
-          <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:.75rem;text-align:center;">
-            <div style="font-size:.7rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">Completion</div>
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:800;color:#6ee7b7;margin:.25rem 0;">{{ active_resume.completion_score }}<span style="font-size:.8rem;font-weight:500;color:var(--txt-3);">%</span></div>
-            <div class="sp-bar-wrap" style="height:4px;"><div class="sp-bar-fill bar-green" style="width:{{ active_resume.completion_score }}%"></div></div>
-          </div>
-          <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:.75rem;text-align:center;">
-            <div style="font-size:.7rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">Formatting</div>
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:800;color:#7dd3fc;margin:.25rem 0;">{{ active_resume.formatting_score }}<span style="font-size:.8rem;font-weight:500;color:var(--txt-3);">/100</span></div>
-            <div class="sp-bar-wrap" style="height:4px;"><div class="sp-bar-fill bar-sky" style="width:{{ active_resume.formatting_score }}%"></div></div>
-          </div>
-        </div>
-
-        <!-- Suggestions & Missing Keywords tabs/collapsible (using details/summary) -->
-        <details class="sp-details" open>
-          <summary class="sp-summary">🤖 ATS Recommendations</summary>
-          <div class="sp-details-content">
-            <h5 style="font-size:.8rem;color:#eef0f8;margin-bottom:.4rem;">Missing Keywords:</h5>
-            <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.875rem;">
-              {% if resume_analysis.keywords %}
-                {% for kw in resume_analysis.keywords %}
-                  <span class="sp-skill-chip" style="font-size:.7rem;padding:.2rem .5rem;background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.2);color:#fda4af;">{{ kw }}</span>
-                {% endfor %}
-              {% else %}
-                <span style="font-size:.75rem;color:var(--green);">✔️ No major placement keywords missing!</span>
-              {% endif %}
-            </div>
-
-            <h5 style="font-size:.8rem;color:#eef0f8;margin-bottom:.4rem;">Key Improvements:</h5>
-            <ul style="padding-left:1.1rem;font-size:.78rem;color:var(--txt-2);line-height:1.5;">
-              {% for sug in resume_analysis.suggestions %}
-                <li style="margin-bottom:.4rem;">{{ sug }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </details>
-
-        <!-- Parsed sections check -->
-        <details class="sp-details" style="margin-top:.75rem;">
-          <summary class="sp-summary">🔍 Parsed Content Sections</summary>
-          <div class="sp-details-content" style="font-size:.78rem;">
-            <div style="display:grid;grid-template-columns:1fr;gap:.5rem;">
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.02);">
-                <span>📚 Education Section</span>
-                <span style="font-weight:700;" class="{% if resume_analysis.education %}good{% else %}warn{% endif %}">{% if resume_analysis.education %}Found ({{ resume_analysis.education|length }} items){% else %}Missing{% endif %}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.02);">
-                <span>💻 Technical Skills</span>
-                <span style="font-weight:700;" class="{% if resume_analysis.skills %}good{% else %}warn{% endif %}">{% if resume_analysis.skills %}Found ({{ resume_analysis.skills|length }} skills){% else %}Missing{% endif %}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.02);">
-                <span>🚀 Projects</span>
-                <span style="font-weight:700;" class="{% if resume_analysis.projects %}good{% else %}warn{% endif %}">{% if resume_analysis.projects %}Found ({{ resume_analysis.projects|length }} items){% else %}Missing{% endif %}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.02);">
-                <span>💼 Work Experience</span>
-                <span style="font-weight:700;" class="{% if resume_analysis.experience %}good{% else %}warn{% endif %}">{% if resume_analysis.experience %}Found ({{ resume_analysis.experience|length }} items){% else %}Missing{% endif %}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;">
-                <span>🏅 Certifications</span>
-                <span style="font-weight:700;" class="{% if resume_analysis.certificates %}good{% else %}warn{% endif %}">{% if resume_analysis.certificates %}Found ({{ resume_analysis.certificates|length }} items){% else %}Missing{% endif %}</span>
-              </div>
-            </div>
-          </div>
-        </details>
-
-      {% else %}
-        <div class="sp-empty" style="padding:2.5rem 1.5rem;">
-          <div class="sp-empty-icon" style="font-size:2rem;margin-bottom:.5rem;">📂</div>
-          <div class="sp-empty-text" style="font-size:.85rem;">No active resume uploaded</div>
-          <p style="font-size:.74rem;color:var(--txt-3);margin-bottom:1rem;">Upload a resume below to calculate your ATS readiness score.</p>
-        </div>
-      {% endif %}
-    </div>
+<div class="sp-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.75rem;">
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-v">📄</div>
+    <div class="sp-stat-label">Total Resumes</div>
+    <div class="sp-stat-value">{{ total_count }}</div>
+    <div class="sp-stat-sub">uploaded documents</div>
   </div>
-
-  <!-- ─── Active CV Card ─── -->
-  <div class="sp-card">
-    <div class="sp-card-header" style="background:linear-gradient(135deg,rgba(6,182,212,.12) 0%,transparent 100%);">
-      <span class="sp-card-title">🔬 Active CV (Academic/General)</span>
-      {% if active_cv %}
-        <span class="sp-badge sp-badge-sky">v{{ active_cv.version }}</span>
-      {% else %}
-        <span class="sp-badge sp-badge-gray">Missing</span>
-      {% endif %}
-    </div>
-    <div class="sp-card-body">
-      {% if active_cv %}
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
-          <div style="min-width:0;flex:1;">
-            <div style="font-weight:700;color:#fff;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ active_cv.filename }}</div>
-            <div style="font-size:.78rem;color:var(--txt-3);margin-top:.2rem;">Uploaded on {{ active_cv.uploaded_at|date:"M d, Y · H:i" }}</div>
-          </div>
-          <a href="{% url 'student_portal:resume_download' active_cv.pk %}" class="sp-btn sp-btn-secondary sp-btn-sm" style="flex-shrink:0;margin-left:.75rem;">📥 Download</a>
-        </div>
-
-        <!-- Scores Breakdown Grid -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem;">
-          <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:.75rem;text-align:center;">
-            <div style="font-size:.7rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">ATS Score</div>
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:800;color:#7dd3fc;margin:.25rem 0;">{{ active_cv.ats_score }}<span style="font-size:.8rem;font-weight:500;color:var(--txt-3);">/100</span></div>
-            <div class="sp-bar-wrap" style="height:4px;"><div class="sp-bar-fill bar-sky" style="width:{{ active_cv.ats_score }}%"></div></div>
-          </div>
-          <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:.75rem;text-align:center;">
-            <div style="font-size:.7rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">Completion</div>
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:800;color:#6ee7b7;margin:.25rem 0;">{{ active_cv.completion_score }}<span style="font-size:.8rem;font-weight:500;color:var(--txt-3);">%</span></div>
-            <div class="sp-bar-wrap" style="height:4px;"><div class="sp-bar-fill bar-green" style="width:{{ active_cv.completion_score }}%"></div></div>
-          </div>
-          <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:.75rem;text-align:center;">
-            <div style="font-size:.7rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">Formatting</div>
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:800;color:#c4b5fd;margin:.25rem 0;">{{ active_cv.formatting_score }}<span style="font-size:.8rem;font-weight:500;color:var(--txt-3);">/100</span></div>
-            <div class="sp-bar-wrap" style="height:4px;"><div class="sp-bar-fill bar-violet" style="width:{{ active_cv.formatting_score }}%"></div></div>
-          </div>
-        </div>
-
-        <!-- Suggestions & Missing Keywords details -->
-        <details class="sp-details" open>
-          <summary class="sp-summary">🤖 ATS Recommendations</summary>
-          <div class="sp-details-content">
-            <h5 style="font-size:.8rem;color:#eef0f8;margin-bottom:.4rem;">Missing Keywords:</h5>
-            <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.875rem;">
-              {% if cv_analysis.keywords %}
-                {% for kw in cv_analysis.keywords %}
-                  <span class="sp-skill-chip" style="font-size:.7rem;padding:.2rem .5rem;background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.2);color:#fda4af;">{{ kw }}</span>
-                {% endfor %}
-              {% else %}
-                <span style="font-size:.75rem;color:var(--green);">✔️ No major placement keywords missing!</span>
-              {% endif %}
-            </div>
-
-            <h5 style="font-size:.8rem;color:#eef0f8;margin-bottom:.4rem;">Key Improvements:</h5>
-            <ul style="padding-left:1.1rem;font-size:.78rem;color:var(--txt-2);line-height:1.5;">
-              {% for sug in cv_analysis.suggestions %}
-                <li style="margin-bottom:.4rem;">{{ sug }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </details>
-
-        <!-- Parsed sections check -->
-        <details class="sp-details" style="margin-top:.75rem;">
-          <summary class="sp-summary">🔍 Parsed Content Sections</summary>
-          <div class="sp-details-content" style="font-size:.78rem;">
-            <div style="display:grid;grid-template-columns:1fr;gap:.5rem;">
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.02);">
-                <span>📚 Education Section</span>
-                <span style="font-weight:700;" class="{% if cv_analysis.education %}good{% else %}warn{% endif %}">{% if cv_analysis.education %}Found ({{ cv_analysis.education|length }} items){% else %}Missing{% endif %}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.02);">
-                <span>💻 Technical Skills</span>
-                <span style="font-weight:700;" class="{% if cv_analysis.skills %}good{% else %}warn{% endif %}">{% if cv_analysis.skills %}Found ({{ cv_analysis.skills|length }} skills){% else %}Missing{% endif %}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.02);">
-                <span>🚀 Projects</span>
-                <span style="font-weight:700;" class="{% if cv_analysis.projects %}good{% else %}warn{% endif %}">{% if cv_analysis.projects %}Found ({{ cv_analysis.projects|length }} items){% else %}Missing{% endif %}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.02);">
-                <span>💼 Work Experience</span>
-                <span style="font-weight:700;" class="{% if cv_analysis.experience %}good{% else %}warn{% endif %}">{% if cv_analysis.experience %}Found ({{ cv_analysis.experience|length }} items){% else %}Missing{% endif %}</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;padding:.25rem 0;">
-                <span>🏅 Certifications</span>
-                <span style="font-weight:700;" class="{% if cv_analysis.certificates %}good{% else %}warn{% endif %}">{% if cv_analysis.certificates %}Found ({{ cv_analysis.certificates|length }} items){% else %}Missing{% endif %}</span>
-              </div>
-            </div>
-          </div>
-        </details>
-
-      {% else %}
-        <div class="sp-empty" style="padding:2.5rem 1.5rem;">
-          <div class="sp-empty-icon" style="font-size:2rem;margin-bottom:.5rem;">📂</div>
-          <div class="sp-empty-text" style="font-size:.85rem;">No active CV uploaded</div>
-          <p style="font-size:.74rem;color:var(--txt-3);margin-bottom:1rem;">Upload your curriculum vitae to run structured ATS comparisons.</p>
-        </div>
-      {% endif %}
-    </div>
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-g">📝</div>
+    <div class="sp-stat-label">Standard Resumes</div>
+    <div class="sp-stat-value">{{ resume_count }}</div>
+    <div class="sp-stat-sub good">ready for drives</div>
   </div>
-
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-s">💼</div>
+    <div class="sp-stat-label">Curriculum Vitae</div>
+    <div class="sp-stat-value">{{ cv_count }}</div>
+    <div class="sp-stat-sub">academic CVs</div>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     Upload & Comparison Grid
+     Upload Resume Section
 ════════════════════════════════════════════════════ -->
-<div style="display:grid;grid-template-columns:340px 1fr;gap:1.5rem;margin-bottom:2rem;align-items:start;">
+<div class="sp-card" style="margin-bottom:1.75rem;" id="upload-section">
+  <div class="sp-card-header">
+    <span class="sp-card-title">📤 Upload New Resume / CV</span>
+    <span class="sp-badge sp-badge-sky">PDF Only · Max {{ max_file_size_mb }}MB</span>
+  </div>
+  <div class="sp-card-body">
+    <form method="post" action="{% url 'student_portal:resume_upload' %}" enctype="multipart/form-data" id="resumeUploadForm">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1.25rem;align-items:end;">
+        
+        <!-- Resume Name -->
+        <div class="sp-form-group" style="margin-bottom:0;">
+          <label class="sp-form-label" for="id_resume_name">Resume Name <span style="color:var(--txt-3);font-weight:400;">(optional)</span></label>
+          <input type="text" name="resume_name" id="id_resume_name" class="sp-form-input"
+                 placeholder="e.g. Full Stack Developer Resume">
+        </div>
 
-  <!-- ─── LEFT: Upload Form ─── -->
-  <div>
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">📤 Upload New Document</span>
+        <!-- Resume Type -->
+        <div class="sp-form-group" style="margin-bottom:0;">
+          <label class="sp-form-label" for="id_resume_type">Resume Type <span style="color:var(--red);">*</span></label>
+          <select name="resume_type" id="id_resume_type" class="sp-form-input">
+            <option value="RESUME">Resume (Standard)</option>
+            <option value="CV">CV (Academic / Research)</option>
+          </select>
+        </div>
+
+        <!-- File Upload Input -->
+        <div class="sp-form-group" style="margin-bottom:0;">
+          <label class="sp-form-label" for="id_file">Choose PDF File <span style="color:var(--red);">*</span></label>
+          <input type="file" name="file" id="id_file" class="sp-form-input" accept=".pdf" required>
+        </div>
+
+        <!-- Submit Button & Default checkbox -->
+        <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <label style="font-size:.8rem;color:var(--txt-2);display:flex;align-items:center;cursor:pointer;">
+            <input type="checkbox" name="is_default" value="true" style="margin-right:.4rem;transform:scale(1.15);">
+            Set as Default Resume
+          </label>
+          <button type="submit" class="sp-btn sp-btn-primary">➕ Upload Resume</button>
+        </div>
+
       </div>
-      <div class="sp-card-body">
-        <form method="post" action="{% url 'student_portal:resume_upload' %}" enctype="multipart/form-data">
-          {% csrf_token %}
+    </form>
+  </div>
+</div>
 
-          <div class="sp-form-group">
-            <label class="sp-form-label" for="id_resume_type">File Type</label>
-            {{ form.resume_type }}
-          </div>
+<!-- ══════════════════════════════════════════════════
+     Search & Filter Bar
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-bottom:1.5rem;padding:1rem 1.25rem;">
+  <form method="get" action="{% url 'student_portal:resume_dashboard' %}" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;">
+    
+    <!-- Search Input -->
+    <div style="flex:1;min-width:220px;display:flex;align-items:center;gap:.5rem;">
+      <input type="text" name="q" value="{{ q }}" class="sp-form-input" placeholder="🔍 Search resume by name..." style="margin-bottom:0;">
+    </div>
 
-          <div class="sp-form-group">
-            <label class="sp-form-label" for="id_file">PDF Document <span style="color:var(--red);">*</span></label>
-            {{ form.file }}
-            <div class="sp-form-hint">Only PDFs under 5 MB are supported.</div>
-          </div>
+    <!-- Filter Type -->
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <span style="font-size:.8rem;color:var(--txt-3);">Type:</span>
+      <select name="type" class="sp-form-input" style="margin-bottom:0;width:auto;" onchange="this.form.submit()">
+        <option value="ALL" {% if selected_type == 'ALL' %}selected{% endif %}>All Types</option>
+        <option value="RESUME" {% if selected_type == 'RESUME' %}selected{% endif %}>Resume Only</option>
+        <option value="CV" {% if selected_type == 'CV' %}selected{% endif %}>CV Only</option>
+      </select>
+    </div>
 
-          <button type="submit" class="sp-btn sp-btn-primary sp-btn-block">Upload &amp; Analyze</button>
-        </form>
+    <!-- Sort By -->
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <span style="font-size:.8rem;color:var(--txt-3);">Sort:</span>
+      <select name="sort" class="sp-form-input" style="margin-bottom:0;width:auto;" onchange="this.form.submit()">
+        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest First</option>
+        <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+        <option value="alphabetical" {% if selected_sort == 'alphabetical' %}selected{% endif %}>Alphabetical</option>
+      </select>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:.5rem;">
+      <button type="submit" class="sp-btn sp-btn-secondary sp-btn-sm">Filter</button>
+      {% if q or selected_type != 'ALL' or selected_sort != 'newest' %}
+        <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-danger sp-btn-sm">Reset</a>
+      {% endif %}
+    </div>
+
+  </form>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Resumes Cards Grid
+════════════════════════════════════════════════════ -->
+{% if resumes %}
+<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1.25rem;">
+  {% for r in resumes %}
+  <div class="sp-card" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;border:1px solid {% if r.is_default %}rgba(245,158,11,.4){% else %}var(--border){% endif %};">
+    
+    <!-- Card Header -->
+    <div style="padding:1.25rem 1.25rem 1rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;margin-bottom:.5rem;">
+        <div style="font-size:1.05rem;font-weight:700;color:#fff;word-break:break-word;line-height:1.3;">
+          {{ r.display_name }}
+        </div>
+        {% if r.is_default %}
+          <span class="sp-badge sp-badge-amber">⭐ Default Resume</span>
+        {% else %}
+          <span class="sp-badge sp-badge-purple">{{ r.get_resume_type_display }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Metadata -->
+      <div style="display:flex;flex-wrap:wrap;gap:1rem;font-size:.78rem;color:var(--txt-3);margin-top:.75rem;">
+        <span>📅 {{ r.uploaded_at|date:"M d, Y" }}</span>
+        <span>📦 {{ r.formatted_file_size }}</span>
+        <span>📑 {{ r.get_resume_type_display }}</span>
       </div>
     </div>
 
-    <!-- Resume Comparison Selector Card -->
-    {% if all_resumes.count >= 2 %}
-      <div class="sp-card" style="margin-top:1.125rem;">
-        <div class="sp-card-header">
-          <span class="sp-card-title">⚔️ Side-by-Side Comparison</span>
-        </div>
-        <div class="sp-card-body">
-          <form method="get" action="{% url 'student_portal:resume_compare' %}">
-            <div class="sp-form-group">
-              <label class="sp-form-label">Version A</label>
-              <select name="version1" class="sp-form-input">
-                {% for res in all_resumes %}
-                  <option value="{{ res.pk }}">{{ res.get_resume_type_display }} v{{ res.version }} ({% if res.is_active %}Active{% else %}{{ res.uploaded_at|date:"M d, Y" }}{% endif %})</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="sp-form-group">
-              <label class="sp-form-label">Version B</label>
-              <select name="version2" class="sp-form-input">
-                {% for res in all_resumes %}
-                  <option value="{{ res.pk }}" {% if forloop.counter == 2 %}selected{% endif %}>{{ res.get_resume_type_display }} v{{ res.version }} ({% if res.is_active %}Active{% else %}{{ res.uploaded_at|date:"M d, Y" }}{% endif %})</option>
-                {% endfor %}
-              </select>
-            </div>
-            <button type="submit" class="sp-btn sp-btn-secondary sp-btn-block">Compare Selected</button>
+    <!-- Rename Collapsible / Inline Form -->
+    <div id="rename-box-{{ r.pk }}" style="display:none;padding:0 1.25rem 1rem;">
+      <form method="post" action="{% url 'student_portal:resume_rename' r.pk %}" style="display:flex;gap:.5rem;">
+        {% csrf_token %}
+        <input type="text" name="resume_name" value="{{ r.display_name }}" class="sp-form-input" style="margin-bottom:0;font-size:.82rem;" required>
+        <button type="submit" class="sp-btn sp-btn-primary sp-btn-xs">Save</button>
+        <button type="button" class="sp-btn sp-btn-secondary sp-btn-xs" onclick="document.getElementById('rename-box-{{ r.pk }}').style.display='none';">Cancel</button>
+      </form>
+    </div>
+
+    <!-- Action Buttons Row -->
+    <div style="padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.15);display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between;">
+      
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+        <!-- Preview -->
+        <a href="{% url 'student_portal:resume_preview' r.pk %}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs" title="Preview PDF inline">👁️ Preview</a>
+        
+        <!-- Download -->
+        <a href="{% url 'student_portal:resume_download' r.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" title="Download File">📥 Download</a>
+        
+        <!-- Rename -->
+        <button type="button" class="sp-btn sp-btn-secondary sp-btn-xs" onclick="document.getElementById('rename-box-{{ r.pk }}').style.display='block';">✏️ Rename</button>
+      </div>
+
+      <div style="display:flex;gap:.4rem;align-items:center;">
+        <!-- Set Default Button -->
+        {% if r.is_default %}
+          <span style="font-size:.72rem;color:#f59e0b;font-weight:600;padding:.2rem .5rem;">⭐ Default</span>
+        {% else %}
+          <form method="post" action="{% url 'student_portal:resume_set_default' r.pk %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="sp-btn sp-btn-warning sp-btn-xs">⭐ Set Default</button>
           </form>
-        </div>
+        {% endif %}
+
+        <!-- Delete -->
+        <a href="{% url 'student_portal:resume_delete' r.pk %}" class="sp-btn sp-btn-danger sp-btn-xs" title="Delete Resume">🗑️ Delete</a>
       </div>
-    {% endif %}
-  </div>
 
-  <!-- ─── RIGHT: History / Progress Log ─── -->
-  <div class="sp-card">
-    <div class="sp-card-header">
-      <span class="sp-card-title">📈 Document Version &amp; Improvement History</span>
     </div>
-    <div class="sp-table-wrap">
-      {% if all_resumes %}
-        <table class="sp-table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Version</th>
-              <th>Date Uploaded</th>
-              <th>ATS Score</th>
-              <th>Completion</th>
-              <th>Formatting</th>
-              <th>Status</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for res in all_resumes %}
-              <tr>
-                <td>
-                  <span class="sp-badge {% if res.resume_type == 'RESUME' %}sp-badge-violet{% else %}sp-badge-sky{% endif %}">
-                    {{ res.get_resume_type_display }}
-                  </span>
-                </td>
-                <td style="font-weight:700;color:#fff;">v{{ res.version }}</td>
-                <td style="font-size:.78rem;">{{ res.uploaded_at|date:"M d, Y · H:i" }}</td>
-                <td>
-                  <strong style="color:#c4b5fd;">{{ res.ats_score }}</strong><small>/100</small>
-                </td>
-                <td>{{ res.completion_score }}%</td>
-                <td>{{ res.formatting_score }}/100</td>
-                <td>
-                  {% if res.is_active %}
-                    <span class="sp-badge sp-badge-green">Active</span>
-                  {% else %}
-                    <span class="sp-badge sp-badge-gray">Archived</span>
-                  {% endif %}
-                </td>
-                <td style="text-align:right;">
-                  <div style="display:inline-flex;gap:.35rem;">
-                    <a href="{% url 'student_portal:resume_download' res.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" title="Download">📥</a>
-                    <a href="{% url 'student_portal:resume_delete' res.pk %}" class="sp-btn sp-btn-danger sp-btn-xs" title="Delete">🗑</a>
-                  </div>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% else %}
-        <div class="sp-empty" style="padding:4rem 2rem;">
-          <div class="sp-empty-icon">📁</div>
-          <div class="sp-empty-text">No documents uploaded yet</div>
-          <div class="sp-empty-sub">Your history, scores, and improvement log will appear here once you make your first upload.</div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
 
+  </div>
+  {% endfor %}
 </div>
+
+<!-- Pagination Controls -->
+{% if page_obj.has_other_pages %}
+<div style="display:flex;justify-content:center;align-items:center;gap:.5rem;margin-top:1.75rem;">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&type={{ selected_type }}&sort={{ selected_sort }}" class="sp-btn sp-btn-secondary sp-btn-sm">← Previous</a>
+  {% endif %}
+  <span style="font-size:.8rem;color:var(--txt-2);padding:0 .5rem;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&type={{ selected_type }}&sort={{ selected_sort }}" class="sp-btn sp-btn-secondary sp-btn-sm">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<!-- ══════════════════════════════════════════════════
+     Empty State
+════════════════════════════════════════════════════ -->
+<div class="sp-card">
+  <div class="sp-empty" style="padding:4.5rem 2rem;">
+    <div class="sp-empty-icon" style="font-size:3.5rem;margin-bottom:1rem;">📄</div>
+    <div class="sp-empty-text" style="font-size:1.25rem;font-weight:700;color:#fff;">No resumes uploaded yet</div>
+    <div class="sp-empty-sub" style="max-width:440px;margin:.5rem auto 1.5rem;">Upload your first PDF resume above to start building your placement profile and analyzing your ATS score.</div>
+    <a href="#upload-section" class="sp-btn sp-btn-primary">📤 Upload Your First Resume</a>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  // Simple File Validation Client-Side
+  document.getElementById('id_file')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        alert('Please select a valid PDF file (.pdf extension only).');
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size exceeds the 5 MB limit. Please select a smaller PDF file.');
+        e.target.value = '';
+        return;
+      }
+    }
+  });
+</script>
 
 {% endblock %}

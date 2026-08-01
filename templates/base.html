@@ -6,151 +6,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PlaceSync — Training & Placement Cell Management Portal">
-    <title>{% block title %}PlaceSync{% endblock %}</title>
+    <title>{% block title %}PlaceSync Admin Portal{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/student.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="page-dashboard">
 
 {% if user.is_authenticated %}
 
 <!-- Pure-CSS sidebar toggle (no JavaScript) -->
-<input type="checkbox" id="sidebar-toggle" aria-hidden="true">
+<input type="checkbox" id="sp-toggle" aria-hidden="true">
 
-<div class="app-layout">
+<div class="sp-layout">
 
-    <!-- ── Sidebar overlay (mobile: closes sidebar when tapped) ── -->
-    <label class="sidebar-overlay" for="sidebar-toggle" aria-hidden="true"></label>
+    <!-- Mobile overlay -->
+    <label class="sp-overlay" for="sp-toggle" aria-hidden="true"></label>
 
-    <!-- ══════════ SIDEBAR ══════════ -->
-    <aside class="sidebar" role="navigation" aria-label="Main navigation">
+    <!-- ══════════ FLOATING SAAS SIDEBAR (Identical to Student Portal) ══════════ -->
+    <aside class="sp-sidebar" role="navigation" aria-label="College Admin navigation">
 
         <!-- Brand -->
-        <a href="{% url 'dashboard:index' %}" class="sidebar-brand">
-            <div class="sidebar-brand-icon">🎓</div>
-            <div class="sidebar-brand-text">Place<span>Sync</span></div>
+        <a href="{% url 'dashboard:index' %}" class="sp-brand">
+            <div class="sp-brand-icon">🎓</div>
+            <div class="sp-brand-text">Place<span>Sync</span></div>
         </a>
 
-        <!-- User block -->
-        <div class="sidebar-user">
-            <div class="sidebar-avatar">{{ user.username|slice:":2"|upper }}</div>
-            <div class="sidebar-user-info">
-                <div class="sidebar-user-name">{{ user.username }}</div>
-                <div class="sidebar-user-role">{{ user.college.code }} — Admin</div>
+        <!-- Admin Identity Card -->
+        <div class="sp-identity">
+            <div class="sp-avatar">{{ user.username|slice:":2"|upper }}</div>
+            <div>
+                <div class="sp-identity-name">{{ user.username }}</div>
+                <div class="sp-identity-roll">{% if user.college %}{{ user.college.code }}{% else %}PlaceSync{% endif %}</div>
+                <div class="sp-identity-badge">Admin Portal</div>
             </div>
         </div>
 
-        <!-- Core -->
+        <!-- Core Section -->
         {% if request.user|has_perm_filter:"dashboard.view" or request.user|has_perm_filter:"system_settings.view" %}
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Core</div>
-            <ul class="sidebar-nav">
+        <div class="sp-section">
+            <div class="sp-section-label">Core</div>
+            <ul class="sp-nav">
                 {% if request.user|has_perm_filter:"dashboard.view" %}
-                <li><a href="{% url 'dashboard:index' %}"         class="sidebar-link"><span class="sidebar-link-icon">📊</span> Dashboard</a></li>
+                <li><a href="{% url 'dashboard:index' %}" class="sp-link {% if request.resolver_match.url_name == 'index' and request.resolver_match.namespace == 'dashboard' %}active{% endif %}"><span class="sp-link-icon">📊</span> Executive Dashboard</a></li>
                 {% endif %}
                 {% if request.user|has_perm_filter:"system_settings.view" %}
-                <li><a href="{% url 'colleges:profile_detail' %}" class="sidebar-link"><span class="sidebar-link-icon">🏫</span> College Profile</a></li>
-                <li><a href="{% url 'departments:list' %}"        class="sidebar-link"><span class="sidebar-link-icon">📂</span> Departments</a></li>
-                <li><a href="{% url 'batches:list' %}"            class="sidebar-link"><span class="sidebar-link-icon">🎓</span> Batches</a></li>
+                <li><a href="{% url 'colleges:profile_detail' %}" class="sp-link {% if request.resolver_match.url_name == 'profile_detail' %}active{% endif %}"><span class="sp-link-icon">🏫</span> College Profile</a></li>
+                <li><a href="{% url 'departments:list' %}" class="sp-link {% if request.resolver_match.namespace == 'departments' %}active{% endif %}"><span class="sp-link-icon">📂</span> Departments</a></li>
+                <li><a href="{% url 'batches:list' %}" class="sp-link {% if request.resolver_match.namespace == 'batches' %}active{% endif %}"><span class="sp-link-icon">🎓</span> Batches</a></li>
                 {% endif %}
             </ul>
         </div>
         {% endif %}
 
-        <!-- People -->
+        <!-- People Section -->
         {% if request.user|has_perm_filter:"students.view" or request.user|has_perm_filter:"opportunity_discovery.view" %}
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">People</div>
-            <ul class="sidebar-nav">
+        <div class="sp-section">
+            <div class="sp-section-label">People & Recruiters</div>
+            <ul class="sp-nav">
                 {% if request.user|has_perm_filter:"students.view" %}
-                <li><a href="{% url 'students:list' %}"                   class="sidebar-link"><span class="sidebar-link-icon">🧑</span> Students</a></li>
+                <li><a href="{% url 'students:list' %}" class="sp-link {% if request.resolver_match.namespace == 'students' %}active{% endif %}"><span class="sp-link-icon">🧑‍🎓</span> Students</a></li>
                 {% endif %}
                 {% if request.user|has_perm_filter:"opportunity_discovery.view" %}
-                <li><a href="{% url 'companies:list' %}"                  class="sidebar-link"><span class="sidebar-link-icon">🏢</span> Companies</a></li>
-                <li><a href="{% url 'companies:verification_dashboard' %}" class="sidebar-link"><span class="sidebar-link-icon">🛡</span> Verification</a></li>
+                <li><a href="{% url 'companies:list' %}" class="sp-link {% if request.resolver_match.url_name == 'list' and request.resolver_match.namespace == 'companies' %}active{% endif %}"><span class="sp-link-icon">🏢</span> Companies</a></li>
+                <li><a href="{% url 'companies:verification_dashboard' %}" class="sp-link {% if request.resolver_match.url_name == 'verification_dashboard' %}active{% endif %}"><span class="sp-link-icon">🛡️</span> Verification</a></li>
                 {% endif %}
             </ul>
         </div>
         {% endif %}
 
-        <!-- Placements -->
+        <!-- Placements Section -->
         {% if request.user|has_perm_filter:"placement_drives.view" or request.user|has_perm_filter:"opportunity_discovery.view" %}
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Placements</div>
-            <ul class="sidebar-nav">
+        <div class="sp-section">
+            <div class="sp-section-label">Placements</div>
+            <ul class="sp-nav">
                 {% if request.user|has_perm_filter:"placement_drives.view" %}
-                <li><a href="{% url 'placements:list' %}"    class="sidebar-link"><span class="sidebar-link-icon">🚀</span> Drives</a></li>
+                <li><a href="{% url 'placements:list' %}" class="sp-link {% if request.resolver_match.namespace == 'placements' %}active{% endif %}"><span class="sp-link-icon">🚀</span> Placement Drives</a></li>
                 {% endif %}
                 {% if request.user|has_perm_filter:"opportunity_discovery.view" %}
-                <li><a href="{% url 'opportunities:list' %}" class="sidebar-link"><span class="sidebar-link-icon">🔍</span> Discovery</a></li>
+                <li><a href="{% url 'opportunities:list' %}" class="sp-link {% if request.resolver_match.namespace == 'opportunities' %}active{% endif %}"><span class="sp-link-icon">🔍</span> Discovery Engine</a></li>
                 {% endif %}
             </ul>
         </div>
         {% endif %}
 
-        <!-- Insights -->
+        <!-- Insights Section -->
         {% if request.user|has_perm_filter:"reports.view" or request.user|has_perm_filter:"messages.view" or request.user|has_perm_filter:"notifications.view" %}
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Insights</div>
-            <ul class="sidebar-nav">
+        <div class="sp-section">
+            <div class="sp-section-label">Analytics & Comm</div>
+            <ul class="sp-nav">
                 {% if request.user|has_perm_filter:"reports.view" %}
-                <li><a href="{% url 'analytics:dashboard' %}"         class="sidebar-link"><span class="sidebar-link-icon">📈</span> Analytics</a></li>
-                <li><a href="{% url 'reports:dashboard' %}"           class="sidebar-link"><span class="sidebar-link-icon">📋</span> Reports</a></li>
+                <li><a href="{% url 'analytics:dashboard' %}" class="sp-link {% if request.resolver_match.namespace == 'analytics' %}active{% endif %}"><span class="sp-link-icon">📈</span> Analytics</a></li>
+                <li><a href="{% url 'reports:dashboard' %}" class="sp-link {% if request.resolver_match.namespace == 'reports' %}active{% endif %}"><span class="sp-link-icon">📋</span> Reports & Exports</a></li>
                 {% endif %}
                 {% if request.user|has_perm_filter:"messages.view" %}
-                <li><a href="{% url 'communication:dashboard' %}"     class="sidebar-link"><span class="sidebar-link-icon">✉</span> Comm Center</a></li>
+                <li><a href="{% url 'communication:dashboard' %}" class="sp-link {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.namespace == 'communication' %}active{% endif %}"><span class="sp-link-icon">✉️</span> Comm Center</a></li>
                 {% endif %}
                 {% if request.user|has_perm_filter:"notifications.view" %}
-                <li><a href="{% url 'communication:notifications' %}" class="sidebar-link"><span class="sidebar-link-icon">🔔</span> Notifications</a></li>
+                <li><a href="{% url 'communication:notifications' %}" class="sp-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><span class="sp-link-icon">🔔</span> Notifications</a></li>
                 {% endif %}
             </ul>
         </div>
         {% endif %}
-        <!-- Settings -->
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Settings</div>
-            <ul class="sidebar-nav">
+
+        <!-- Settings Section -->
+        <div class="sp-section">
+            <div class="sp-section-label">Settings</div>
+            <ul class="sp-nav">
                 {% if request.user|is_college_admin_filter %}
-                <li><a href="{% url 'staff_permissions:settings' %}" class="sidebar-link"><span class="sidebar-link-icon">⚙️</span> Settings</a></li>
+                <li><a href="{% url 'staff_permissions:settings' %}" class="sp-link {% if request.resolver_match.namespace == 'staff_permissions' %}active{% endif %}"><span class="sp-link-icon">⚙️</span> System Settings</a></li>
                 {% else %}
-                <li><a href="{% url 'staff_permissions:change_password' %}" class="sidebar-link"><span class="sidebar-link-icon">🔑</span> Change Password</a></li>
+                <li><a href="{% url 'staff_permissions:change_password' %}" class="sp-link"><span class="sp-link-icon">🔑</span> Change Password</a></li>
                 {% endif %}
             </ul>
         </div>
-        <!-- Sign out -->
-        <div class="sidebar-footer">
-            <a href="{% url 'accounts:logout' %}" class="sidebar-logout">
-                <span>↩</span> Sign Out
+
+        <!-- Footer Sign Out -->
+        <div class="sp-footer">
+            <a href="{% url 'accounts:logout' %}" class="sp-logout">
+                <span class="sp-link-icon">↩</span> Sign Out
             </a>
         </div>
     </aside>
 
     <!-- ══════════ MAIN AREA ══════════ -->
-    <div class="main-area">
+    <div class="sp-main">
 
         <!-- Sticky Topbar -->
-        <header class="topbar">
-            <!-- Hamburger (mobile only, visible via CSS) -->
-            <label class="sidebar-toggle-label" for="sidebar-toggle" aria-label="Toggle navigation">☰</label>
+        <header class="sp-topbar">
+            <!-- Mobile Hamburger Button -->
+            <label class="sp-hamburger" for="sp-toggle" aria-label="Toggle navigation">☰</label>
 
-            <span class="topbar-title">{% block topbar_title %}PlaceSync{% endblock %}</span>
+            <span class="sp-topbar-title">
+                <span>🎓</span> {% block topbar_title %}PlaceSync Admin Portal{% endblock %}
+            </span>
 
-            <div class="topbar-actions">
-                <a href="{% url 'communication:notifications' %}" class="topbar-btn" title="Notifications">
-                    🔔<span class="topbar-notif-dot"></span>
+            <div class="sp-topbar-right">
+                <a href="{% url 'communication:notifications' %}" class="sp-topbar-btn" title="Notifications">
+                    🔔<span class="sp-notif-dot"></span>
                 </a>
-                <a href="{% url 'reports:dashboard' %}"   class="topbar-btn" title="Reports">📋</a>
-                <a href="{% url 'analytics:dashboard' %}" class="topbar-btn" title="Analytics">📈</a>
+                <a href="{% url 'reports:dashboard' %}" class="sp-topbar-btn" title="Reports">📋</a>
+                <a href="{% url 'analytics:dashboard' %}" class="sp-topbar-btn" title="Analytics">📈</a>
             </div>
         </header>
 
         <!-- Flash messages -->
         {% if messages %}
-            <div class="messages-container">
+            <div class="sp-messages">
                 {% for message in messages %}
-                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    <div class="sp-alert {% if message.tags %}sp-alert-{{ message.tags }}{% else %}sp-alert-info{% endif %}">
                         <span>{{ message }}</span>
                     </div>
                 {% endfor %}
@@ -158,14 +165,14 @@
         {% endif %}
 
         <!-- ── Page content ── -->
-        <main class="page-content" id="main-content">
+        <main class="sp-content" id="main-content">
 {% else %}
 
-<!-- ══════════ UNAUTHENTICATED ══════════ -->
+<!-- UNAUTHENTICATED LAYOUT -->
 {% if messages %}
     <div style="position:fixed;top:1rem;right:1rem;z-index:999;min-width:280px;max-width:380px;">
         {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" style="margin-bottom:.5rem;">
+            <div class="sp-alert {% if message.tags %}sp-alert-{{ message.tags }}{% else %}sp-alert-info{% endif %}" style="margin-bottom:.5rem;">
                 <span>{{ message }}</span>
             </div>
         {% endfor %}
@@ -178,14 +185,16 @@
 
 {% if user.is_authenticated %}
         </main>
-        <footer class="footer">
-            &copy; 2026 PlaceSync &mdash; Training &amp; Placement Cell Portal
+        <footer class="sp-page-footer">
+            &copy; 2026 PlaceSync &mdash; Training &amp; Placement Cell SaaS Management Portal
         </footer>
-    </div><!-- /.main-area -->
-</div><!-- /.app-layout -->
+    </div><!-- /.sp-main -->
+</div><!-- /.sp-layout -->
 {% else %}
 </div>
 {% endif %}
+
+<script src="{% static 'js/ui-interactions.js' %}"></script>
 
 </body>
 </html>

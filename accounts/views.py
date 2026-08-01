@@ -34,18 +34,53 @@ class CollegeRegistrationView(View):
 class CollegeLoginView(LoginView):
     authentication_form = CollegeLoginForm
     template_name = 'accounts/login.html'
-    redirect_authenticated_user = True
+    redirect_authenticated_user = False
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            # If logged in as a STUDENT and trying to access College Admin login,
+            # log out student session so user can enter College Admin credentials.
+            if getattr(request.user, 'role', None) == 'STUDENT':
+                logout(request)
+                messages.info(request, "Student session ended. Please log in with your College Admin credentials.")
+                return super().dispatch(request, *args, **kwargs)
+            else:
+                return redirect('dashboard:index')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.get_user()
+        # Ensure student accounts do not log in via College Admin form
+        if hasattr(user, 'role') and user.role == 'STUDENT':
+            messages.error(
+                self.request,
+                "Student accounts cannot log in through the College Admin Portal. Please use Student Login."
+            )
+            return self.form_invalid(form)
+        return super().form_valid(form)
 
 
 # ─── Student: Login ───────────────────────────────────────────────────────────
 class StudentLoginView(LoginView):
     template_name = 'accounts/student_login.html'
+    redirect_authenticated_user = False
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            # If logged in as an ADMIN/STAFF and trying to access Student login,
+            # log out admin session so user can enter Student credentials.
+            if getattr(request.user, 'role', None) != 'STUDENT':
+                logout(request)
+                messages.info(request, "Admin session ended. Please log in with your Student credentials.")
+                return super().dispatch(request, *args, **kwargs)
+            else:
+                return redirect('student_portal:dashboard')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         user = self.request.user
         if hasattr(user, 'role') and user.role == 'STUDENT':
             return reverse_lazy('student_portal:dashboard')
-        # Fallback for admin who uses the student login page by mistake
         return reverse_lazy('dashboard:index')
 
     def form_valid(self, form):
@@ -59,6 +94,7 @@ class StudentLoginView(LoginView):
             )
             return self.form_invalid(form)
         return super().form_valid(form)
+
 
 
 # ─── Shared: Logout ───────────────────────────────────────────────────────────

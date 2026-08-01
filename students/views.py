@@ -18,6 +18,10 @@ class StudentListView(LoginRequiredMixin, View):
     template_name = 'students/student_list.html'
 
     def get(self, request, *args, **kwargs):
+        if hasattr(request.user, 'role') and request.user.role == 'STUDENT':
+            messages.warning(request, "Access restricted to College Admin staff.")
+            return redirect('student_portal:dashboard')
+
         college = request.user.college
         if not college:
             raise Http404("No college associated with your account.")

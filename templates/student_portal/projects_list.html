@@ -1,66 +1,56 @@
 {% extends 'student_portal/base.html' %}
 
 {% block title %}Project Portfolio | PlaceSync{% endblock %}
-{% block topbar_title %}Project Portfolio{% endblock %}
+{% block topbar_title %}{% if is_recruiter %}{{ student.name }}'s Project Portfolio{% else %}Project Portfolio{% endif %}{% endblock %}
 {% block nav_projects %}active{% endblock %}
 {% block page_body_class %}page-projects{% endblock %}
 
 {% block content %}
 
 <!-- ══════════════════════════════════════════════════
-     Page Header
+     Page Header & Action Bar
 ════════════════════════════════════════════════════ -->
-<div class="sp-page-header">
+<div class="sp-page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
   <div>
     <h1 class="sp-page-title">📁 Project Portfolio</h1>
-    <p class="sp-page-subtitle">Showcase your technical projects, GitHub repositories, live applications and technical
-      achievements.</p>
+    <p class="sp-page-subtitle">Showcase your technical projects, GitHub repositories, live applications, and technical documentation to recruiters.</p>
   </div>
   {% if not is_recruiter %}
   <div class="sp-page-actions">
-    <a href="{% url 'student_portal:project_create' %}" class="sp-btn sp-btn-primary">➕ Add New Project</a>
+    <a href="{% url 'student_portal:project_create' %}" class="sp-btn sp-btn-primary" style="padding:.65rem 1.35rem;font-size:.875rem;">
+      ➕ Add New Project
+    </a>
   </div>
   {% endif %}
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     Summary Stats Row
+     KPI Statistics Row (4 Cards)
 ════════════════════════════════════════════════════ -->
-<div class="sp-stats" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 1.75rem; gap: 0.75rem;">
-
+<div class="sp-stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem;">
+  
   <div class="sp-stat" style="padding: 1rem 0.75rem; min-height: 100px;">
-    <div class="sp-stat-icon si-v" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">📁
-    </div>
+    <div class="sp-stat-icon si-v" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">🔨</div>
     <div class="sp-stat-label" style="font-size: 0.62rem; margin-bottom: 0.15rem;">Total Projects</div>
     <div class="sp-stat-value" style="font-size: 1.4rem;">{{ total_projects }}</div>
   </div>
 
   <div class="sp-stat" style="padding: 1rem 0.75rem; min-height: 100px;">
-    <div class="sp-stat-icon si-g" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">✔️
-    </div>
+    <div class="sp-stat-icon si-g" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">✅</div>
     <div class="sp-stat-label" style="font-size: 0.62rem; margin-bottom: 0.15rem;">Completed</div>
     <div class="sp-stat-value" style="font-size: 1.4rem;">{{ completed_projects }}</div>
   </div>
 
   <div class="sp-stat" style="padding: 1rem 0.75rem; min-height: 100px;">
-    <div class="sp-stat-icon si-s" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">⏳</div>
-    <div class="sp-stat-label" style="font-size: 0.62rem; margin-bottom: 0.15rem;">Ongoing</div>
-    <div class="sp-stat-value" style="font-size: 1.4rem;">{{ ongoing_projects }}</div>
-  </div>
-
-  <div class="sp-stat" style="padding: 1rem 0.75rem; min-height: 100px;">
-    <div class="sp-stat-icon si-a" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">🌟
-    </div>
+    <div class="sp-stat-icon si-a" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">🌟</div>
     <div class="sp-stat-label" style="font-size: 0.62rem; margin-bottom: 0.15rem;">Featured</div>
     <div class="sp-stat-value" style="font-size: 1.4rem;">{{ featured_projects }}</div>
   </div>
 
   <div class="sp-stat" style="padding: 1rem 0.75rem; min-height: 100px;">
-    <div class="sp-stat-icon si-t" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">🏆
-    </div>
+    <div class="sp-stat-icon si-t" style="font-size: 0.95rem; width: 30px; height: 30px; margin-bottom: 0.5rem;">🏆</div>
     <div class="sp-stat-label" style="font-size: 0.62rem; margin-bottom: 0.15rem;">Portfolio Score</div>
-    <div class="sp-stat-value" style="font-size: 1.4rem;">{{ portfolio_score }}<span
-        style="font-size:0.75rem;color:var(--txt-3);font-weight:600;">/45</span></div>
+    <div class="sp-stat-value" style="font-size: 1.4rem;">{{ portfolio_score }}<span style="font-size:0.75rem;color:var(--txt-3);font-weight:600;">/45</span></div>
   </div>
 
 </div>
@@ -70,14 +60,11 @@
 ════════════════════════════════════════════════════ -->
 <div class="sp-card" style="margin-bottom:1.75rem;">
   <div class="sp-card-body" style="padding: 1.125rem;">
-    <form method="get"
-      action="{% if is_recruiter %}{% url 'student_portal:recruiter_portfolio' student.id %}{% else %}{% url 'student_portal:projects_list' %}{% endif %}"
-      style="display:grid;grid-template-columns:1.8fr 1fr 1fr auto;gap:0.75rem;align-items:end;">
-
+    <form method="get" action="{% if is_recruiter %}{% url 'student_portal:recruiter_portfolio' student.id %}{% else %}{% url 'student_portal:projects_list' %}{% endif %}" style="display:grid;grid-template-columns:1.8fr 1fr 1fr auto;gap:0.75rem;align-items:end;">
+      
       <div class="sp-form-group" style="margin-bottom:0;">
         <label class="sp-form-label" for="filter_q">Search Projects</label>
-        <input type="text" name="q" id="filter_q" class="sp-form-input" placeholder="Search by name, technology..."
-          value="{{ q }}">
+        <input type="text" name="q" id="filter_q" class="sp-form-input" placeholder="Search by name, technology..." value="{{ q }}">
       </div>
 
       <div class="sp-form-group" style="margin-bottom:0;">
@@ -102,8 +89,7 @@
 
       <div style="display:flex;gap:0.5rem;align-items:center;">
         <button type="submit" class="sp-btn sp-btn-primary">Search</button>
-        <a href="{% if is_recruiter %}{% url 'student_portal:recruiter_portfolio' student.id %}{% else %}{% url 'student_portal:projects_list' %}{% endif %}"
-          class="sp-btn sp-btn-secondary" style="height:36px;padding:.5rem 1rem;">Clear</a>
+        <a href="{% if is_recruiter %}{% url 'student_portal:recruiter_portfolio' student.id %}{% else %}{% url 'student_portal:projects_list' %}{% endif %}" class="sp-btn sp-btn-secondary" style="height:36px;padding:.5rem 1rem;">Clear</a>
       </div>
 
     </form>
@@ -116,53 +102,41 @@
 {% if projects %}
 <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));gap:1.5rem;margin-bottom:2rem;">
   {% for project in projects %}
-  <div class="sp-card"
-    style="display:flex;flex-direction:column;position:relative;transition:var(--t);border-top:3px solid {% if project.is_featured %}#7c3aed{% else %}var(--border){% endif %};"
-    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.3)';this.style.borderColor='rgba(124,58,237,.35)';"
-    onmouseout="this.style.transform='none';this.style.boxShadow='none';this.style.borderColor='var(--border)';">
+  <div class="sp-card sp-card-hover" style="display:flex;flex-direction:column;position:relative;transition:var(--t);border-top:3px solid {% if project.is_featured %}#7c3aed{% else %}var(--border){% endif %};">
 
     <!-- Featured Badge overlay -->
     {% if project.is_featured %}
-    <span class="sp-badge sp-badge-violet"
-      style="position:absolute;top:10px;left:10px;font-size:.65rem;font-weight:800;box-shadow:0 2px 10px rgba(124,58,237,0.4);z-index:10;background:#7c3aed;color:#fff;">
+    <span class="sp-badge sp-badge-violet" style="position:absolute;top:10px;left:10px;font-size:.65rem;font-weight:800;box-shadow:0 2px 10px rgba(124,58,237,0.4);z-index:10;background:#7c3aed;color:#fff;">
       ⭐ Featured
     </span>
     {% endif %}
 
     <!-- Card header with clean gradient box -->
-    <div
-      style="height:140px;width:100%;position:relative;background:linear-gradient(135deg,#1f1a4a 0%,#3b1b6d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:1px solid var(--border);padding:1rem;">
+    <div style="height:140px;width:100%;position:relative;background:linear-gradient(135deg,#1f1a4a 0%,#3b1b6d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:1px solid var(--border);padding:1rem;">
       <span style="font-size:3rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4));margin-bottom:0.25rem;">🚀</span>
 
       <!-- Category Tag (Top Right) -->
-      <span class="sp-badge sp-badge-indigo"
-        style="position:absolute;top:10px;right:10px;font-size:.62rem;font-weight:700;background:rgba(11,14,28,0.78);border-color:rgba(255,255,255,0.15);color:#fff;">
+      <span class="sp-badge sp-badge-indigo" style="position:absolute;top:10px;right:10px;font-size:.62rem;font-weight:700;background:rgba(11,14,28,0.78);border-color:rgba(255,255,255,0.15);color:#fff;">
         {{ project.get_category_display }}
       </span>
 
       <!-- Status Tag overlay (Bottom Left) -->
-      <span
-        class="sp-badge {% if project.status == 'COMPLETED' %}sp-badge-green{% elif project.status == 'ONGOING' or project.status == 'IN_PROGRESS' %}sp-badge-sky{% else %}sp-badge-amber{% endif %}"
-        style="position:absolute;bottom:10px;left:10px;font-size:.62rem;font-weight:700;">
+      <span class="sp-badge {% if project.status == 'COMPLETED' %}sp-badge-green{% elif project.status == 'ONGOING' or project.status == 'IN_PROGRESS' %}sp-badge-sky{% else %}sp-badge-amber{% endif %}" style="position:absolute;bottom:10px;left:10px;font-size:.62rem;font-weight:700;">
         {{ project.get_status_display }}
       </span>
 
       <!-- Score Tag overlay (Bottom Right) -->
-      <span class="sp-badge sp-badge-violet"
-        style="position:absolute;bottom:10px;right:10px;font-size:.62rem;font-weight:700;background:rgba(124,58,237,0.18);">
+      <span class="sp-badge sp-badge-violet" style="position:absolute;bottom:10px;right:10px;font-size:.62rem;font-weight:700;background:rgba(124,58,237,0.18);">
         Score: {{ project.portfolio_score }}/45
       </span>
     </div>
 
     <!-- Body -->
-    <div class="sp-card-body"
-      style="padding:1.25rem;flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:1rem;">
+    <div class="sp-card-body" style="padding:1.25rem;flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:1rem;">
       <div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-          <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:#fff;">{{
-            project.title }}</h3>
-          <span style="font-size:0.75rem;color:var(--txt-3);font-weight:600;">{{ project.get_project_type_display
-            }}</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;gap:0.5rem;">
+          <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:#fff;margin:0;">{{ project.title }}</h3>
+          <span style="font-size:0.75rem;color:var(--txt-3);font-weight:600;white-space:nowrap;">{{ project.get_project_type_display }}</span>
         </div>
 
         <!-- Short description -->
@@ -173,12 +147,10 @@
         <!-- Technology Badges -->
         <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.75rem;">
           {% for badge in project.technology_badges|slice:":5" %}
-          <span class="sp-badge {{ badge.class }}" style="font-size:0.62rem;padding:0.1rem 0.4rem;">{{ badge.name
-            }}</span>
+          <span class="sp-badge {{ badge.class }}" style="font-size:0.62rem;padding:0.1rem 0.4rem;">{{ badge.name }}</span>
           {% endfor %}
           {% if project.technology_list|length > 5 %}
-          <span class="sp-badge sp-badge-gray" style="font-size:0.62rem;padding:0.1rem 0.4rem;">+{{
-            project.technology_list|length|add:"-5" }} more</span>
+          <span class="sp-badge sp-badge-gray" style="font-size:0.62rem;padding:0.1rem 0.4rem;">+{{ project.technology_list|length|add:"-5" }} more</span>
           {% endif %}
         </div>
       </div>
@@ -189,23 +161,17 @@
         <!-- Link Icons -->
         <div style="display:flex;gap:0.75rem;margin-bottom:0.85rem;align-items:center;justify-content:flex-start;">
           {% if project.github_url %}
-          <a href="{{ project.github_url }}" target="_blank" title="GitHub Repository"
-            style="text-decoration:none;font-size:1.15rem;color:var(--txt-2);transition:var(--t);"
-            onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">
+          <a href="{{ project.github_url }}" target="_blank" title="GitHub Repository" style="text-decoration:none;font-size:1.15rem;color:var(--txt-2);transition:var(--t);" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">
             🐙 <span style="font-size:0.78rem;font-weight:600;margin-left:0.15rem;">GitHub</span>
           </a>
           {% endif %}
           {% if project.live_url %}
-          <a href="{{ project.live_url }}" target="_blank" title="Live Application"
-            style="text-decoration:none;font-size:1.15rem;color:var(--txt-2);transition:var(--t);"
-            onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">
+          <a href="{{ project.live_url }}" target="_blank" title="Live Application" style="text-decoration:none;font-size:1.15rem;color:var(--txt-2);transition:var(--t);" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">
             🌐 <span style="font-size:0.78rem;font-weight:600;margin-left:0.15rem;">Live Demo</span>
           </a>
           {% endif %}
           {% if project.youtube_url %}
-          <a href="{{ project.youtube_url }}" target="_blank" title="Video Walkthrough"
-            style="text-decoration:none;font-size:1.15rem;color:var(--txt-2);transition:var(--t);"
-            onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">
+          <a href="{{ project.youtube_url }}" target="_blank" title="Video Walkthrough" style="text-decoration:none;font-size:1.15rem;color:var(--txt-2);transition:var(--t);" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">
             📺 <span style="font-size:0.78rem;font-weight:600;margin-left:0.15rem;">Walkthrough</span>
           </a>
           {% endif %}
@@ -215,19 +181,14 @@
         </div>
 
         <!-- Operations Row -->
-        <div
-          style="display:grid;grid-template-columns:{% if not is_recruiter %}1.8fr 1fr 1fr{% else %}1fr{% endif %};gap:0.5rem;align-items:center;">
+        <div style="display:grid;grid-template-columns:{% if not is_recruiter %}1.8fr 1fr 1fr{% else %}1fr{% endif %};gap:0.5rem;align-items:center;">
 
           {% if is_recruiter %}
-          <a href="{% url 'student_portal:recruiter_project_detail' project.pk %}"
-            class="sp-btn sp-btn-primary sp-btn-sm" style="text-align:center;">🔍 View Project Portfolio</a>
+          <a href="{% url 'student_portal:recruiter_project_detail' project.pk %}" class="sp-btn sp-btn-primary sp-btn-sm" style="text-align:center;">🔍 View Project Portfolio</a>
           {% else %}
-          <a href="{% url 'student_portal:project_detail' project.pk %}" class="sp-btn sp-btn-primary sp-btn-sm"
-            style="text-align:center;padding:.42rem 0.5rem;">🔍 View Details</a>
-          <a href="{% url 'student_portal:project_edit' project.pk %}" class="sp-btn sp-btn-secondary sp-btn-sm"
-            style="text-align:center;padding:.42rem 0.5rem;">✏️ Edit</a>
-          <a href="{% url 'student_portal:project_delete' project.pk %}" class="sp-btn sp-btn-danger sp-btn-sm"
-            style="text-align:center;padding:.42rem 0.5rem;">🗑 Delete</a>
+          <a href="{% url 'student_portal:project_detail' project.pk %}" class="sp-btn sp-btn-primary sp-btn-sm" style="text-align:center;padding:.42rem 0.5rem;">🔍 View Details</a>
+          <a href="{% url 'student_portal:project_edit' project.pk %}" class="sp-btn sp-btn-secondary sp-btn-sm" style="text-align:center;padding:.42rem 0.5rem;">✏️ Edit</a>
+          <a href="{% url 'student_portal:project_delete' project.pk %}" class="sp-btn sp-btn-danger sp-btn-sm" style="text-align:center;padding:.42rem 0.5rem;">🗑 Delete</a>
           {% endif %}
 
         </div>
@@ -245,11 +206,9 @@
 <div class="sp-card">
   <div class="sp-empty" style="padding:5rem 2rem;text-align:center;">
     <div class="sp-empty-icon" style="font-size:3rem;margin-bottom:1rem;">🔨</div>
-    <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:#fff;margin-bottom:0.5rem;">No Projects
-      Found</h3>
+    <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:#fff;margin-bottom:0.5rem;">No Projects Found</h3>
     <p style="font-size:0.875rem;color:var(--txt-2);max-width:420px;margin:0 auto 1.5rem;">
-      Showcase your tech achievements! Upload your academic models, hackathon websites, and developer tools to stand out
-      to recruiters.
+      Showcase your tech achievements! Upload your academic models, hackathon websites, and developer tools to stand out to recruiters.
     </p>
     {% if not is_recruiter %}
     <a href="{% url 'student_portal:project_create' %}" class="sp-btn sp-btn-primary">➕ Showcase Your First Project</a>

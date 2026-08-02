@@ -16,22 +16,22 @@
 
 <!-- Deletion warning box -->
 <div style="max-width: 540px; margin: 2.5rem auto 5rem;">
-  <form method="post" class="sp-card" style="box-shadow: 0 16px 40px rgba(0,0,0,0.35);">
+  <form method="post" class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
     {% csrf_token %}
 
     <div class="sp-card-body" style="padding: 2.5rem; text-align: center;">
-      <div style="font-size: 3rem; margin-bottom: 1.25rem;">🗑</div>
-      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #fff; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.75rem;">
+      <div style="font-size: 3rem; margin-bottom: 1.25rem;">🗑️</div>
+      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #0F172A !important; font-size: 1.3rem; font-weight: 800; margin-bottom: 0.75rem;">
         Delete Certificate?
       </h3>
-      <p style="font-size: 0.88rem; color: var(--txt-2); line-height: 1.6; margin-bottom: 1.75rem;">
-        You are about to delete <strong>"{{ object.title }}"</strong> from your student profile.<br>
+      <p style="font-size: 0.9rem; color: #1E293B !important; font-weight: 600; line-height: 1.6; margin-bottom: 1.75rem;">
+        You are about to delete <strong style="color:#0F172A !important;">"{{ object.title }}"</strong> from your student profile.<br>
         This will permanently remove the record and the associated certificate file. This action cannot be undone.
       </p>
 
       <div style="display: flex; gap: 1rem; justify-content: center;">
-        <a href="{% url 'student_portal:certificates_list' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2rem;">No, Cancel</a>
-        <button type="submit" class="sp-btn sp-btn-danger" style="padding: 0.65rem 2.5rem;">
+        <a href="{% url 'student_portal:certificates_list' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2rem; border:1.5px solid #475569 !important;">No, Cancel</a>
+        <button type="submit" class="sp-btn sp-btn-danger" style="padding: 0.65rem 2.5rem; background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">
           Yes, Delete Certificate
         </button>
       </div>

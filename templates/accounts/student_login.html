@@ -6,126 +6,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PlaceSync Student Login — Access your placement dashboard">
     <title>Student Login | PlaceSync</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/student.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=9.1">
+    <link rel="stylesheet" href="{% static 'css/student.css' %}?v=8.0">
 </head>
 <body>
 
-<div class="auth-page">
+<div class="auth-container">
+    <div class="auth-card">
 
-    <!-- Left decorative panel -->
-    <div class="auth-left">
-        <div class="auth-left-brand">Place<span>Sync</span></div>
-        <p class="auth-left-tagline">
-            Your placement journey starts here. Track applications, discover opportunities, and land your dream career.
-        </p>
-
-        <div class="auth-features">
-            <div class="auth-feature-item">
-                <span class="auth-feature-icon">📊</span>
-                <span>Real-time application tracking</span>
-            </div>
-            <div class="auth-feature-item">
-                <span class="auth-feature-icon">🚀</span>
-                <span>Browse live placement drives</span>
-            </div>
-            <div class="auth-feature-item">
-                <span class="auth-feature-icon">📄</span>
-                <span>Upload &amp; analyze your resume</span>
-            </div>
-            <div class="auth-feature-item">
-                <span class="auth-feature-icon">🔔</span>
-                <span>Instant placement notifications</span>
-            </div>
-            <div class="auth-feature-item">
-                <span class="auth-feature-icon">📈</span>
-                <span>Career readiness score</span>
-            </div>
+        <div class="auth-logo">
+            <div class="auth-logo-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="auth-logo-text">Place<span>Sync</span></div>
         </div>
-    </div>
 
-    <!-- Right form panel -->
-    <div class="auth-right">
-        <div class="auth-card">
+        <a href="{% url 'home' %}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
 
-            <div class="auth-logo">
-                <div class="auth-logo-icon">🎓</div>
-                <div class="auth-logo-text">Place<span>Sync</span></div>
-            </div>
+        <h1 class="auth-title">Student Login</h1>
+        <p class="auth-subtitle">Sign in to access your placement dashboard</p>
 
-            <a href="{% url 'home' %}" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.825rem;color:var(--txt-muted);text-decoration:none;font-weight:600;margin-bottom:1rem;transition:all 0.2s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--txt-muted)'">
-                ← Back to Home
-            </a>
+        <!-- Info Notice -->
+        <div class="auth-info-box">
+            <i class="fa-solid fa-circle-info" style="margin-right:0.25rem;"></i> Login credentials:<br>
+            &bull; Username: <strong>Enrollment / Roll Number</strong><br>
+            &bull; Password: <strong>Password assigned by your TPO</strong>
+        </div>
 
-            <h1 class="auth-title">Student Login</h1>
-            <p class="auth-subtitle">Sign in to access your placement dashboard</p>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-            <!-- Info box -->
-            <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.22);border-radius:var(--r-md);padding:0.85rem 1rem;font-size:0.82rem;color:var(--txt-2);line-height:1.5;margin-bottom:1.5rem;">
-                <strong style="color:#a5b4fc;">Login credentials:</strong><br>
-                Username = <strong>Enrollment / Roll Number</strong><br>
-                Password = <strong>Password assigned by your TPO</strong>
-            </div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" style="margin-bottom:1.25rem;">
-                        <span>{{ message }}</span>
-                    </div>
-                {% endfor %}
+            {% if form.non_field_errors %}
+                <div class="alert">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
             {% endif %}
 
-            <form method="post" novalidate>
-                {% csrf_token %}
-                {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
-
-                {% if form.non_field_errors %}
-                    <div class="non-field-errors">
-                        {% for error in form.non_field_errors %}
-                            <div>{{ error }}</div>
+            <div class="sp-form-group" style="margin-bottom:1.25rem;">
+                <label class="sp-form-label" for="id_username" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">Enrollment Number</label>
+                <input type="text" name="username" id="id_username" class="sp-form-control"
+                       placeholder="e.g. 2027CSE001" autocomplete="username"
+                       value="{{ form.data.username|default:'' }}" required>
+                {% if form.username.errors %}
+                    <ul class="form-error">
+                        {% for error in form.username.errors %}
+                            <li>{{ error }}</li>
                         {% endfor %}
-                    </div>
+                    </ul>
                 {% endif %}
+            </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="id_username">Enrollment Number</label>
-                    <input type="text" name="username" id="id_username" class="form-input"
-                           placeholder="e.g. 2021CS001" autocomplete="username"
-                           value="{{ form.data.username|default:'' }}" required>
-                    {% if form.username.errors %}
-                        <ul class="form-error">
-                            {% for error in form.username.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
+            <div class="sp-form-group" style="margin-bottom:1.5rem;">
+                <label class="sp-form-label" for="id_password" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">Password</label>
+                <input type="password" name="password" id="id_password" class="sp-form-control"
+                       placeholder="Enter your password" autocomplete="current-password" required>
+                {% if form.password.errors %}
+                    <ul class="form-error">
+                        {% for error in form.password.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="id_password">Password</label>
-                    <input type="password" name="password" id="id_password" class="form-input"
-                           placeholder="Enter your password" autocomplete="current-password" required>
-                    {% if form.password.errors %}
-                        <ul class="form-error">
-                            {% for error in form.password.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
+            <button type="submit" class="auth-btn-primary">
+                Sign In to Dashboard <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
 
-                <button type="submit" class="btn btn-primary btn-block" style="padding:0.8rem 1.5rem; font-size:0.95rem; border-radius:var(--r-lg); margin-top:1.25rem;">
-                    Sign In to Dashboard &nbsp;→
-                </button>
-            </form>
+        <div class="auth-divider"><span>College Admin or Staff?</span></div>
 
-            <div class="auth-divider"><span>College Admin?</span></div>
+        <a href="{% url 'accounts:login' %}" class="auth-btn-secondary">
+            Go to Admin Login
+        </a>
 
-            <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-block" style="border-radius:var(--r-lg); padding:0.75rem 1.5rem;">
-                Go to Admin Login
-            </a>
-
-        </div>
     </div>
 </div>
 

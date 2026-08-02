@@ -16,7 +16,7 @@
     <p class="sp-page-subtitle">Upload, rename, manage, and preview your PDF resumes and curriculum vitae (CV) for
       placement applications.</p>
   </div>
-  <div style="display:flex;gap:.75rem;">
+  <div class="sp-page-actions">
     <a href="{% url 'student_portal:ats_analysis' %}" class="sp-btn sp-btn-secondary">🎯 ATS Intelligence</a>
     <a href="{% url 'student_portal:resume_parser' %}" class="sp-btn sp-btn-secondary">🤖 AI Resume Parser</a>
   </div>
@@ -26,31 +26,34 @@
      KPI Stats Bar
 ════════════════════════════════════════════════════ -->
 <div class="sp-stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem;">
-  <div class="sp-stat" style="padding:1rem 0.75rem;min-height:100px;">
-    <div class="sp-stat-icon si-v" style="font-size:0.95rem;width:30px;height:30px;margin-bottom:0.5rem;">📚</div>
-    <div class="sp-stat-label" style="font-size:0.62rem;margin-bottom:0.15rem;">Total Resumes / CVs</div>
-    <div class="sp-stat-value" style="font-size:1.4rem;">{{ total_resumes }}</div>
+  <div class="sp-stat" style="padding:1.1rem 1rem;min-height:105px;background:#FFFFFF !important;border:1.5px solid #475569 !important;">
+    <div class="sp-stat-icon si-v" style="font-size:1rem;width:32px;height:32px;margin-bottom:0.4rem;">📚</div>
+    <div class="sp-stat-label" style="font-size:0.75rem;color:#1E293B !important;font-weight:800;text-transform:uppercase;margin-bottom:0.25rem;">Total Resumes / CVs</div>
+    <div class="sp-stat-value" style="font-size:1.6rem;color:#0F172A !important;font-weight:800;">{{ total_count }}</div>
   </div>
 
-  <div class="sp-stat" style="padding:1rem 0.75rem;min-height:100px;">
-    <div class="sp-stat-icon si-g" style="font-size:0.95rem;width:30px;height:30px;margin-bottom:0.5rem;">⭐</div>
-    <div class="sp-stat-label" style="font-size:0.62rem;margin-bottom:0.15rem;">Default Resume</div>
-    <div class="sp-stat-value" style="font-size:1.1rem;word-break:break-word;color:#fcd34d;">
-      {% if default_resume %}{{ default_resume.display_name|truncatechars:18 }}{% else %}<span
-        style="color:var(--txt-3);font-size:.85rem;">Not set</span>{% endif %}
+  <div class="sp-stat" style="padding:1.1rem 1rem;min-height:105px;background:#FFFFFF !important;border:1.5px solid #475569 !important;">
+    <div class="sp-stat-icon si-g" style="font-size:1rem;width:32px;height:32px;margin-bottom:0.4rem;">⭐</div>
+    <div class="sp-stat-label" style="font-size:0.75rem;color:#1E293B !important;font-weight:800;text-transform:uppercase;margin-bottom:0.25rem;">Default Resume</div>
+    <div class="sp-stat-value" style="font-size:1.1rem;word-break:break-word;">
+      {% if default_resume %}
+        <span style="color:#32867D !important;font-weight:800;">{{ default_resume.display_name|truncatechars:18 }}</span>
+      {% else %}
+        <span style="color:#64748B !important;font-weight:700;font-size:0.9rem;">Not set</span>
+      {% endif %}
     </div>
   </div>
 
-  <div class="sp-stat" style="padding:1rem 0.75rem;min-height:100px;">
-    <div class="sp-stat-icon si-a" style="font-size:0.95rem;width:30px;height:30px;margin-bottom:0.5rem;">📄</div>
-    <div class="sp-stat-label" style="font-size:0.62rem;margin-bottom:0.15rem;">Resumes Count</div>
-    <div class="sp-stat-value" style="font-size:1.4rem;">{{ resumes_count }}</div>
+  <div class="sp-stat" style="padding:1.1rem 1rem;min-height:105px;background:#FFFFFF !important;border:1.5px solid #475569 !important;">
+    <div class="sp-stat-icon si-a" style="font-size:1rem;width:32px;height:32px;margin-bottom:0.4rem;">📄</div>
+    <div class="sp-stat-label" style="font-size:0.75rem;color:#1E293B !important;font-weight:800;text-transform:uppercase;margin-bottom:0.25rem;">Resumes Count</div>
+    <div class="sp-stat-value" style="font-size:1.6rem;color:#0284C7 !important;font-weight:800;">{{ resume_count }}</div>
   </div>
 
-  <div class="sp-stat" style="padding:1rem 0.75rem;min-height:100px;">
-    <div class="sp-stat-icon si-t" style="font-size:0.95rem;width:30px;height:30px;margin-bottom:0.5rem;">📑</div>
-    <div class="sp-stat-label" style="font-size:0.62rem;margin-bottom:0.15rem;">CVs Count</div>
-    <div class="sp-stat-value" style="font-size:1.4rem;">{{ cvs_count }}</div>
+  <div class="sp-stat" style="padding:1.1rem 1rem;min-height:105px;background:#FFFFFF !important;border:1.5px solid #475569 !important;">
+    <div class="sp-stat-icon si-t" style="font-size:1rem;width:32px;height:32px;margin-bottom:0.4rem;">📑</div>
+    <div class="sp-stat-label" style="font-size:0.75rem;color:#1E293B !important;font-weight:800;text-transform:uppercase;margin-bottom:0.25rem;">CVs Count</div>
+    <div class="sp-stat-value" style="font-size:1.6rem;color:#059669 !important;font-weight:800;">{{ cv_count }}</div>
   </div>
 </div>
 

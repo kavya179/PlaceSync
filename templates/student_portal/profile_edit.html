@@ -13,7 +13,7 @@
     <p class="sp-page-subtitle">Update your personal contact details, online profiles and career preferences.</p>
   </div>
   <div class="sp-page-actions">
-    <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary">⬅️ Back to Profile</a>
+    <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary" style="border: 1.5px solid #475569 !important;">⬅️ Back to Profile</a>
   </div>
 </div>
 
@@ -24,15 +24,15 @@
   <div style="display: flex; flex-direction: column; gap: 1.5rem;">
     
     {% if form.non_field_errors %}
-    <div class="sp-alert sp-alert-error">
+    <div class="sp-alert sp-alert-error" style="border: 1.5px solid #DC2626 !important; background: #FEF2F2 !important; color: #0F172A !important;">
       <span>{{ form.non_field_errors }}</span>
     </div>
     {% endif %}
 
     <!-- Section 1: Personal Details -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">👤 Personal Details</span>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">👤 Personal Details</span>
       </div>
       <div class="sp-card-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
         
@@ -41,7 +41,7 @@
             <label class="sp-form-label" for="{{ form.photo.id_for_label }}">Profile Picture</label>
             {{ form.photo }}
             {% if form.photo.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.photo.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.photo.errors.0 }}</div>
             {% endif %}
           </div>
           
@@ -49,7 +49,7 @@
             <label class="sp-form-label" for="{{ form.name.id_for_label }}">Full Name *</label>
             {{ form.name }}
             {% if form.name.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.name.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.name.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
@@ -59,7 +59,7 @@
             <label class="sp-form-label" for="{{ form.email.id_for_label }}">Email Address *</label>
             {{ form.email }}
             {% if form.email.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.email.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.email.errors.0 }}</div>
             {% endif %}
           </div>
 
@@ -67,7 +67,7 @@
             <label class="sp-form-label" for="{{ form.phone.id_for_label }}">Phone Number</label>
             {{ form.phone }}
             {% if form.phone.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.phone.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.phone.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
@@ -77,7 +77,7 @@
             <label class="sp-form-label" for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
             {{ form.date_of_birth }}
             {% if form.date_of_birth.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.date_of_birth.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.date_of_birth.errors.0 }}</div>
             {% endif %}
           </div>
 
@@ -85,7 +85,7 @@
             <label class="sp-form-label" for="{{ form.gender.id_for_label }}">Gender</label>
             {{ form.gender }}
             {% if form.gender.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.gender.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.gender.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
@@ -94,7 +94,7 @@
           <label class="sp-form-label" for="{{ form.address.id_for_label }}">Contact Address</label>
           {{ form.address }}
           {% if form.address.errors %}
-          <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.address.errors.0 }}</div>
+          <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.address.errors.0 }}</div>
           {% endif %}
         </div>
 
@@ -102,7 +102,7 @@
           <label class="sp-form-label" for="{{ form.bio.id_for_label }}">Bio / About Me</label>
           {{ form.bio }}
           {% if form.bio.errors %}
-          <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.bio.errors.0 }}</div>
+          <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.bio.errors.0 }}</div>
           {% endif %}
         </div>
 
@@ -110,9 +110,9 @@
     </div>
 
     <!-- Section 2: Social Profiles -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">🌐 Social &amp; Coding Profiles</span>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">🌐 Social &amp; Coding Profiles</span>
       </div>
       <div class="sp-card-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
         
@@ -121,7 +121,7 @@
             <label class="sp-form-label" for="{{ form.github_url.id_for_label }}">GitHub Profile URL</label>
             {{ form.github_url }}
             {% if form.github_url.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.github_url.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.github_url.errors.0 }}</div>
             {% endif %}
           </div>
 
@@ -129,7 +129,7 @@
             <label class="sp-form-label" for="{{ form.linkedin_url.id_for_label }}">LinkedIn Profile URL</label>
             {{ form.linkedin_url }}
             {% if form.linkedin_url.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.linkedin_url.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.linkedin_url.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
@@ -139,7 +139,7 @@
             <label class="sp-form-label" for="{{ form.portfolio_url.id_for_label }}">Personal Portfolio Website</label>
             {{ form.portfolio_url }}
             {% if form.portfolio_url.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.portfolio_url.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.portfolio_url.errors.0 }}</div>
             {% endif %}
           </div>
 
@@ -147,7 +147,7 @@
             <label class="sp-form-label" for="{{ form.leetcode_url.id_for_label }}">LeetCode Profile URL</label>
             {{ form.leetcode_url }}
             {% if form.leetcode_url.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.leetcode_url.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.leetcode_url.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
@@ -156,9 +156,9 @@
     </div>
 
     <!-- Section 3: Career Preferences -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">💼 Career Preferences</span>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">💼 Career Preferences</span>
       </div>
       <div class="sp-card-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
         
@@ -167,7 +167,7 @@
             <label class="sp-form-label" for="{{ form.preferred_job_role.id_for_label }}">Preferred Job Role</label>
             {{ form.preferred_job_role }}
             {% if form.preferred_job_role.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.preferred_job_role.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.preferred_job_role.errors.0 }}</div>
             {% endif %}
           </div>
 
@@ -175,7 +175,7 @@
             <label class="sp-form-label" for="{{ form.preferred_work_location.id_for_label }}">Preferred Location</label>
             {{ form.preferred_work_location }}
             {% if form.preferred_work_location.errors %}
-            <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.preferred_work_location.errors.0 }}</div>
+            <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.preferred_work_location.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
@@ -184,7 +184,7 @@
           <label class="sp-form-label" for="{{ form.higher_studies.id_for_label }}">Higher Studies Plan (Optional)</label>
           {{ form.higher_studies }}
           {% if form.higher_studies.errors %}
-          <div style="color: var(--red); font-size: 0.72rem; margin-top: 0.25rem;">{{ form.higher_studies.errors.0 }}</div>
+          <div style="color: #DC2626; font-size: 0.75rem; font-weight: 700; margin-top: 0.25rem;">{{ form.higher_studies.errors.0 }}</div>
           {% endif %}
         </div>
 
@@ -193,7 +193,7 @@
 
     <!-- Form Submit Controls -->
     <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 2rem;">
-      <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2.25rem;">Cancel</a>
+      <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2.25rem; border: 1.5px solid #475569 !important;">Cancel</a>
       <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem 2.75rem;">Save Profile Settings</button>
     </div>
 
@@ -201,24 +201,24 @@
 
   <!-- Right Side: Tips Info Card -->
   <div>
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">💡 Editing Tips</span>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">💡 Editing Tips</span>
       </div>
-      <div class="sp-card-body" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.82rem; color: var(--txt-2); line-height: 1.5;">
+      <div class="sp-card-body" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; font-size: 0.82rem; color: #1E293B !important; line-height: 1.5;">
         
         <div>
-          <strong style="color: #fff; display: block; margin-bottom: 0.15rem;">Photo Aspect Ratio</strong>
+          <strong style="color: #0F172A !important; font-weight: 800; display: block; margin-bottom: 0.15rem;">Photo Aspect Ratio</strong>
           Choose a square professional profile photo (JPG or PNG) for the best layout rendering.
         </div>
 
-        <div style="border-top: 1px solid rgba(255,255,255,0.04); padding-top: 0.75rem;">
-          <strong style="color: #fff; display: block; margin-bottom: 0.15rem;">Social Reach</strong>
+        <div style="border-top: 1.5px solid #CBD5E1; padding-top: 0.75rem;">
+          <strong style="color: #0F172A !important; font-weight: 800; display: block; margin-bottom: 0.15rem;">Social Reach</strong>
           Keeping your GitHub, LeetCode and LinkedIn links up-to-date helps recruiters verify your developer milestones easily.
         </div>
 
-        <div style="border-top: 1px solid rgba(255,255,255,0.04); padding-top: 0.75rem;">
-          <strong style="color: #fff; display: block; margin-bottom: 0.15rem;">Academic Info</strong>
+        <div style="border-top: 1.5px solid #CBD5E1; padding-top: 0.75rem;">
+          <strong style="color: #0F172A !important; font-weight: 800; display: block; margin-bottom: 0.15rem;">Academic Info</strong>
           Remember: Your academic details (CGPA, Course, Batch, Semester grades) are managed officially by your College Admin and are read-only.
         </div>
 

@@ -8,13 +8,14 @@
 <title>{% block title %}Student Portal | PlaceSync{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="{% static 'css/student.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="{% static 'css/student.css' %}?v=8.2">
 <style>
   summary::-webkit-details-marker { display: none; }
   summary { list-style: none; }
   .sp-nav-details[open] .sp-dropdown-caret { transform: rotate(180deg); }
-  .sp-submenu-link:hover { color: #fff !important; background: rgba(255,255,255,0.05) !important; }
-  .sp-submenu-link.active { color: #fff !important; background: rgba(99,102,241,0.18) !important; font-weight: 700; border-left: 2px solid var(--i1); }
+  .sp-submenu-link:hover { color: #FFFFFF !important; background: rgba(0, 0, 0, 0.25) !important; }
+  .sp-submenu-link.active { color: #FFFFFF !important; background: #32867D !important; font-weight: 800 !important; border: 1.5px solid #A5F3FC !important; }
 </style>
 {% block extra_head %}{% endblock %}
 </head>
@@ -33,7 +34,7 @@
 
     <!-- Brand -->
     <a href="{% url 'student_portal:dashboard' %}" class="sp-brand">
-      <div class="sp-brand-icon">🎓</div>
+      <div class="sp-brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
       <div class="sp-brand-text">Place<span>Sync</span></div>
     </a>
 

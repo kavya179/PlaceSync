@@ -7,21 +7,21 @@
 {% block content %}
 
 <!-- ── Page Header ── -->
-<div class="page-header" style="margin-bottom: 1.5rem;">
-    <div class="page-header-left">
-        <h1 class="page-title" style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;">Overview</h1>
-        <p class="page-subtitle" style="font-size:0.875rem;color:var(--txt-2);">
-            Welcome back, <strong style="color:#fff;">{{ user.username }}</strong> &mdash;
-            <span style="color:var(--primary-lt);">{{ user.college.name }}</span>
+<div class="sp-page-header" style="margin-bottom: 1.5rem;">
+    <div>
+        <h1 class="sp-page-title">Overview</h1>
+        <p class="sp-page-subtitle">
+            Welcome back, <strong style="color:#0F172A !important;">{{ user.username }}</strong> &mdash;
+            <span style="color:#32867D !important; font-weight:800;">{{ user.college.name }}</span>
         </p>
     </div>
-    <div class="page-header-actions">
+    <div class="sp-page-actions">
         {% if request.user|can_edit_filter %}
-        <a href="{% url 'placements:create' %}" class="btn btn-primary">
+        <a href="{% url 'placements:create' %}" class="sp-btn sp-btn-primary">
             ➕ &nbsp;New Drive
         </a>
         {% endif %}
-        <a href="{% url 'students:list' %}" class="btn btn-secondary">
+        <a href="{% url 'students:list' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">
             🧑‍🎓 &nbsp;Students
         </a>
     </div>
@@ -31,50 +31,50 @@
      Section 1: Institutional Metrics
      ══════════════════════════════════════════════════ -->
 <div style="margin-bottom:0.75rem;">
-    <h2 style="font-size:0.78rem;font-weight:700;color:var(--txt-3);margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.12em;">Institutional Overview</h2>
+    <h2 style="font-size:0.84rem; font-weight:800; color:#0F172A !important; margin-bottom:1rem; text-transform:uppercase; letter-spacing:0.1em;">Institutional Overview</h2>
 </div>
-<div class="stats-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin-bottom: 2rem;">
+<div class="sp-stats" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin-bottom: 2rem; gap:1rem;">
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-indigo">🧑‍🎓</div>
-        <div class="stats-label">Total Students</div>
-        <div class="stats-value">{{ stats.total_students }}</div>
-        <span class="stats-change up" style="color:var(--txt-3);">Enrolled candidates</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-v" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#7C3AED !important;">🧑‍🎓</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Total Students</div>
+        <div class="sp-stat-value" style="color:#0F172A !important; font-weight:800;">{{ stats.total_students }}</div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Enrolled candidates</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-cyan">📂</div>
-        <div class="stats-label">Total Departments</div>
-        <div class="stats-value" style="color:var(--info);">{{ stats.total_departments }}</div>
-        <span class="stats-change" style="color:var(--txt-3);">Academic units</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-a" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#0284C7 !important;">📂</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Total Departments</div>
+        <div class="sp-stat-value" style="color:#0284C7 !important; font-weight:800;">{{ stats.total_departments }}</div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Academic units</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-violet">📅</div>
-        <div class="stats-label">Total Batches</div>
-        <div class="stats-value" style="color:var(--primary-lt);">{{ stats.total_batches }}</div>
-        <span class="stats-change" style="color:var(--txt-3);">Graduating cohorts</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-v" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#32867D !important;">📅</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Total Batches</div>
+        <div class="sp-stat-value" style="color:#32867D !important; font-weight:800;">{{ stats.total_batches }}</div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Graduating cohorts</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-sky">🏢</div>
-        <div class="stats-label">Total Companies</div>
-        <div class="stats-value" style="color:var(--info);">{{ stats.total_companies }}</div>
-        <span class="stats-change" style="color:var(--txt-3);">Registered recruiters</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-g" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#059669 !important;">🏢</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Total Companies</div>
+        <div class="sp-stat-value" style="color:#059669 !important; font-weight:800;">{{ stats.total_companies }}</div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Registered recruiters</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-amber">🚀</div>
-        <div class="stats-label">Active Drives</div>
-        <div class="stats-value" style="color:var(--warning);">{{ stats.active_drives }}</div>
-        <span class="stats-change" style="color:var(--txt-3);">Ongoing processes</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-t" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#D97706 !important;">🚀</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Active Drives</div>
+        <div class="sp-stat-value" style="color:#D97706 !important; font-weight:800;">{{ stats.active_drives }}</div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Ongoing processes</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-rose">🔔</div>
-        <div class="stats-label">Pending Notifications</div>
-        <div class="stats-value" style="color:var(--danger);">{{ stats.unread_notifications }}</div>
-        <span class="stats-change" style="color:var(--txt-3);">Unread system alerts</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-s" style="background:#FEF2F2 !important; border:1.5px solid #DC2626 !important; color:#DC2626 !important;">🔔</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Pending Notifications</div>
+        <div class="sp-stat-value" style="color:#DC2626 !important; font-weight:800;">{{ stats.unread_notifications }}</div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Unread system alerts</span>
     </div>
 
 </div>
@@ -83,59 +83,59 @@
      Section 2: Placement & Internship Performance Metrics
      ══════════════════════════════════════════════════ -->
 <div style="margin-bottom:0.75rem;">
-    <h2 style="font-size:0.78rem;font-weight:700;color:var(--txt-3);margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.12em;">Placement &amp; Internship Metrics</h2>
+    <h2 style="font-size:0.84rem; font-weight:800; color:#0F172A !important; margin-bottom:1rem; text-transform:uppercase; letter-spacing:0.1em;">Placement &amp; Internship Metrics</h2>
 </div>
-<div class="stats-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin-bottom: 2rem;">
+<div class="sp-stats" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin-bottom: 2rem; gap:1rem;">
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-green">✅</div>
-        <div class="stats-label">Placed Students</div>
-        <div class="stats-value" style="color:var(--success);">{{ stats.placed_students }}</div>
-        <span class="stats-change up" style="color:var(--success);">Offers secured</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-g" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#059669 !important;">✅</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Placed Students</div>
+        <div class="sp-stat-value" style="color:#059669 !important; font-weight:800;">{{ stats.placed_students }}</div>
+        <span class="sp-stat-change" style="color:#059669 !important; font-weight:700;">Offers secured</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-teal">🔬</div>
-        <div class="stats-label">Internship Placed</div>
-        <div class="stats-value" style="color:var(--info);">{{ stats.internship_students }}</div>
-        <span class="stats-change up" style="color:var(--info);">Active internships</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-a" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#0284C7 !important;">🔬</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Internship Placed</div>
+        <div class="sp-stat-value" style="color:#0284C7 !important; font-weight:800;">{{ stats.internship_students }}</div>
+        <span class="sp-stat-change" style="color:#0284C7 !important; font-weight:700;">Active internships</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-violet">📊</div>
-        <div class="stats-label">Placement %</div>
-        <div class="stats-value" style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-v" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#7C3AED !important;">📊</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Placement %</div>
+        <div class="sp-stat-value" style="color:#7C3AED !important; font-weight:800;">
             {{ stats.placement_ratio }}%
         </div>
-        <span class="stats-change up" style="color:var(--primary-lt);">Success rate</span>
+        <span class="sp-stat-change" style="color:#7C3AED !important; font-weight:700;">Success rate</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-amber">💰</div>
-        <div class="stats-label">Highest Package</div>
-        <div class="stats-value" style="color:var(--warning);">{{ stats.highest_package }} <span style="font-size:0.9rem;font-weight:500;">LPA</span></div>
-        <span class="stats-change" style="color:var(--txt-3);">Top job salary package</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-t" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#D97706 !important;">💰</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Highest Package</div>
+        <div class="sp-stat-value" style="color:#D97706 !important; font-weight:800;">{{ stats.highest_package }} <span style="font-size:0.82rem; font-weight:700;">LPA</span></div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Top job salary package</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-indigo">📈</div>
-        <div class="stats-label">Average Package</div>
-        <div class="stats-value" style="color:var(--primary-lt);">{{ stats.average_package }} <span style="font-size:0.9rem;font-weight:500;">LPA</span></div>
-        <span class="stats-change" style="color:var(--txt-3);">Mean job package</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-v" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#32867D !important;">📈</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Average Package</div>
+        <div class="sp-stat-value" style="color:#32867D !important; font-weight:800;">{{ stats.average_package }} <span style="font-size:0.82rem; font-weight:700;">LPA</span></div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Mean job package</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-sky">💸</div>
-        <div class="stats-label">Highest Stipend</div>
-        <div class="stats-value" style="color:var(--info);">₹{{ stats.highest_stipend }}<span style="font-size:0.8rem;font-weight:500;">/mo</span></div>
-        <span class="stats-change" style="color:var(--txt-3);">Top internship stipend</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-a" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#0284C7 !important;">💸</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Highest Stipend</div>
+        <div class="sp-stat-value" style="color:#0284C7 !important; font-weight:800;">₹{{ stats.highest_stipend }}<span style="font-size:0.78rem; font-weight:700;">/mo</span></div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Top internship stipend</span>
     </div>
 
-    <div class="stats-card">
-        <div class="stats-card-icon icon-teal">📉</div>
-        <div class="stats-label">Average Stipend</div>
-        <div class="stats-value" style="color:var(--success);">₹{{ stats.average_stipend }}<span style="font-size:0.8rem;font-weight:500;">/mo</span></div>
-        <span class="stats-change" style="color:var(--txt-3);">Mean internship stipend</span>
+    <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-stat-icon si-g" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#059669 !important;">📉</div>
+        <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Average Stipend</div>
+        <div class="sp-stat-value" style="color:#059669 !important; font-weight:800;">₹{{ stats.average_stipend }}<span style="font-size:0.78rem; font-weight:700;">/mo</span></div>
+        <span class="sp-stat-change" style="color:#334155 !important; font-weight:700;">Mean internship stipend</span>
     </div>
 
 </div>
@@ -146,39 +146,39 @@
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem;">
 
     <!-- Left Column: Upcoming Placement Drives -->
-    <div class="card" style="margin-top:0;">
-        <div class="card-header">
-            <span class="card-title">📅 Upcoming drives</span>
-            <a href="{% url 'placements:list' %}" class="btn btn-xs btn-secondary">View all</a>
+    <div class="sp-card" style="margin-top:0; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important; display:flex; justify-content:space-between; align-items:center;">
+            <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">📅 Upcoming drives</span>
+            <a href="{% url 'placements:list' %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;">View all</a>
         </div>
-        <div class="card-body" style="padding:0;">
+        <div class="sp-card-body" style="padding:0;">
             {% if upcoming_drives %}
-                <table class="data-table">
+                <table class="sp-table" style="width:100%; border-collapse:collapse;">
                     <thead>
-                        <tr>
-                            <th>Recruiter &amp; Role</th>
-                            <th>Type</th>
-                            <th>Deadline</th>
+                        <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                            <th style="padding:0.75rem 1rem; color:#0F172A !important; font-weight:800; font-size:0.8rem; text-align:left;">Recruiter &amp; Role</th>
+                            <th style="padding:0.75rem 1rem; color:#0F172A !important; font-weight:800; font-size:0.8rem; text-align:left;">Type</th>
+                            <th style="padding:0.75rem 1rem; color:#0F172A !important; font-weight:800; font-size:0.8rem; text-align:left;">Deadline</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for drive in upcoming_drives %}
-                        <tr>
-                            <td>
+                        <tr style="border-bottom:1px solid #CBD5E1;">
+                            <td style="padding:0.75rem 1rem;">
                                 <a href="{% url 'placements:detail' drive.pk %}"
-                                   style="color:var(--txt-1);text-decoration:none;font-weight:600;">
+                                   style="color:#0F172A !important; text-decoration:none; font-weight:800; font-size:0.9rem;">
                                     {{ drive.role }}
                                 </a>
-                                <div style="font-size:0.75rem;color:var(--txt-2);margin-top:2px;">
+                                <div style="font-size:0.78rem; color:#334155 !important; font-weight:600; margin-top:2px;">
                                     {{ drive.company.name }}
                                 </div>
                             </td>
-                            <td>
-                                <span class="badge {% if drive.drive_type == 'JOB' %}badge-indigo{% else %}badge-sky{% endif %}">
+                            <td style="padding:0.75rem 1rem;">
+                                <span class="sp-badge {% if drive.drive_type == 'JOB' %}sp-badge-violet{% else %}sp-badge-sky{% endif %}">
                                     {{ drive.get_drive_type_display }}
                                 </span>
                             </td>
-                            <td style="font-size:0.8rem;color:var(--txt-2);">
+                            <td style="padding:0.75rem 1rem; font-size:0.82rem; color:#1E293B !important; font-weight:700;">
                                 {% if drive.deadline %}{{ drive.deadline|date:"M d, Y" }}{% else %}—{% endif %}
                             </td>
                         </tr>
@@ -186,11 +186,11 @@
                     </tbody>
                 </table>
             {% else %}
-                <div style="padding:3rem 1.5rem; text-align:center; color:var(--txt-3);">
-                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">📅</div>
-                    <p style="font-weight:600;margin-bottom:0.5rem;color:var(--txt-2);">No upcoming drives scheduled</p>
+                <div style="padding:3rem 1.5rem; text-align:center; color:#334155 !important;">
+                    <div style="font-size:2.5rem; margin-bottom:0.75rem;">📅</div>
+                    <p style="font-weight:700; margin-bottom:0.5rem; color:#0F172A !important;">No upcoming drives scheduled</p>
                     {% if request.user|can_edit_filter %}
-                    <a href="{% url 'placements:create' %}" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">Create Drive</a>
+                    <a href="{% url 'placements:create' %}" class="sp-btn sp-btn-primary sp-btn-sm" style="margin-top:0.75rem;">Create Drive</a>
                     {% endif %}
                 </div>
             {% endif %}
@@ -198,38 +198,38 @@
     </div>
 
     <!-- Right Column: Latest Applications -->
-    <div class="card" style="margin-top:0;">
-        <div class="card-header">
-            <span class="card-title">📝 Latest Applications</span>
-            <a href="{% url 'placements:list' %}" class="btn btn-xs btn-secondary">View all</a>
+    <div class="sp-card" style="margin-top:0; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+        <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important; display:flex; justify-content:space-between; align-items:center;">
+            <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">📝 Latest Applications</span>
+            <a href="{% url 'placements:list' %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;">View all</a>
         </div>
-        <div class="card-body" style="padding:0;">
+        <div class="sp-card-body" style="padding:0;">
             {% if latest_applications %}
-                <table class="data-table">
+                <table class="sp-table" style="width:100%; border-collapse:collapse;">
                     <thead>
-                        <tr>
-                            <th>Candidate</th>
-                            <th>Applied Position</th>
-                            <th>Status</th>
+                        <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                            <th style="padding:0.75rem 1rem; color:#0F172A !important; font-weight:800; font-size:0.8rem; text-align:left;">Candidate</th>
+                            <th style="padding:0.75rem 1rem; color:#0F172A !important; font-weight:800; font-size:0.8rem; text-align:left;">Applied Position</th>
+                            <th style="padding:0.75rem 1rem; color:#0F172A !important; font-weight:800; font-size:0.8rem; text-align:left;">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for app in latest_applications %}
-                        <tr>
-                            <td>
-                                <span style="font-weight:600;color:#fff;">{{ app.student.name }}</span>
-                                <div style="font-size:0.75rem;color:var(--txt-2);margin-top:2px;">
+                        <tr style="border-bottom:1px solid #CBD5E1;">
+                            <td style="padding:0.75rem 1rem;">
+                                <span style="font-weight:800; color:#0F172A !important; font-size:0.9rem;">{{ app.student.name }}</span>
+                                <div style="font-size:0.78rem; color:#334155 !important; font-weight:600; margin-top:2px;">
                                     {{ app.student.roll_number }}
                                 </div>
                             </td>
-                            <td>
-                                <span style="font-weight:500;color:var(--txt-1);">{{ app.drive.role }}</span>
-                                <div style="font-size:0.75rem;color:var(--txt-2);margin-top:2px;">
+                            <td style="padding:0.75rem 1rem;">
+                                <span style="font-weight:700; color:#1E293B !important; font-size:0.88rem;">{{ app.drive.role }}</span>
+                                <div style="font-size:0.78rem; color:#334155 !important; font-weight:600; margin-top:2px;">
                                     {{ app.drive.company.name }}
                                 </div>
                             </td>
-                            <td>
-                                <span class="badge {% if app.status == 'SELECTED' %}badge-green{% elif app.status == 'SHORTLISTED' %}badge-indigo{% elif app.status == 'REJECTED' %}badge-rose{% else %}badge-amber{% endif %}">
+                            <td style="padding:0.75rem 1rem;">
+                                <span class="sp-badge {% if app.status == 'SELECTED' %}sp-badge-green{% elif app.status == 'SHORTLISTED' %}sp-badge-sky{% elif app.status == 'REJECTED' %}sp-badge-rose{% else %}sp-badge-amber{% endif %}">
                                     {{ app.get_status_display }}
                                 </span>
                             </td>
@@ -238,9 +238,9 @@
                     </tbody>
                 </table>
             {% else %}
-                <div style="padding:3rem 1.5rem; text-align:center; color:var(--txt-3);">
-                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">📝</div>
-                    <p style="font-weight:600;margin-bottom:0.5rem;color:var(--txt-2);">No applications received yet</p>
+                <div style="padding:3rem 1.5rem; text-align:center; color:#334155 !important;">
+                    <div style="font-size:2.5rem; margin-bottom:0.75rem;">📝</div>
+                    <p style="font-weight:700; margin-bottom:0.5rem; color:#0F172A !important;">No applications received yet</p>
                 </div>
             {% endif %}
         </div>
@@ -252,79 +252,67 @@
      Institutional Modules Grid
      ══════════════════════════════════════════════════ -->
 <div style="margin-bottom:0.75rem;">
-    <h2 style="font-size:0.78rem;font-weight:700;color:var(--txt-3);margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:0.12em;">All Modules</h2>
+    <h2 style="font-size:0.84rem; font-weight:800; color:#0F172A !important; margin-bottom:1.25rem; text-transform:uppercase; letter-spacing:0.1em;">All Modules</h2>
 </div>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;">
+<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; margin-bottom:2rem;">
 
-    <a href="{% url 'students:list' %}" class="module-card">
+    <a href="{% url 'students:list' %}" class="module-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; padding:1.25rem; border-radius:8px; text-decoration:none; display:flex; flex-direction:column; gap:0.4rem;">
         <div style="font-size:1.75rem;">🧑‍🎓</div>
-        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Students</div>
-        <div style="font-size:0.78rem;color:var(--txt-2);line-height:1.5;margin-top:0.25rem;">Manage student records, profiles, CGPA &amp; status</div>
+        <div style="font-weight:800; color:#0F172A !important; font-size:0.95rem;">Students</div>
+        <div style="font-size:0.8rem; color:#334155 !important; font-weight:600; line-height:1.5;">Manage student records, profiles, CGPA &amp; status</div>
     </a>
 
-    <a href="{% url 'companies:list' %}" class="module-card">
+    <a href="{% url 'companies:list' %}" class="module-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; padding:1.25rem; border-radius:8px; text-decoration:none; display:flex; flex-direction:column; gap:0.4rem;">
         <div style="font-size:1.75rem;">🏢</div>
-        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Companies</div>
-        <div style="font-size:0.78rem;color:var(--txt-2);line-height:1.5;margin-top:0.25rem;">Recruiters, HR contacts, placement history</div>
+        <div style="font-weight:800; color:#0F172A !important; font-size:0.95rem;">Companies</div>
+        <div style="font-size:0.8rem; color:#334155 !important; font-weight:600; line-height:1.5;">Recruiters, HR contacts, placement history</div>
     </a>
 
-    <a href="{% url 'placements:list' %}" class="module-card">
+    <a href="{% url 'placements:list' %}" class="module-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; padding:1.25rem; border-radius:8px; text-decoration:none; display:flex; flex-direction:column; gap:0.4rem;">
         <div style="font-size:1.75rem;">🚀</div>
-        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Drives</div>
-        <div style="font-size:0.78rem;color:var(--txt-2);line-height:1.5;margin-top:0.25rem;">Job &amp; Internship drives, eligibility, applications</div>
+        <div style="font-weight:800; color:#0F172A !important; font-size:0.95rem;">Drives</div>
+        <div style="font-size:0.8rem; color:#334155 !important; font-weight:600; line-height:1.5;">Job &amp; Internship drives, eligibility, applications</div>
     </a>
 
-    <a href="{% url 'opportunities:list' %}" class="module-card">
+    <a href="{% url 'opportunities:list' %}" class="module-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; padding:1.25rem; border-radius:8px; text-decoration:none; display:flex; flex-direction:column; gap:0.4rem;">
         <div style="font-size:1.75rem;">🔍</div>
-        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Discovery</div>
-        <div style="font-size:0.78rem;color:var(--txt-2);line-height:1.5;margin-top:0.25rem;">Scrape career pages, auto-discover opportunities</div>
+        <div style="font-weight:800; color:#0F172A !important; font-size:0.95rem;">Discovery</div>
+        <div style="font-size:0.8rem; color:#334155 !important; font-weight:600; line-height:1.5;">Scrape career pages, auto-discover opportunities</div>
     </a>
 
-    <a href="{% url 'analytics:dashboard' %}" class="module-card">
+    <a href="{% url 'analytics:dashboard' %}" class="module-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; padding:1.25rem; border-radius:8px; text-decoration:none; display:flex; flex-direction:column; gap:0.4rem;">
         <div style="font-size:1.75rem;">📈</div>
-        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Analytics</div>
-        <div style="font-size:0.78rem;color:var(--txt-2);line-height:1.5;margin-top:0.25rem;">Charts, placement trends, department stats</div>
+        <div style="font-weight:800; color:#0F172A !important; font-size:0.95rem;">Analytics</div>
+        <div style="font-size:0.8rem; color:#334155 !important; font-weight:600; line-height:1.5;">Charts, placement trends, department stats</div>
     </a>
 
-    <a href="{% url 'reports:dashboard' %}" class="module-card">
+    <a href="{% url 'reports:dashboard' %}" class="module-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; padding:1.25rem; border-radius:8px; text-decoration:none; display:flex; flex-direction:column; gap:0.4rem;">
         <div style="font-size:1.75rem;">📋</div>
-        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Reports</div>
-        <div style="font-size:0.78rem;color:var(--txt-2);line-height:1.5;margin-top:0.25rem;">PDF/CSV exports — placement, salary, batch</div>
+        <div style="font-weight:800; color:#0F172A !important; font-size:0.95rem;">Reports</div>
+        <div style="font-size:0.8rem; color:#334155 !important; font-weight:600; line-height:1.5;">PDF/CSV exports — placement, salary, batch</div>
     </a>
 
-    <a href="{% url 'communication:dashboard' %}" class="module-card">
+    <a href="{% url 'communication:dashboard' %}" class="module-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; padding:1.25rem; border-radius:8px; text-decoration:none; display:flex; flex-direction:column; gap:0.4rem;">
         <div style="font-size:1.75rem;">✉️</div>
-        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Comm Center</div>
-        <div style="font-size:0.78rem;color:var(--txt-2);line-height:1.5;margin-top:0.25rem;">Email students &amp; companies, notifications</div>
+        <div style="font-weight:800; color:#0F172A !important; font-size:0.95rem;">Comm Center</div>
+        <div style="font-size:0.8rem; color:#334155 !important; font-weight:600; line-height:1.5;">Email students &amp; companies, notifications</div>
     </a>
 
-    <a href="{% url 'companies:verification_dashboard' %}" class="module-card">
+    <a href="{% url 'companies:verification_dashboard' %}" class="module-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; padding:1.25rem; border-radius:8px; text-decoration:none; display:flex; flex-direction:column; gap:0.4rem;">
         <div style="font-size:1.75rem;">🛡️</div>
-        <div style="font-weight:600;color:#fff;font-size:0.925rem;">Verification</div>
-        <div style="font-size:0.78rem;color:var(--txt-2);line-height:1.5;margin-top:0.25rem;">Company trust scores, verify/reject status</div>
+        <div style="font-weight:800; color:#0F172A !important; font-size:0.95rem;">Verification</div>
+        <div style="font-size:0.8rem; color:#334155 !important; font-weight:600; line-height:1.5;">Company trust scores, verify/reject status</div>
     </a>
 
 </div>
 
 <!-- Styles for Hover Actions and responsive grids -->
 <style>
-.module-card {
-    display:flex;
-    flex-direction:column;
-    gap:0.5rem;
-    padding:1.25rem;
-    background:var(--card-bg);
-    border:1px solid var(--border);
-    border-radius:var(--r-lg);
-    text-decoration:none;
-    transition:var(--t);
-}
 .module-card:hover {
-    background: rgba(99,102,241,0.07);
-    border-color: rgba(99,102,241,0.3);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    background: #F8FAFC !important;
+    border-color: #32867D !important;
+    transform: translateY(-2px);
 }
 @media (max-width: 900px) {
     div[style*="grid-template-columns:1fr 1fr"] {

@@ -987,6 +987,7 @@ class StudentResumeDashboardView(StudentRequiredMixin, View):
         total_count = all_student_resumes.count()
         resume_count = all_student_resumes.filter(resume_type='RESUME').count()
         cv_count = all_student_resumes.filter(resume_type='CV').count()
+        default_resume = all_student_resumes.filter(is_default=True).first()
 
         # Pagination
         from django.core.paginator import Paginator
@@ -1002,8 +1003,12 @@ class StudentResumeDashboardView(StudentRequiredMixin, View):
             'paginator': paginator,
             'page_obj': resumes_page,
             'total_count': total_count,
+            'total_resumes': total_count,
             'resume_count': resume_count,
+            'resumes_count': resume_count,
             'cv_count': cv_count,
+            'cvs_count': cv_count,
+            'default_resume': default_resume,
             'q': q,
             'selected_type': selected_type,
             'selected_sort': selected_sort,
@@ -2563,15 +2568,15 @@ def _get_heatmap_cols(student, year):
         for _ in range(7):
             count = counts_dict.get(curr, 0)
             if count == 0:
-                color = 'rgba(255, 255, 255, 0.05)'
+                color = '#E2E8F0'
             elif count <= 2:
-                color = '#4c1d95'
+                color = '#9BE9A8'
             elif count <= 4:
-                color = '#6d28d9'
+                color = '#40C463'
             elif count <= 6:
-                color = '#8b5cf6'
+                color = '#30A14E'
             else:
-                color = '#c4b5fd'
+                color = '#216E39'
             col_days.append({
                 'date': curr,
                 'count': count,

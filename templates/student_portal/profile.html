@@ -21,68 +21,68 @@
 
   <!-- LEFT COLUMN: Profile Card -->
   <div>
-    <div class="sp-card" style="box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; overflow: hidden; position: relative;">
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; text-align: center; overflow: hidden; position: relative;">
       
       <!-- Top banner decoration -->
-      <div style="height: 90px; background: var(--grad); position: absolute; top: 0; left: 0; right: 0; z-index: 1;"></div>
+      <div style="height: 80px; background: #3E6B7A; position: absolute; top: 0; left: 0; right: 0; z-index: 1;"></div>
       
-      <div class="sp-card-body" style="padding: 2.25rem 1.5rem 1.75rem; position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+      <div class="sp-card-body" style="padding: 2rem 1.5rem 1.75rem; position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
         
         <!-- Profile Photo -->
         {% if student.photo %}
-          <div style="width: 110px; height: 110px; border-radius: 50%; overflow: hidden; border: 4px solid var(--bg-sidebar); background: var(--bg-sidebar); box-shadow: 0 6px 16px rgba(0,0,0,0.3); margin-top: 1rem; margin-bottom: 1rem;">
+          <div style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 4px solid #3E6B7A; background: #FFFFFF; margin-top: 0.75rem; margin-bottom: 0.75rem;">
             <img src="{{ student.photo.url }}" alt="{{ student.name }}" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
         {% else %}
-          <div style="width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--bg-sidebar); background: var(--v1); box-shadow: 0 6px 16px rgba(0,0,0,0.3); margin-top: 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: #fff; font-family: 'Space Grotesk', sans-serif;">
+          <div style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid #3E6B7A; background: #32867D; margin-top: 0.75rem; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; color: #FFFFFF !important;">
             {{ student.name|slice:":2"|upper }}
           </div>
         {% endif %}
 
-        <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.15rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.15rem;">
           {{ student.name }}
         </h3>
-        <p style="font-size: 0.8rem; color: var(--txt-2); margin-bottom: 0.75rem;">
-          Enrollment: <strong style="color: #fff;">{{ student.roll_number }}</strong>
+        <p style="font-size: 0.82rem; color: #334155 !important; font-weight: 700; margin-bottom: 0.75rem;">
+          Enrollment: <strong style="color: #0F172A !important; font-weight: 800;">{{ student.roll_number }}</strong>
         </p>
 
-        <span class="sp-badge {% if student.placement_status == 'PLACED' %}sp-badge-green{% elif student.placement_status == 'INTERN' %}sp-badge-sky{% elif student.placement_status == 'PLACED_AND_INTERN' %}sp-badge-violet{% else %}sp-badge-gray{% endif %}" style="margin-bottom: 1.5rem; font-size: 0.72rem; padding: 0.2rem 0.65rem;">
+        <span class="sp-badge {% if student.placement_status == 'PLACED' %}sp-badge-green{% elif student.placement_status == 'INTERN' %}sp-badge-sky{% elif student.placement_status == 'PLACED_AND_INTERN' %}sp-badge-violet{% else %}sp-badge-gray{% endif %}" style="margin-bottom: 1.5rem; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.65rem; border: 1.5px solid #475569 !important;">
           {{ student.get_placement_status_display }}
         </span>
 
         <!-- Profile Strength & ATS -->
-        <div style="width: 100%; text-align: left; background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: var(--r-md); padding: 1rem; display: flex; flex-direction: column; gap: 0.85rem;">
+        <div style="width: 100%; text-align: left; background: #F8FAFC; border: 1.5px solid #475569; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.85rem;">
           
           <div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; font-size: 0.72rem;">
-              <span style="color: var(--txt-2);">Profile Strength</span>
-              <span style="color: #c4b5fd; font-weight: 600;">{{ student.profile_completion }}%</span>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; font-size: 0.78rem;">
+              <span style="color: #1E293B !important; font-weight: 700;">Profile Strength</span>
+              <span style="color: #32867D !important; font-weight: 800;">{{ student.profile_completion }}%</span>
             </div>
-            <div class="sp-bar-wrap" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 999px; overflow: hidden;">
-              <div class="sp-bar-fill bar-violet" style="width: {{ student.profile_completion }}%; height: 100%; background: var(--grad); border-radius: 999px;"></div>
+            <div class="sp-bar-wrap" style="height: 8px; background: #E2E8F0; border-radius: 999px; overflow: hidden;">
+              <div class="sp-bar-fill bar-violet" style="width: {{ student.profile_completion }}%; height: 100%; background: #32867D; border-radius: 999px;"></div>
             </div>
           </div>
 
-          <div style="border-top: 1px solid rgba(255,255,255,0.04); padding-top: 0.75rem;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; font-size: 0.72rem;">
-              <span style="color: var(--txt-2);">ATS Resume Score</span>
-              <span style="color: #38bdf8; font-weight: 600;">{{ student.ats_score }}/100</span>
+          <div style="border-top: 1.5px solid #CBD5E1; padding-top: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; font-size: 0.78rem;">
+              <span style="color: #1E293B !important; font-weight: 700;">ATS Resume Score</span>
+              <span style="color: #059669 !important; font-weight: 800;">{{ student.ats_score }}/100</span>
             </div>
-            <div class="sp-bar-wrap" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 999px; overflow: hidden;">
-              <div class="sp-bar-fill bar-sky" style="width: {{ student.ats_score }}%; height: 100%; background: linear-gradient(135deg, #06b6d4 0%, #38bdf8 100%); border-radius: 999px;"></div>
+            <div class="sp-bar-wrap" style="height: 8px; background: #E2E8F0; border-radius: 999px; overflow: hidden;">
+              <div class="sp-bar-fill bar-sky" style="width: {{ student.ats_score }}%; height: 100%; background: #059669; border-radius: 999px;"></div>
             </div>
           </div>
 
         </div>
 
         <!-- Resume Download/View button -->
-        <div style="width: 100%; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.25rem;">
+        <div style="width: 100%; margin-top: 1.5rem; border-top: 1.5px solid #CBD5E1; padding-top: 1.25rem;">
           {% if student.resume %}
-            <a href="{{ student.resume.url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <a href="{{ student.resume.url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; border: 1.5px solid #475569 !important;">
               📄 View Active Resume
             </a>
           {% else %}
-            <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="color: var(--amber); border-color: rgba(245,158,11,0.25); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="color: #D97706 !important; border: 1.5px solid #475569 !important; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
               ⚠️ Upload Resume
             </a>
           {% endif %}
@@ -96,17 +96,17 @@
   <div style="display: flex; flex-direction: column; gap: 1.5rem;">
 
     <!-- About Me -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">📝 About Me</span>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">📝 About Me</span>
       </div>
       <div class="sp-card-body" style="padding: 1.25rem;">
         {% if student.bio %}
-          <p style="font-size: 0.88rem; color: var(--txt-2); line-height: 1.6; white-space: pre-line; margin-bottom: 0;">
+          <p style="font-size: 0.88rem; color: #1E293B !important; font-weight: 600; line-height: 1.6; white-space: pre-line; margin-bottom: 0;">
             {{ student.bio }}
           </p>
         {% else %}
-          <p style="font-size: 0.825rem; color: var(--txt-3); font-style: italic; margin-bottom: 0;">
+          <p style="font-size: 0.825rem; color: #334155 !important; font-weight: 600; font-style: italic; margin-bottom: 0;">
             No bio added yet. Write a professional introduction in your edit profile tab.
           </p>
         {% endif %}
@@ -114,41 +114,41 @@
     </div>
 
     <!-- Personal Information -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">👤 Personal Information</span>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">👤 Personal Information</span>
       </div>
       <div class="sp-card-body" style="padding: 0;">
         <div class="sp-profile-info-card" style="border: none; padding: 0.5rem 1.25rem;">
           
-          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Full Name</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff; font-weight: 600;">{{ student.name }}</div>
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Full Name</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.name }}</div>
           </div>
 
-          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Email Address</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff;"><a href="mailto:{{ student.email }}" style="color: #a78bfa; text-decoration: none;">{{ student.email }}</a></div>
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Email Address</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;"><a href="mailto:{{ student.email }}" style="color: #32867D !important; text-decoration: underline;">{{ student.email }}</a></div>
           </div>
 
-          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Phone Number</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff;">{% if student.phone %}{{ student.phone }}{% else %}<span style="color: var(--txt-3); font-style: italic;">Not provided</span>{% endif %}</div>
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Phone Number</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{% if student.phone %}{{ student.phone }}{% else %}<span style="color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>{% endif %}</div>
           </div>
 
-          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Date of Birth</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff;">{% if student.date_of_birth %}{{ student.date_of_birth|date:"F d, Y" }}{% else %}<span style="color: var(--txt-3); font-style: italic;">Not provided</span>{% endif %}</div>
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Date of Birth</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{% if student.date_of_birth %}{{ student.date_of_birth|date:"F d, Y" }}{% else %}<span style="color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>{% endif %}</div>
           </div>
 
-          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Gender</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff;">{% if student.gender %}{{ student.gender }}{% else %}<span style="color: var(--txt-3); font-style: italic;">Not provided</span>{% endif %}</div>
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Gender</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{% if student.gender %}{{ student.gender }}{% else %}<span style="color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>{% endif %}</div>
           </div>
 
           <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border: none;">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Contact Address</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff; text-align: right; max-width: 320px; word-break: break-word;">{% if student.address %}{{ student.address }}{% else %}<span style="color: var(--txt-3); font-style: italic;">Not provided</span>{% endif %}</div>
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Contact Address</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800; text-align: right; max-width: 320px; word-break: break-word;">{% if student.address %}{{ student.address }}{% else %}<span style="color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>{% endif %}</div>
           </div>
 
         </div>
@@ -156,45 +156,45 @@
     </div>
 
     <!-- Social Profiles -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">🌐 Social &amp; Coding Profiles</span>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">🌐 Social &amp; Coding Profiles</span>
       </div>
       <div class="sp-card-body" style="padding: 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
         
-        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: var(--r-md); padding: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.8rem; font-weight: 600; color: var(--txt-2);">GitHub</span>
+        <div style="background: #F8FAFC; border: 1.5px solid #475569; border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.82rem; font-weight: 800; color: #0F172A !important;">GitHub</span>
           {% if student.github_url %}
-            <a href="{{ student.github_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs">View Profile</a>
+            <a href="{{ student.github_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs" style="border: 1.5px solid #475569 !important;">View Profile</a>
           {% else %}
-            <span style="font-size: 0.72rem; color: var(--txt-3); font-style: italic;">Not provided</span>
+            <span style="font-size: 0.75rem; color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>
           {% endif %}
         </div>
 
-        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: var(--r-md); padding: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.8rem; font-weight: 600; color: var(--txt-2);">LinkedIn</span>
+        <div style="background: #F8FAFC; border: 1.5px solid #475569; border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.82rem; font-weight: 800; color: #0F172A !important;">LinkedIn</span>
           {% if student.linkedin_url %}
-            <a href="{{ student.linkedin_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs" style="border-color: rgba(59,130,246,0.2); color: #60a5fa;">View Profile</a>
+            <a href="{{ student.linkedin_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs" style="border: 1.5px solid #475569 !important; color: #2563EB !important;">View Profile</a>
           {% else %}
-            <span style="font-size: 0.72rem; color: var(--txt-3); font-style: italic;">Not provided</span>
+            <span style="font-size: 0.75rem; color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>
           {% endif %}
         </div>
 
-        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: var(--r-md); padding: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.8rem; font-weight: 600; color: var(--txt-2);">Portfolio</span>
+        <div style="background: #F8FAFC; border: 1.5px solid #475569; border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.82rem; font-weight: 800; color: #0F172A !important;">Portfolio</span>
           {% if student.portfolio_url %}
-            <a href="{{ student.portfolio_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs">View Website</a>
+            <a href="{{ student.portfolio_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs" style="border: 1.5px solid #475569 !important;">View Website</a>
           {% else %}
-            <span style="font-size: 0.72rem; color: var(--txt-3); font-style: italic;">Not provided</span>
+            <span style="font-size: 0.75rem; color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>
           {% endif %}
         </div>
 
-        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); border-radius: var(--r-md); padding: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.8rem; font-weight: 600; color: var(--txt-2);">LeetCode</span>
+        <div style="background: #F8FAFC; border: 1.5px solid #475569; border-radius: 8px; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.82rem; font-weight: 800; color: #0F172A !important;">LeetCode</span>
           {% if student.leetcode_url %}
-            <a href="{{ student.leetcode_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs" style="border-color: rgba(245,158,11,0.25); color: #fcd34d;">View Profile</a>
+            <a href="{{ student.leetcode_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs" style="border: 1.5px solid #475569 !important; color: #D97706 !important;">View Profile</a>
           {% else %}
-            <span style="font-size: 0.72rem; color: var(--txt-3); font-style: italic;">Not provided</span>
+            <span style="font-size: 0.75rem; color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>
           {% endif %}
         </div>
 
@@ -202,26 +202,26 @@
     </div>
 
     <!-- Career Preferences -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">💼 Career Preferences</span>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">💼 Career Preferences</span>
       </div>
       <div class="sp-card-body" style="padding: 0;">
         <div class="sp-profile-info-card" style="border: none; padding: 0.5rem 1.25rem;">
           
-          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Preferred Job Role</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff; font-weight: 600;">{% if student.preferred_job_role %}{{ student.preferred_job_role }}{% else %}<span style="color: var(--txt-3); font-style: italic;">Not provided</span>{% endif %}</div>
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Preferred Job Role</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{% if student.preferred_job_role %}{{ student.preferred_job_role }}{% else %}<span style="color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>{% endif %}</div>
           </div>
 
-          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Preferred Location</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff; font-weight: 600;">{% if student.preferred_work_location %}{{ student.preferred_work_location }}{% else %}<span style="color: var(--txt-3); font-style: italic;">Not provided</span>{% endif %}</div>
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Preferred Location</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{% if student.preferred_work_location %}{{ student.preferred_work_location }}{% else %}<span style="color: #334155 !important; font-style: italic; font-weight: 600;">Not provided</span>{% endif %}</div>
           </div>
 
           <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border: none;">
-            <div class="sp-info-label" style="font-size: 0.82rem; color: var(--txt-3); font-weight: 500;">Higher Studies Plan</div>
-            <div class="sp-info-value" style="font-size: 0.85rem; color: #fff;">{% if student.higher_studies %}{{ student.higher_studies }}{% else %}<span style="color: var(--txt-3); font-style: italic;">Not planned</span>{% endif %}</div>
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Higher Studies Plan</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{% if student.higher_studies %}{{ student.higher_studies }}{% else %}<span style="color: #334155 !important; font-style: italic; font-weight: 600;">Not planned</span>{% endif %}</div>
           </div>
 
         </div>

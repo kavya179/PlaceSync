@@ -22,7 +22,7 @@
   </div>
   {% if is_recruiter %}
   <div class="sp-page-actions">
-    <span class="sp-badge sp-badge-violet" style="font-size:0.82rem; font-weight:800; padding:0.4rem 0.8rem;">
+    <span class="sp-badge sp-badge-violet" style="font-size:0.85rem; font-weight:800; padding:0.45rem 0.9rem;">
       Level: {{ growth_level }}
     </span>
   </div>
@@ -32,101 +32,100 @@
 <!-- ══════════════════════════════════════════════════
      Dashboard Stat Cards
 ════════════════════════════════════════════════════ -->
-<div class="sp-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.75rem; gap: 0.75rem;">
+<div class="sp-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.25rem; gap: 0.85rem;">
   
   <!-- Streaks & Consistency -->
-  <div class="sp-stat" style="padding: 1rem; min-height: 100px; background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(124,58,237,0.1) 100%);">
-    <div class="sp-stat-icon si-v" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem;">🔥</div>
-    <div class="sp-stat-label" style="font-size: 0.65rem; margin-bottom: 0.15rem;">Current Streak</div>
-    <div class="sp-stat-value" style="font-size: 1.45rem;">{{ current_streak }} <span style="font-size: 0.72rem; color: var(--txt-3); font-weight: 500;">days</span></div>
+  <div class="sp-stat" style="padding: 1rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-v" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; color:#475569 !important;">🔥</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#475569 !important; font-weight:800; margin-bottom: 0.15rem;">Current Streak</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#475569 !important; font-weight:800;">{{ current_streak }} <span style="font-size: 0.78rem; color: #475569 !important; font-weight: 700;">days</span></div>
   </div>
 
-  <div class="sp-stat" style="padding: 1rem; min-height: 100px;">
-    <div class="sp-stat-icon si-g" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem;">⚡</div>
-    <div class="sp-stat-label" style="font-size: 0.65rem; margin-bottom: 0.15rem;">Longest Streak</div>
-    <div class="sp-stat-value" style="font-size: 1.45rem;">{{ longest_streak }} <span style="font-size: 0.72rem; color: var(--txt-3); font-weight: 500;">days</span></div>
+  <div class="sp-stat" style="padding: 1rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-g" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; color:#475569 !important;">⚡</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#475569 !important; font-weight:800; margin-bottom: 0.15rem;">Longest Streak</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#475569 !important; font-weight:800;">{{ longest_streak }} <span style="font-size: 0.78rem; color: #475569 !important; font-weight: 700;">days</span></div>
   </div>
 
-  <div class="sp-stat" style="padding: 1rem; min-height: 100px; background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(5,150,105,0.1) 100%);">
-    <div class="sp-stat-icon si-s" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem;">🎯</div>
-    <div class="sp-stat-label" style="font-size: 0.65rem; margin-bottom: 0.15rem;">Consistency Score</div>
-    <div class="sp-stat-value" style="font-size: 1.45rem;">{{ consistency_score }}<span style="font-size: 0.72rem; color: var(--txt-3); font-weight: 500;">%</span></div>
+  <div class="sp-stat" style="padding: 1rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-s" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; color:#475569 !important;">🎯</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#475569 !important; font-weight:800; margin-bottom: 0.15rem;">Consistency Score</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#475569 !important; font-weight:800;">{{ consistency_score }}<span style="font-size: 0.78rem; color: #475569 !important; font-weight: 700;">%</span></div>
   </div>
 
-  <div class="sp-stat" style="padding: 1rem; min-height: 100px;">
-    <div class="sp-stat-icon si-a" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem;">⏳</div>
-    <div class="sp-stat-label" style="font-size: 0.65rem; margin-bottom: 0.15rem;">Learning Hours</div>
-    <div class="sp-stat-value" style="font-size: 1.45rem;">{{ learning_hours|floatformat:1 }} <span style="font-size: 0.72rem; color: var(--txt-3); font-weight: 500;">hrs</span></div>
-  </div>
-
-</div>
-
-<div class="sp-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem; gap: 0.75rem;">
-
-  <div class="sp-stat" style="padding: 1rem; min-height: 100px;">
-    <div class="sp-stat-icon si-t" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem;">📅</div>
-    <div class="sp-stat-label" style="font-size: 0.65rem; margin-bottom: 0.15rem;">Activities This Year</div>
-    <div class="sp-stat-value" style="font-size: 1.45rem;">{{ activities_this_year }}</div>
-  </div>
-
-  <div class="sp-stat" style="padding: 1rem; min-height: 100px;">
-    <div class="sp-stat-icon si-v" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem;">📊</div>
-    <div class="sp-stat-label" style="font-size: 0.65rem; margin-bottom: 0.15rem;">Weekly summaries</div>
-    <div class="sp-stat-value" style="font-size: 1.45rem;">{{ weekly_updates }}</div>
-  </div>
-
-  <div class="sp-stat" style="padding: 1rem; min-height: 100px;">
-    <div class="sp-stat-icon si-g" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem;">🏆</div>
-    <div class="sp-stat-label" style="font-size: 0.65rem; margin-bottom: 0.15rem;">Hackathons Logged</div>
-    <div class="sp-stat-value" style="font-size: 1.45rem;">{{ hackathons_count }}</div>
-  </div>
-
-  <div class="sp-stat" style="padding: 1rem; min-height: 100px;">
-    <div class="sp-stat-icon si-s" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem;">💯</div>
-    <div class="sp-stat-label" style="font-size: 0.65rem; margin-bottom: 0.15rem;">Practice Problems</div>
-    <div class="sp-stat-value" style="font-size: 1.45rem;">{{ problems_solved }}</div>
+  <div class="sp-stat" style="padding: 1rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-a" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; color:#475569 !important;">⏳</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#475569 !important; font-weight:800; margin-bottom: 0.15rem;">Learning Hours</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#475569 !important; font-weight:800;">{{ learning_hours|floatformat:1 }} <span style="font-size: 0.78rem; color: #475569 !important; font-weight: 700;">hrs</span></div>
   </div>
 
 </div>
 
+<div class="sp-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.75rem; gap: 0.85rem;">
+
+  <div class="sp-stat" style="padding: 1rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-t" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; color:#475569 !important;">📅</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#475569 !important; font-weight:800; margin-bottom: 0.15rem;">Activities This Year</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#475569 !important; font-weight:800;">{{ activities_this_year }}</div>
+  </div>
+
+  <div class="sp-stat" style="padding: 1rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-v" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; color:#475569 !important;">📊</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#475569 !important; font-weight:800; margin-bottom: 0.15rem;">Weekly Summaries</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#475569 !important; font-weight:800;">{{ weekly_updates }}</div>
+  </div>
+
+  <div class="sp-stat" style="padding: 1rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-g" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; color:#475569 !important;">🏆</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#475569 !important; font-weight:800; margin-bottom: 0.15rem;">Hackathons Logged</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#475569 !important; font-weight:800;">{{ hackathons_count }}</div>
+  </div>
+
+  <div class="sp-stat" style="padding: 1rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-s" style="font-size: 1rem; width: 32px; height: 32px; margin-bottom: 0.4rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; color:#475569 !important;">💯</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#475569 !important; font-weight:800; margin-bottom: 0.15rem;">Practice Problems</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#475569 !important; font-weight:800;">{{ problems_solved }}</div>
+  </div>
+
+</div>
 
 <!-- ══════════════════════════════════════════════════
      GROWTH HEATMAP SECTION (GitHub Style)
 ════════════════════════════════════════════════════ -->
-<div class="sp-card" style="margin-bottom: 2rem;">
-  <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center; padding:1.125rem 1.5rem;">
-    <span class="sp-card-title">📈 Coding Consistency Heatmap</span>
-    <span style="font-size:0.75rem; color:var(--txt-3);">Each grid cell represents one day. Click a cell to view activities of that day.</span>
+<div class="sp-card" style="margin-bottom: 2rem; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+  <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center; padding:1.125rem 1.5rem; background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+    <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">📈 Coding Consistency Heatmap</span>
+    <span style="font-size:0.78rem; color:#334155 !important; font-weight:700;">Each grid cell represents one day. Click a cell to view activities of that day.</span>
   </div>
   <div class="sp-card-body" style="padding:1.5rem; overflow-x:auto;">
 
     <!-- YEAR FILTER + SINGLE HEATMAP -->
-    <h4 style="font-family:'Space Grotesk',sans-serif; font-size:0.9rem; color:#fff; margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+    <h4 style="font-family:'Space Grotesk',sans-serif; font-size:0.95rem; color:#0F172A !important; font-weight:800; margin-bottom:0.85rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
       <span style="display:flex; align-items:center; gap:0.5rem;">
         Calendar Year:
         <form method="get" style="display:inline-block;" id="year-filter-form">
           {% if date_filter %}<input type="hidden" name="date" value="{{ date_filter }}">{% endif %}
           {% if category_filter %}<input type="hidden" name="category" value="{{ category_filter }}">{% endif %}
           <select name="year" onchange="document.getElementById('year-filter-form').submit();"
-                  style="background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:0.25rem 0.6rem; font-size:0.85rem; font-family:'Space Grotesk',sans-serif; cursor:pointer;">
+                  class="sp-form-control" style="padding:0.25rem 0.6rem; font-size:0.85rem; font-weight:800; cursor:pointer;">
             {% for yr in available_years %}
             <option value="{{ yr }}" {% if yr == selected_year %}selected{% endif %}>{{ yr }}</option>
             {% endfor %}
           </select>
         </form>
       </span>
-      <span style="font-size:0.75rem; font-weight:normal; color:var(--txt-3);">Total Activities: {{ selected_year_activity_count }}</span>
+      <span style="font-size:0.8rem; font-weight:700; color:#334155 !important;">Total Activities: {{ selected_year_activity_count }}</span>
     </h4>
 
-    <div style="display: flex; gap: 3px; overflow-x: auto; padding-bottom: 0.5rem; scrollbar-width: thin;">
+    <div style="display: flex; gap: 4px; overflow-x: auto; padding: 0.5rem 0.25rem 0.75rem; scrollbar-width: thin;">
       {% for column in heatmap_cols %}
-      <div style="display: flex; flex-direction: column; gap: 3px;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
         {% for day in column %}
         <a href="?date={{ day.date|date:'Y-m-d' }}&year={{ selected_year }}{% if category_filter %}&category={{ category_filter }}{% endif %}" 
            title="{% if day.count > 0 %}{{ day.count }} activities{% else %}No activities{% endif %} on {{ day.date|date:'M d, Y' }}"
-           style="width: 11px; height: 11px; border-radius: 2px; background: {{ day.color }}; display: block; border: 1px solid rgba(0,0,0,0.15); transition: transform 0.1s;"
-           onmouseover="this.style.transform='scale(1.25)'; this.style.zIndex='10';"
-           onmouseout="this.style.transform='none';">
+           style="width: 13px; height: 13px; border-radius: 3px; background: {{ day.color }}; display: block; border: 1.5px solid {% if day.count == 0 %}#CBD5E1{% else %}#1B4D27{% endif %} !important; transition: transform 0.15s, box-shadow 0.15s;"
+           onmouseover="this.style.transform='scale(1.4)'; this.style.zIndex='10'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.25)';"
+           onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
         </a>
         {% endfor %}
       </div>
@@ -134,27 +133,26 @@
     </div>
 
     <!-- Heatmap Legend -->
-    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:var(--txt-3); margin-top:1rem; padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.03);">
+    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:#334155 !important; font-weight:700; margin-top:1rem; padding-top:0.75rem; border-top:1.5px solid #CBD5E1;">
       <div>
         {% if date_filter %}
-        <span style="color:var(--v1); font-weight:700;">⚠️ Showing activities for {{ date_filter }} only.</span>
-        <a href="?year={{ selected_year }}{% if category_filter %}&category={{ category_filter }}{% endif %}" style="color:#fff; text-decoration:underline; margin-left:0.5rem;">Clear date filter</a>
+        <span style="color:#DC2626 !important; font-weight:800;">⚠️ Showing activities for {{ date_filter }} only.</span>
+        <a href="?year={{ selected_year }}{% if category_filter %}&category={{ category_filter }}{% endif %}" style="color:#32867D !important; text-decoration:underline; font-weight:800; margin-left:0.5rem;">Clear date filter</a>
         {% endif %}
       </div>
-      <div style="display:flex; align-items:center; gap:0.25rem;">
-        <span>Less</span>
-        <span style="width:10px; height:10px; border-radius:1px; background:rgba(255,255,255,0.05); display:inline-block;"></span>
-        <span style="width:10px; height:10px; border-radius:1px; background:#4c1d95; display:inline-block;"></span>
-        <span style="width:10px; height:10px; border-radius:1px; background:#6d28d9; display:inline-block;"></span>
-        <span style="width:10px; height:10px; border-radius:1px; background:#8b5cf6; display:inline-block;"></span>
-        <span style="width:10px; height:10px; border-radius:1px; background:#c4b5fd; display:inline-block;"></span>
-        <span>More</span>
+      <div style="display:flex; align-items:center; gap:0.4rem;">
+        <span style="color:#0F172A !important; font-weight:800;">Less</span>
+        <span style="width:12px; height:12px; border-radius:2.5px; background:#E2E8F0; display:inline-block; border:1.5px solid #CBD5E1;" title="0 activities"></span>
+        <span style="width:12px; height:12px; border-radius:2.5px; background:#9BE9A8; display:inline-block; border:1.5px solid #40C463;" title="1-2 activities"></span>
+        <span style="width:12px; height:12px; border-radius:2.5px; background:#40C463; display:inline-block; border:1.5px solid #30A14E;" title="3-4 activities"></span>
+        <span style="width:12px; height:12px; border-radius:2.5px; background:#30A14E; display:inline-block; border:1.5px solid #216E39;" title="5-6 activities"></span>
+        <span style="width:12px; height:12px; border-radius:2.5px; background:#216E39; display:inline-block; border:1.5px solid #144422;" title="7+ activities"></span>
+        <span style="color:#0F172A !important; font-weight:800;">More</span>
       </div>
     </div>
 
   </div>
 </div>
-
 
 <!-- ══════════════════════════════════════════════════
      MAIN VIEWPORT: TWO COLUMN LAYOUT
@@ -166,25 +164,25 @@
     
     <!-- Timeline Actions and Filters Header -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
-      <h3 style="font-family:'Space Grotesk',sans-serif; color:#fff; font-size:1.25rem; font-weight:700; margin-bottom:0;">
+      <h3 style="font-family:'Space Grotesk',sans-serif; color:#0F172A !important; font-size:1.25rem; font-weight:800; margin-bottom:0;">
         🕒 Growth Timeline
       </h3>
       
       {% if not is_recruiter %}
       <!-- CSS dropdown-only add menu -->
       <div class="add-dropdown-container" style="position:relative; display:inline-block;">
-        <span class="sp-btn sp-btn-primary" style="cursor:pointer; display:flex; align-items:center; gap:0.25rem;">
+        <span class="sp-btn sp-btn-primary" style="cursor:pointer; display:flex; align-items:center; gap:0.25rem; font-weight:800;">
           ➕ Add Journal Log <span style="font-size:0.6rem;">▼</span>
         </span>
-        <div class="add-dropdown-content" style="display:none; position:absolute; right:0; top:36px; background:#100e2b; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:200; width:220px; overflow:hidden;">
-          <a href="{% url 'student_portal:journey_add' 'daily_log' %}" style="display:block; padding:0.65rem 1rem; color:#fff; text-decoration:none; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.03); transition:var(--t);" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='none';">✍️ Daily Log</a>
-          <a href="{% url 'student_portal:journey_add' 'weekly_summary' %}" style="display:block; padding:0.65rem 1rem; color:#fff; text-decoration:none; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.03); transition:var(--t);" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='none';">📊 Weekly Summary</a>
-          <a href="{% url 'student_portal:journey_add' 'monthly_summary' %}" style="display:block; padding:0.65rem 1rem; color:#fff; text-decoration:none; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.03); transition:var(--t);" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='none';">📅 Monthly Summary</a>
-          <a href="{% url 'student_portal:journey_add' 'coding_practice' %}" style="display:block; padding:0.65rem 1rem; color:#fff; text-decoration:none; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.03); transition:var(--t);" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='none';">💻 Coding Practice</a>
-          <a href="{% url 'student_portal:journey_add' 'project_milestone' %}" style="display:block; padding:0.65rem 1rem; color:#fff; text-decoration:none; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.03); transition:var(--t);" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='none';">🔨 Project Milestone</a>
-          <a href="{% url 'student_portal:journey_add' 'hackathon' %}" style="display:block; padding:0.65rem 1rem; color:#fff; text-decoration:none; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.03); transition:var(--t);" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='none';">🏆 Hackathon Journal</a>
-          <a href="{% url 'student_portal:journey_add' 'learning_journal' %}" style="display:block; padding:0.65rem 1rem; color:#fff; text-decoration:none; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.03); transition:var(--t);" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='none';">📖 Learning Journal</a>
-          <a href="{% url 'student_portal:journey_add' 'open_source' %}" style="display:block; padding:0.65rem 1rem; color:#fff; text-decoration:none; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.03); transition:var(--t);" onmouseover="this.style.background='var(--border)';" onmouseout="this.style.background='none';">🐙 Open Source</a>
+        <div class="add-dropdown-content" style="display:none; position:absolute; right:0; top:36px; background:#FFFFFF; border:1.5px solid #475569; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.15); z-index:200; width:220px; overflow:hidden;">
+          <a href="{% url 'student_portal:journey_add' 'daily_log' %}" style="display:block; padding:0.65rem 1rem; color:#0F172A !important; text-decoration:none; font-size:0.84rem; font-weight:800; border-bottom:1px solid #E2E8F0;" onmouseover="this.style.background='#F8FAFC';" onmouseout="this.style.background='none';">✍️ Daily Log</a>
+          <a href="{% url 'student_portal:journey_add' 'weekly_summary' %}" style="display:block; padding:0.65rem 1rem; color:#0F172A !important; text-decoration:none; font-size:0.84rem; font-weight:800; border-bottom:1px solid #E2E8F0;" onmouseover="this.style.background='#F8FAFC';" onmouseout="this.style.background='none';">📊 Weekly Summary</a>
+          <a href="{% url 'student_portal:journey_add' 'monthly_summary' %}" style="display:block; padding:0.65rem 1rem; color:#0F172A !important; text-decoration:none; font-size:0.84rem; font-weight:800; border-bottom:1px solid #E2E8F0;" onmouseover="this.style.background='#F8FAFC';" onmouseout="this.style.background='none';">📅 Monthly Summary</a>
+          <a href="{% url 'student_portal:journey_add' 'coding_practice' %}" style="display:block; padding:0.65rem 1rem; color:#0F172A !important; text-decoration:none; font-size:0.84rem; font-weight:800; border-bottom:1px solid #E2E8F0;" onmouseover="this.style.background='#F8FAFC';" onmouseout="this.style.background='none';">💻 Coding Practice</a>
+          <a href="{% url 'student_portal:journey_add' 'project_milestone' %}" style="display:block; padding:0.65rem 1rem; color:#0F172A !important; text-decoration:none; font-size:0.84rem; font-weight:800; border-bottom:1px solid #E2E8F0;" onmouseover="this.style.background='#F8FAFC';" onmouseout="this.style.background='none';">🔨 Project Milestone</a>
+          <a href="{% url 'student_portal:journey_add' 'hackathon' %}" style="display:block; padding:0.65rem 1rem; color:#0F172A !important; text-decoration:none; font-size:0.84rem; font-weight:800; border-bottom:1px solid #E2E8F0;" onmouseover="this.style.background='#F8FAFC';" onmouseout="this.style.background='none';">🏆 Hackathon Journal</a>
+          <a href="{% url 'student_portal:journey_add' 'learning_journal' %}" style="display:block; padding:0.65rem 1rem; color:#0F172A !important; text-decoration:none; font-size:0.84rem; font-weight:800; border-bottom:1px solid #E2E8F0;" onmouseover="this.style.background='#F8FAFC';" onmouseout="this.style.background='none';">📖 Learning Journal</a>
+          <a href="{% url 'student_portal:journey_add' 'open_source' %}" style="display:block; padding:0.65rem 1rem; color:#0F172A !important; text-decoration:none; font-size:0.84rem; font-weight:800;" onmouseover="this.style.background='#F8FAFC';" onmouseout="this.style.background='none';">🐙 Open Source</a>
         </div>
         <style>
           .add-dropdown-container:hover .add-dropdown-content { display: block !important; }
@@ -194,12 +192,12 @@
     </div>
 
     <!-- Category Filters -->
-    <div style="display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:1rem;">
-      <a href="?year={{ selected_year }}{% if date_filter %}&date={{ date_filter }}{% endif %}" class="sp-badge {% if not category_filter %}sp-badge-indigo{% else %}sp-badge-gray{% endif %}" style="text-decoration:none; font-size:0.72rem; padding:0.25rem 0.6rem;">
+    <div style="display:flex; flex-wrap:wrap; gap:0.45rem; margin-bottom:1.5rem; border-bottom:1.5px solid #CBD5E1; padding-bottom:1rem;">
+      <a href="?year={{ selected_year }}{% if date_filter %}&date={{ date_filter }}{% endif %}" class="sp-badge {% if not category_filter %}sp-badge-violet{% else %}sp-badge-gray{% endif %}" style="text-decoration:none;">
         All Categories
       </a>
       {% for cat_val, cat_lbl in categories %}
-      <a href="?category={{ cat_val }}&year={{ selected_year }}{% if date_filter %}&date={{ date_filter }}{% endif %}" class="sp-badge {% if category_filter == cat_val %}sp-badge-indigo{% else %}sp-badge-gray{% endif %}" style="text-decoration:none; font-size:0.72rem; padding:0.25rem 0.6rem;">
+      <a href="?category={{ cat_val }}&year={{ selected_year }}{% if date_filter %}&date={{ date_filter }}{% endif %}" class="sp-badge {% if category_filter == cat_val %}sp-badge-violet{% else %}sp-badge-gray{% endif %}" style="text-decoration:none;">
         {{ cat_lbl }}
       </a>
       {% endfor %}
@@ -207,75 +205,73 @@
 
     <!-- TIMELINE LISTING -->
     {% if activities %}
-    <div style="position:relative; padding-left:1.5rem; border-left:2px solid var(--border); display:flex; flex-direction:column; gap:1.5rem;">
+    <div style="position:relative; padding-left:1.5rem; border-left:2.5px solid #475569; display:flex; flex-direction:column; gap:1.5rem;">
       {% for act in activities %}
       
       <!-- Individual Timeline Item -->
       <div style="position:relative;">
         
         <!-- Timeline bullet icon -->
-        <div style="position:absolute; left:-32px; top:4px; width:16px; height:16px; border-radius:50%; border:3px solid var(--body-bg); background:{% if act.status == 'COMPLETED' %}var(--green){% else %}var(--sky){% endif %}; z-index:10; box-shadow:0 0 0 2px var(--border);"></div>
+        <div style="position:absolute; left:-32px; top:12px; width:16px; height:16px; border-radius:50%; border:3px solid #C5DFD9; background:{% if act.status == 'COMPLETED' %}#059669{% else %}#0284C7{% endif %}; z-index:10;"></div>
 
-        <div class="sp-card" style="transition:var(--t); border-left:3px solid {% if act.status == 'COMPLETED' %}var(--green){% else %}var(--sky){% endif %};"
-             onmouseover="this.style.boxShadow='0 8px 24px rgba(0,0,0,0.3)';"
-             onmouseout="this.style.boxShadow='none';">
+        <div class="sp-card" style="transition:var(--t); border:1.5px solid #475569 !important; background:#FFFFFF !important; border-left:5px solid {% if act.status == 'COMPLETED' %}#059669{% else %}#0284C7{% endif %} !important;">
           <div class="sp-card-body" style="padding:1.25rem;">
             
             <!-- Metadata Header -->
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem; flex-wrap:wrap; gap:0.5rem;">
               <div>
-                <span class="sp-badge sp-badge-violet" style="font-size:0.62rem; font-weight:700; margin-right:0.4rem; padding:0.1rem 0.4rem;">
+                <span class="sp-badge sp-badge-violet">
                   {{ act.get_activity_type_display }}
                 </span>
-                <span class="sp-badge sp-badge-indigo" style="font-size:0.62rem; font-weight:700; padding:0.1rem 0.4rem;">
+                <span class="sp-badge sp-badge-sky">
                   {{ act.get_category_display }}
                 </span>
               </div>
               <div style="display:flex; align-items:center; gap:0.5rem;">
-                <span style="font-size:0.75rem; color:var(--txt-3); font-weight:500;">📅 {{ act.date|date:"F d, Y" }}</span>
+                <span style="font-size:0.8rem; color:#334155 !important; font-weight:700;">📅 {{ act.date|date:"F d, Y" }}</span>
                 {% if act.hours_spent > 0 %}
-                <span class="sp-badge sp-badge-sky" style="font-size:0.65rem; padding:0.1rem 0.4rem;">⏱️ {{ act.hours_spent|floatformat:1 }} hrs</span>
+                <span class="sp-badge sp-badge-sky">⏱️ {{ act.hours_spent|floatformat:1 }} hrs</span>
                 {% endif %}
               </div>
             </div>
 
             <!-- Title & Description -->
-            <h4 style="font-family:'Space Grotesk',sans-serif; color:#fff; font-size:1.05rem; font-weight:700; margin-bottom:0.5rem; display:flex; align-items:center; justify-content:space-between;">
+            <h4 style="font-family:'Space Grotesk',sans-serif; color:#0F172A !important; font-size:1.1rem; font-weight:800; margin-bottom:0.5rem; display:flex; align-items:center; justify-content:space-between;">
               <span>{{ act.title }}</span>
-              <span style="font-size:0.72rem; font-weight:normal;">
+              <span style="font-size:0.78rem; font-weight:700;">
                 {% if act.status == 'COMPLETED' %}
-                <span style="color:var(--green); font-weight:600;">✔️ Completed</span>
+                <span style="color:#059669 !important; font-weight:800;">✅ Completed</span>
                 {% else %}
-                <span style="color:var(--sky); font-weight:600;">⏳ In Progress</span>
+                <span style="color:#0284C7 !important; font-weight:800;">⏳ In Progress</span>
                 {% endif %}
               </span>
             </h4>
 
-            <p style="font-size:0.86rem; color:var(--txt-2); line-height:1.6; white-space:pre-line; margin-bottom:0.75rem;">
+            <p style="font-size:0.88rem; color:#1E293B !important; font-weight:600; line-height:1.6; white-space:pre-line; margin-bottom:0.75rem;">
               {{ act.description }}
             </p>
 
             <!-- Tech Badges & Project links -->
-            <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid rgba(255,255,255,0.03); padding-top:0.75rem; flex-wrap:wrap; gap:0.75rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1.5px solid #CBD5E1; padding-top:0.75rem; flex-wrap:wrap; gap:0.75rem;">
               
               <div>
                 {% if act.technology_badges %}
-                <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">
+                <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
                   {% for badge in act.technology_badges %}
-                  <span class="sp-badge {{ badge.class }}" style="font-size:0.62rem; padding:0.1rem 0.35rem;">{{ badge.name }}</span>
+                  <span class="sp-badge {{ badge.class }}">{{ badge.name }}</span>
                   {% endfor %}
                 </div>
                 {% endif %}
                 
                 {% if act.related_project %}
-                <div style="margin-top:0.4rem; font-size:0.75rem; color:var(--txt-2);">
-                  🛠️ Project: <a href="{% url 'student_portal:project_detail' act.related_project.pk %}" style="color:#a78bfa; text-decoration:none; font-weight:600;">{{ act.related_project.title }}</a>
+                <div style="margin-top:0.4rem; font-size:0.8rem; color:#334155 !important; font-weight:700;">
+                  🛠️ Project: <a href="{% url 'student_portal:project_detail' act.related_project.pk %}" style="color:#32867D !important; text-decoration:none; font-weight:800;">{{ act.related_project.title }}</a>
                 </div>
                 {% endif %}
                 
                 {% if act.attachment %}
-                <div style="margin-top:0.4rem; font-size:0.75rem;">
-                  📎 Attachment: <a href="{{ act.attachment.url }}" target="_blank" style="color:#60a5fa; text-decoration:none; font-weight:600;">Download / View File</a>
+                <div style="margin-top:0.4rem; font-size:0.8rem;">
+                  📎 Attachment: <a href="{{ act.attachment.url }}" target="_blank" style="color:#0284C7 !important; text-decoration:none; font-weight:800;">Download / View File</a>
                 </div>
                 {% endif %}
               </div>
@@ -283,40 +279,38 @@
               <!-- Controls (Only shown for student OWNER) -->
               {% if not is_recruiter %}
               <div style="display:flex; gap:0.5rem; align-items:center;">
-                <!-- We map activity model structure back to its form mapping key -->
                 {% if act.activity_type == 'DAILY_LOG' %}
-                  <a href="{% url 'student_portal:journey_edit' 'daily_log' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                  <a href="{% url 'student_portal:journey_delete' 'daily_log' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';">🗑 Delete</a>
+                  <a href="{% url 'student_portal:journey_edit' 'daily_log' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                  <a href="{% url 'student_portal:journey_delete' 'daily_log' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                 {% elif act.content_object %}
                   {% if act.activity_type == 'WEEKLY_SUMMARY' %}
-                    <a href="{% url 'student_portal:journey_edit' 'weekly_summary' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                    <a href="{% url 'student_portal:journey_delete' 'weekly_summary' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                    <a href="{% url 'student_portal:journey_edit' 'weekly_summary' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                    <a href="{% url 'student_portal:journey_delete' 'weekly_summary' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                   {% elif act.activity_type == 'MONTHLY_SUMMARY' %}
-                    <a href="{% url 'student_portal:journey_edit' 'monthly_summary' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                    <a href="{% url 'student_portal:journey_delete' 'monthly_summary' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                    <a href="{% url 'student_portal:journey_edit' 'monthly_summary' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                    <a href="{% url 'student_portal:journey_delete' 'monthly_summary' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                   {% elif act.activity_type == 'PROJECT_MILESTONE' %}
-                    <a href="{% url 'student_portal:journey_edit' 'project_milestone' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                    <a href="{% url 'student_portal:journey_delete' 'project_milestone' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                    <a href="{% url 'student_portal:journey_edit' 'project_milestone' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                    <a href="{% url 'student_portal:journey_delete' 'project_milestone' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                   {% elif act.activity_type == 'HACKATHON' %}
-                    <a href="{% url 'student_portal:journey_edit' 'hackathon' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                    <a href="{% url 'student_portal:journey_delete' 'hackathon' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                    <a href="{% url 'student_portal:journey_edit' 'hackathon' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                    <a href="{% url 'student_portal:journey_delete' 'hackathon' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                   {% elif act.activity_type == 'CODING_PRACTICE' %}
-                    <a href="{% url 'student_portal:journey_edit' 'coding_practice' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                    <a href="{% url 'student_portal:journey_delete' 'coding_practice' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                    <a href="{% url 'student_portal:journey_edit' 'coding_practice' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                    <a href="{% url 'student_portal:journey_delete' 'coding_practice' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                   {% elif act.activity_type == 'LEARNING_JOURNAL' %}
-                    <a href="{% url 'student_portal:journey_edit' 'learning_journal' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                    <a href="{% url 'student_portal:journey_delete' 'learning_journal' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                    <a href="{% url 'student_portal:journey_edit' 'learning_journal' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                    <a href="{% url 'student_portal:journey_delete' 'learning_journal' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                   {% elif act.activity_type == 'OPEN_SOURCE' %}
-                    <a href="{% url 'student_portal:journey_edit' 'open_source' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                    <a href="{% url 'student_portal:journey_delete' 'open_source' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                    <a href="{% url 'student_portal:journey_edit' 'open_source' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                    <a href="{% url 'student_portal:journey_delete' 'open_source' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                   {% elif act.activity_type == 'ACHIEVEMENT' %}
-                    <a href="{% url 'student_portal:journey_edit' 'achievement' act.content_object.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                    <a href="{% url 'student_portal:journey_delete' 'achievement' act.content_object.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                    <a href="{% url 'student_portal:journey_edit' 'achievement' act.content_object.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                    <a href="{% url 'student_portal:journey_delete' 'achievement' act.content_object.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                   {% endif %}
                 {% else %}
-                  <!-- If it's a generic activity that was created directly -->
-                  <a href="{% url 'student_portal:journey_edit' 'daily_log' act.pk %}" style="font-size:0.72rem; color:var(--txt-2); text-decoration:none;" onmouseover="this.style.color='#fff';" onmouseout="this.style.color='var(--txt-2)';">✏️ Edit</a>
-                  <a href="{% url 'student_portal:journey_delete' 'daily_log' act.pk %}" style="font-size:0.72rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+                  <a href="{% url 'student_portal:journey_edit' 'daily_log' act.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                  <a href="{% url 'student_portal:journey_delete' 'daily_log' act.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
                 {% endif %}
               </div>
               {% endif %}
@@ -332,11 +326,11 @@
 
     {% else %}
     <!-- Empty Timeline State -->
-    <div class="sp-card">
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
       <div class="sp-empty" style="padding:4rem 2rem; text-align:center;">
         <div style="font-size:2.5rem; margin-bottom:1rem;">⏳</div>
-        <h4 style="font-family:'Space Grotesk',sans-serif; color:#fff; font-size:1.1rem; margin-bottom:0.4rem;">No activities logged</h4>
-        <p style="font-size:0.84rem; color:var(--txt-3); max-width:340px; margin:0 auto 1.25rem;">
+        <h4 style="font-family:'Space Grotesk',sans-serif; color:#0F172A !important; font-size:1.1rem; font-weight:800; margin-bottom:0.4rem;">No activities logged</h4>
+        <p style="font-size:0.84rem; color:#334155 !important; font-weight:600; max-width:340px; margin:0 auto 1.25rem;">
           Keep a dynamic record of daily learning, practice algorithms, hackathons, and certifications.
         </p>
         {% if not is_recruiter %}
@@ -352,26 +346,26 @@
   <div style="display:flex; flex-direction:column; gap:1.75rem;">
 
     <!-- Level & Automatic Scores Card -->
-    <div class="sp-card" style="background: linear-gradient(135deg, rgba(30,27,75,0.4) 0%, rgba(47,25,84,0.4) 100%); border-color: rgba(124,58,237,0.25);">
-      <div class="sp-card-header" style="background: rgba(124,58,237,0.03);">
-        <span class="sp-card-title" style="color:#c4b5fd;">🏆 Career Growth Level</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important; border-top:4px solid #7C3AED !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">🏆 Career Growth Level</span>
       </div>
       <div class="sp-card-body" style="padding:1.25rem;">
         
         <div style="text-align:center; padding:0.5rem 0 1rem;">
-          <span style="font-size:2.75rem; display:block; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3));">{{ growth_level|slice:":2" }}</span>
-          <span style="font-family:'Space Grotesk',sans-serif; font-size:1.25rem; font-weight:700; color:#fff; display:block; margin-top:0.25rem;">
+          <span style="font-size:2.75rem; display:block;">{{ growth_level|slice:":2" }}</span>
+          <span style="font-family:'Space Grotesk',sans-serif; font-size:1.25rem; font-weight:800; color:#0F172A !important; display:block; margin-top:0.25rem;">
             {{ growth_level|slice:"2:" }}
           </span>
-          <span style="font-size:0.75rem; color:var(--txt-3); display:block; margin-top:0.15rem;">Points: {{ points }}</span>
+          <span style="font-size:0.8rem; color:#7C3AED !important; font-weight:800; display:block; margin-top:0.15rem;">Points: {{ points }}</span>
         </div>
 
-        <div style="font-size:0.72rem; color:var(--txt-2); display:flex; flex-direction:column; gap:0.5rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:0.75rem;">
+        <div style="font-size:0.78rem; color:#1E293B !important; font-weight:700; display:flex; flex-direction:column; gap:0.5rem; border-top:1.5px solid #CBD5E1; padding-top:0.75rem;">
           <div style="display:flex; justify-content:space-between;">
             <span>Activities Log (+5 pts each)</span>
-            <span style="color:#fff; font-weight:600;">+{{ points }} pts</span>
+            <span style="color:#059669 !important; font-weight:800;">+{{ points }} pts</span>
           </div>
-          <p style="font-size:0.65rem; color:var(--txt-3); line-height:1.4; margin-bottom:0;">
+          <p style="font-size:0.72rem; color:#334155 !important; font-weight:600; line-height:1.45; margin-bottom:0;">
             Scores are updated automatically as you build projects, attend hackathons, complete learning courses, and practice coding logic.
           </p>
         </div>
@@ -380,71 +374,71 @@
     </div>
 
     <!-- Technical Links -->
-    <div class="sp-card">
-      <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="sp-card-title">🔗 Technical Links</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">🔗 Technical Links</span>
         {% if not is_recruiter %}
-        <a href="{% url 'student_portal:journey_links' %}" style="font-size:0.72rem; color:#a78bfa; text-decoration:none;">✏️ Edit</a>
+        <a href="{% url 'student_portal:journey_links' %}" style="font-size:0.78rem; color:#32867D !important; text-decoration:none; font-weight:800;">✏️ Edit</a>
         {% endif %}
       </div>
       <div class="sp-card-body" style="padding:1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
         
         {% if links.github %}
-        <a href="{{ links.github }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem;">
+        <a href="{{ links.github }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
           🐙 GitHub Repository Profile
         </a>
         {% endif %}
 
         {% if links.leetcode %}
-        <a href="{{ links.leetcode }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border-color: rgba(245,158,11,0.25); color:#fcd34d;">
+        <a href="{{ links.leetcode }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
           🧠 LeetCode Profile
         </a>
         {% endif %}
 
         {% if links.codechef %}
-        <a href="{{ links.codechef }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem;">
-          👨‍🍳 CodeChef Profile
+        <a href="{{ links.codechef }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
+          🤓 CodeChef Profile
         </a>
         {% endif %}
 
         {% if links.codeforces %}
-        <a href="{{ links.codeforces }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem;">
+        <a href="{{ links.codeforces }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
           🚀 CodeForces Profile
         </a>
         {% endif %}
 
         {% if links.hackerrank %}
-        <a href="{{ links.hackerrank }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border-color: rgba(16,185,129,0.25); color:#a7f3d0;">
+        <a href="{{ links.hackerrank }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
           🎯 HackerRank Profile
         </a>
         {% endif %}
 
         {% if links.geeksforgeeks %}
-        <a href="{{ links.geeksforgeeks }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem;">
+        <a href="{{ links.geeksforgeeks }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
           🤓 GeeksforGeeks Profile
         </a>
         {% endif %}
 
         {% if links.kaggle %}
-        <a href="{{ links.kaggle }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem;">
+        <a href="{{ links.kaggle }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
           📊 Kaggle Data Profile
         </a>
         {% endif %}
 
         {% if links.portfolio %}
-        <a href="{{ links.portfolio }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem;">
+        <a href="{{ links.portfolio }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
           💼 Personal Portfolio Website
         </a>
         {% endif %}
 
         {% if links.linkedin %}
-        <a href="{{ links.linkedin }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border-color: rgba(59,130,246,0.25); color:#93c5fd;">
+        <a href="{{ links.linkedin }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block sp-btn-sm" style="text-align:left; justify-content:flex-start; gap:0.5rem; border:1.5px solid #475569 !important; font-weight:800;">
           👔 LinkedIn Professional
         </a>
         {% endif %}
 
         {% if not links.github and not links.leetcode and not links.codechef and not links.codeforces and not links.hackerrank and not links.geeksforgeeks and not links.kaggle and not links.portfolio and not links.linkedin %}
-        <span style="font-size:0.75rem; color:var(--txt-3); font-style:italic; text-align:center; padding:0.5rem 0;">
+        <span style="font-size:0.78rem; color:#334155 !important; font-style:italic; font-weight:600; text-align:center; padding:0.5rem 0;">
           No technical links added yet.
         </span>
         {% endif %}
@@ -453,37 +447,37 @@
     </div>
 
     <!-- Current Goals -->
-    <div class="sp-card">
-      <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="sp-card-title">🎯 Current Goals</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">🎯 Current Goals</span>
         {% if not is_recruiter %}
-        <a href="{% url 'student_portal:journey_add' 'goal' %}" style="font-size:0.72rem; color:#a78bfa; text-decoration:none;">➕ Add</a>
+        <a href="{% url 'student_portal:journey_add' 'goal' %}" style="font-size:0.78rem; color:#32867D !important; text-decoration:none; font-weight:800;">➕ Add</a>
         {% endif %}
       </div>
       <div class="sp-card-body" style="padding:1.25rem; display:flex; flex-direction:column; gap:0.65rem;">
         {% if goals %}
           {% for goal in goals %}
-          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:var(--r-md); padding:0.75rem; display:flex; flex-direction:column; gap:0.35rem; position:relative;">
+          <div style="background:#F8FAFC !important; border:1.5px solid #475569 !important; border-radius:8px; padding:0.85rem; display:flex; flex-direction:column; gap:0.35rem;">
             
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="sp-badge {% if goal.priority == 'HIGH' %}sp-badge-danger{% elif goal.priority == 'MEDIUM' %}sp-badge-amber{% else %}sp-badge-gray{% endif %}" style="font-size:0.6rem; padding:0.05rem 0.35rem;">
+              <span class="sp-badge {% if goal.priority == 'HIGH' %}sp-badge-danger{% elif goal.priority == 'MEDIUM' %}sp-badge-amber{% else %}sp-badge-gray{% endif %}">
                 {{ goal.get_priority_display }} Priority
               </span>
-              <span style="font-size:0.72rem; color:var(--txt-3);">Due: {{ goal.target_date|date:"M d, Y" }}</span>
+              <span style="font-size:0.78rem; color:#334155 !important; font-weight:700;">Due: {{ goal.target_date|date:"M d, Y" }}</span>
             </div>
 
-            <p style="font-size:0.8rem; color:#fff; font-weight:600; margin-bottom:0;">
+            <p style="font-size:0.86rem; color:#0F172A !important; font-weight:800; margin-bottom:0;">
               {{ goal.title }}
             </p>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.03); padding-top:0.4rem; margin-top:0.25rem;">
-              <span style="font-size:0.72rem; {% if goal.status == 'COMPLETED' %}color:var(--green){% else %}color:var(--sky){% endif %}; font-weight:600;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #CBD5E1; padding-top:0.45rem; margin-top:0.25rem;">
+              <span style="font-size:0.78rem; {% if goal.status == 'COMPLETED' %}color:#059669 !important;{% else %}color:#0284C7 !important;{% endif %} font-weight:800;">
                 {{ goal.get_status_display }}
               </span>
               {% if not is_recruiter %}
-              <div style="display:flex; gap:0.35rem;">
-                <a href="{% url 'student_portal:journey_edit' 'goal' goal.pk %}" style="font-size:0.7rem; color:var(--txt-2); text-decoration:none;">✏️ Edit</a>
-                <a href="{% url 'student_portal:journey_delete' 'goal' goal.pk %}" style="font-size:0.7rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+              <div style="display:flex; gap:0.45rem;">
+                <a href="{% url 'student_portal:journey_edit' 'goal' goal.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+                <a href="{% url 'student_portal:journey_delete' 'goal' goal.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
               </div>
               {% endif %}
             </div>
@@ -491,7 +485,7 @@
           </div>
           {% endfor %}
         {% else %}
-        <span style="font-size:0.75rem; color:var(--txt-3); font-style:italic; text-align:center; padding:0.5rem 0;">
+        <span style="font-size:0.78rem; color:#334155 !important; font-style:italic; font-weight:600; text-align:center; padding:0.5rem 0;">
           No learning goals set.
         </span>
         {% endif %}
@@ -499,49 +493,49 @@
     </div>
 
     <!-- Achievements -->
-    <div class="sp-card">
-      <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center;">
-        <span class="sp-card-title">🏆 Achievements &amp; Awards</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">🏆 Achievements &amp; Awards</span>
         {% if not is_recruiter %}
-        <a href="{% url 'student_portal:journey_add' 'achievement' %}" style="font-size:0.72rem; color:#a78bfa; text-decoration:none;">➕ Add</a>
+        <a href="{% url 'student_portal:journey_add' 'achievement' %}" style="font-size:0.78rem; color:#32867D !important; text-decoration:none; font-weight:800;">➕ Add</a>
         {% endif %}
       </div>
       <div class="sp-card-body" style="padding:1.25rem; display:flex; flex-direction:column; gap:0.65rem;">
         {% if achievements %}
           {% for ach in achievements %}
-          <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:var(--r-md); padding:0.75rem; display:flex; flex-direction:column; gap:0.25rem;">
+          <div style="background:#F8FAFC !important; border:1.5px solid #475569 !important; border-radius:8px; padding:0.85rem; display:flex; flex-direction:column; gap:0.35rem;">
             
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="sp-badge sp-badge-violet" style="font-size:0.6rem; padding:0.05rem 0.35rem;">
+              <span class="sp-badge sp-badge-violet">
                 {{ ach.get_category_display }}
               </span>
-              <span style="font-size:0.72rem; color:var(--txt-3);">{{ ach.date|date:"Y" }}</span>
+              <span style="font-size:0.78rem; color:#334155 !important; font-weight:700;">{{ ach.date|date:"Y" }}</span>
             </div>
 
-            <p style="font-size:0.8rem; color:#fff; font-weight:700; margin-bottom:0;">
+            <p style="font-size:0.86rem; color:#0F172A !important; font-weight:800; margin-bottom:0;">
               {{ ach.title }}
             </p>
-            <p style="font-size:0.75rem; color:var(--txt-2); margin-bottom:0; line-height:1.4;">
+            <p style="font-size:0.78rem; color:#1E293B !important; font-weight:600; margin-bottom:0; line-height:1.45;">
               {{ ach.description }}
             </p>
 
             {% if ach.certificate %}
-            <div style="font-size:0.7rem; margin-top:0.25rem;">
-              📎 <a href="{{ ach.certificate.url }}" target="_blank" style="color:#60a5fa; text-decoration:none;">Verification File</a>
+            <div style="font-size:0.78rem; margin-top:0.25rem;">
+              📎 <a href="{{ ach.certificate.url }}" target="_blank" style="color:#0284C7 !important; font-weight:800; text-decoration:none;">Verification File</a>
             </div>
             {% endif %}
 
             {% if not is_recruiter %}
-            <div style="display:flex; gap:0.35rem; justify-content:flex-end; border-top:1px solid rgba(255,255,255,0.03); padding-top:0.4rem; margin-top:0.25rem;">
-              <a href="{% url 'student_portal:journey_edit' 'achievement' ach.pk %}" style="font-size:0.7rem; color:var(--txt-2); text-decoration:none;">✏️ Edit</a>
-              <a href="{% url 'student_portal:journey_delete' 'achievement' ach.pk %}" style="font-size:0.7rem; color:var(--red); text-decoration:none;">🗑 Delete</a>
+            <div style="display:flex; gap:0.45rem; justify-content:flex-end; border-top:1.5px solid #CBD5E1; padding-top:0.45rem; margin-top:0.25rem;">
+              <a href="{% url 'student_portal:journey_edit' 'achievement' ach.pk %}" style="font-size:0.78rem; color:#334155 !important; font-weight:800; text-decoration:none;">✏️ Edit</a>
+              <a href="{% url 'student_portal:journey_delete' 'achievement' ach.pk %}" style="font-size:0.78rem; color:#DC2626 !important; font-weight:800; text-decoration:none;">🗑️ Delete</a>
             </div>
             {% endif %}
 
           </div>
           {% endfor %}
         {% else %}
-        <span style="font-size:0.75rem; color:var(--txt-3); font-style:italic; text-align:center; padding:0.5rem 0;">
+        <span style="font-size:0.78rem; color:#334155 !important; font-style:italic; font-weight:600; text-align:center; padding:0.5rem 0;">
           No verified achievements recorded.
         </span>
         {% endif %}

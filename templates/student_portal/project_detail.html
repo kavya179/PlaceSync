@@ -11,34 +11,34 @@
 ════════════════════════════════════════════════════ -->
 <div class="sp-page-header" style="margin-bottom: 1.5rem;">
   <div>
-    <a href="{% if is_recruiter %}{% url 'student_portal:recruiter_portfolio' student.id %}{% else %}{% url 'student_portal:projects_list' %}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="margin-bottom: 0.75rem;">⬅️ Back to Portfolio</a>
+    <a href="{% if is_recruiter %}{% url 'student_portal:recruiter_portfolio' student.id %}{% else %}{% url 'student_portal:projects_list' %}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="margin-bottom: 0.75rem; border:1.5px solid #475569 !important;">⬅️ Back to Portfolio</a>
     <h1 class="sp-page-title">{{ project.title }}</h1>
     <p class="sp-page-subtitle">Detailed portfolio view for showcase and verification</p>
   </div>
   {% if not is_recruiter %}
   <div class="sp-page-actions">
-    <a href="{% url 'student_portal:project_edit' project.pk %}" class="sp-btn sp-btn-secondary">✏️ Edit Project</a>
-    <a href="{% url 'student_portal:project_delete' project.pk %}" class="sp-btn sp-btn-danger">🗑 Delete Project</a>
+    <a href="{% url 'student_portal:project_edit' project.pk %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">✏️ Edit Project</a>
+    <a href="{% url 'student_portal:project_delete' project.pk %}" class="sp-btn sp-btn-danger" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">🗑️ Delete Project</a>
   </div>
   {% endif %}
 </div>
 
 <!-- ══════════════════════════════════════════════════
-     Gradient Header Box
+     Header Banner Box
 ════════════════════════════════════════════════════ -->
-<div style="height: 200px; width: 100%; border-radius: var(--r-lg); border: 1px solid var(--border); overflow: hidden; position: relative; margin-bottom: 1.75rem; background: linear-gradient(135deg, #100e2b 0%, #2f1954 100%); display: flex; align-items: center; justify-content: center;">
-  <div style="text-align: center; text-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+<div style="height: 200px; width: 100%; border-radius: 8px; border: 1.5px solid #475569; overflow: hidden; position: relative; margin-bottom: 1.75rem; background: #F8FAFC; display: flex; align-items: center; justify-content: center;">
+  <div style="text-align: center;">
     <span style="font-size: 4rem;">🚀</span>
-    <h2 style="font-family:'Space Grotesk',sans-serif; font-size: 1.8rem; color: #fff; margin-top: 0.25rem;">{{ project.title }}</h2>
+    <h2 style="font-family:'Space Grotesk',sans-serif; font-size: 1.8rem; color: #0F172A !important; font-weight:800; margin-top: 0.25rem;">{{ project.title }}</h2>
   </div>
   <!-- Floating Metadata Tags -->
   <div style="position: absolute; bottom: 15px; left: 15px; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-    <span class="sp-badge sp-badge-violet" style="background: rgba(12, 15, 29, 0.85); border-color: rgba(255,255,255,0.15); color: #fff;">{{ project.get_category_display }}</span>
-    <span class="sp-badge sp-badge-indigo" style="background: rgba(12, 15, 29, 0.85); border-color: rgba(255,255,255,0.15); color: #fff;">{{ project.get_project_type_display }}</span>
-    <span class="sp-badge {% if project.status == 'COMPLETED' %}sp-badge-green{% else %}sp-badge-sky{% endif %}" style="background: rgba(12, 15, 29, 0.85); border-color: rgba(255,255,255,0.15);">{{ project.get_status_display }}</span>
+    <span class="sp-badge sp-badge-violet">{{ project.get_category_display }}</span>
+    <span class="sp-badge sp-badge-sky">{{ project.get_project_type_display }}</span>
+    <span class="sp-badge {% if project.status == 'COMPLETED' %}sp-badge-green{% else %}sp-badge-sky{% endif %}">{{ project.get_status_display }}</span>
   </div>
   <div style="position: absolute; bottom: 15px; right: 15px;">
-    <span class="sp-badge sp-badge-violet" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; background: rgba(124, 58, 237, 0.85); color: #fff; border: none; font-weight: 800;">
+    <span class="sp-badge sp-badge-violet" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;">
       Score: {{ project.portfolio_score }}/45
     </span>
   </div>
@@ -53,13 +53,13 @@
   <div style="display: flex; flex-direction: column; gap: 1.75rem;">
 
     <!-- About Project -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">📖 Project Description</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">📖 Project Description</span>
       </div>
       <div class="sp-card-body" style="padding: 1.5rem;">
-        <h4 style="font-family:'Space Grotesk',sans-serif; color: #fff; font-size: 1.05rem; margin-bottom: 0.75rem;">{{ project.short_description }}</h4>
-        <p style="font-size: 0.9rem; color: var(--txt-2); line-height: 1.7; white-space: pre-line;">
+        <h4 style="font-family:'Space Grotesk',sans-serif; color: #0F172A !important; font-weight:800; font-size: 1.15rem; margin-bottom: 0.75rem;">{{ project.short_description }}</h4>
+        <p style="font-size: 0.92rem; color: #1E293B !important; font-weight:600; line-height: 1.7; white-space: pre-line;">
           {{ project.detailed_description }}
         </p>
       </div>
@@ -67,15 +67,15 @@
 
     <!-- Key Features -->
     {% if project.feature_list %}
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">💡 Key Features</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">💡 Key Features</span>
       </div>
       <div class="sp-card-body" style="padding: 1.5rem;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           {% for feature in project.feature_list %}
-          <div style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.88rem; color: var(--txt-1);">
-            <span style="color: var(--green); font-weight: 800;">✔️</span>
+          <div style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.9rem; color: #1E293B !important; font-weight:700;">
+            <span style="color: #059669; font-weight: 800;">✅</span>
             <span>{{ feature }}</span>
           </div>
           {% endfor %}
@@ -90,59 +90,59 @@
   <div style="display: flex; flex-direction: column; gap: 1.75rem;">
 
     <!-- Links Card -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">🔗 Project Links</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">🔗 Project Links</span>
       </div>
       <div class="sp-card-body" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 0.65rem;">
         {% if project.github_url %}
-        <a href="{{ project.github_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem;">
+        <a href="{{ project.github_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; border:1.5px solid #475569 !important; font-weight:800;">
           🐙 GitHub Repository
         </a>
         {% endif %}
         {% if project.live_url %}
-        <a href="{{ project.live_url }}" target="_blank" class="sp-btn sp-btn-primary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem;">
+        <a href="{{ project.live_url }}" target="_blank" class="sp-btn sp-btn-primary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; font-weight:800;">
           🌐 Live Website Application
         </a>
         {% endif %}
         {% if project.youtube_url %}
-        <a href="{{ project.youtube_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem; border-color: rgba(244,63,94,0.3); color:#fda4af;">
+        <a href="{{ project.youtube_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; border:1.5px solid #475569 !important; font-weight:800;">
           📺 YouTube Video Demo
         </a>
         {% endif %}
         {% if project.documentation_url %}
-        <a href="{{ project.documentation_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem;">
+        <a href="{{ project.documentation_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; border:1.5px solid #475569 !important; font-weight:800;">
           📖 Documentation Website
         </a>
         {% endif %}
         {% if project.google_drive_url %}
-        <a href="{{ project.google_drive_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem;">
+        <a href="{{ project.google_drive_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; border:1.5px solid #475569 !important; font-weight:800;">
           💾 Google Drive Folder
         </a>
         {% endif %}
         {% if project.figma_url %}
-        <a href="{{ project.figma_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem;">
+        <a href="{{ project.figma_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; border:1.5px solid #475569 !important; font-weight:800;">
           🎨 Figma Design File
         </a>
         {% endif %}
         {% if project.play_store_url %}
-        <a href="{{ project.play_store_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem;">
+        <a href="{{ project.play_store_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; border:1.5px solid #475569 !important; font-weight:800;">
           🤖 Google Play Store
         </a>
         {% endif %}
         {% if project.app_store_url %}
-        <a href="{{ project.app_store_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem;">
+        <a href="{{ project.app_store_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; border:1.5px solid #475569 !important; font-weight:800;">
           🍏 Apple App Store
         </a>
         {% endif %}
         {% if project.portfolio_url %}
-        <a href="{{ project.portfolio_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.8rem;">
+        <a href="{{ project.portfolio_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-block" style="text-align: left; justify-content: flex-start; gap: 0.5rem; font-size: 0.84rem; border:1.5px solid #475569 !important; font-weight:800;">
           💼 Portfolio Website
         </a>
         {% endif %}
 
         {% if not project.github_url and not project.live_url and not project.youtube_url and not project.documentation_url and not project.google_drive_url and not project.figma_url and not project.play_store_url and not project.app_store_url and not project.portfolio_url %}
-        <div style="font-size:0.8rem; color:var(--txt-3); text-align:center; padding:1rem 0; font-style:italic;">
+        <div style="font-size:0.82rem; color:#334155 !important; text-align:center; padding:1rem 0; font-style:italic; font-weight:600;">
           No external links provided
         </div>
         {% endif %}
@@ -150,14 +150,14 @@
     </div>
 
     <!-- Technologies Used -->
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">💻 Technologies Used</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">💻 Technologies Used</span>
       </div>
       <div class="sp-card-body" style="padding: 1.25rem;">
         <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
           {% for badge in project.technology_badges %}
-          <span class="sp-badge {{ badge.class }}" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">{{ badge.name }}</span>
+          <span class="sp-badge {{ badge.class }}">{{ badge.name }}</span>
           {% endfor %}
         </div>
       </div>
@@ -165,14 +165,14 @@
 
     <!-- Achievements & Awards -->
     {% if project.achievement_list %}
-    <div class="sp-card">
-      <div class="sp-card-header">
-        <span class="sp-card-title">🏆 Achievements</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">🏆 Achievements</span>
       </div>
       <div class="sp-card-body" style="padding: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
         {% for ach in project.achievement_list %}
-        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.84rem; color:#fff;">
-          <span style="color:var(--amber);">⭐</span>
+        <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.88rem; color:#0F172A !important; font-weight:700;">
+          <span style="color:#D97706;">⭐</span>
           <span>{{ ach }}</span>
         </div>
         {% endfor %}
@@ -181,50 +181,50 @@
     {% endif %}
 
     <!-- Score Verification Card (Interactive Scorecard) -->
-    <div class="sp-card" style="border-color: rgba(124, 58, 237, 0.3);">
-      <div class="sp-card-header" style="background: rgba(124, 58, 237, 0.04);">
-        <span class="sp-card-title" style="color: #c4b5fd;">🏆 Score Breakdown Scorecard</span>
+    <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">🏆 Score Breakdown Scorecard</span>
       </div>
-      <div class="sp-card-body" style="padding: 1.25rem; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.65rem;">
+      <div class="sp-card-body" style="padding: 1.25rem; font-size: 0.84rem; display: flex; flex-direction: column; gap: 0.65rem; color:#1E293B !important; font-weight:700;">
         
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span>GitHub Repository (+10)</span>
-          <span>{% if score_breakdown.github_completed %}<span style="color:var(--green);font-weight:700;">✔️ Achieved</span>{% else %}<span style="color:var(--txt-3);">❌ Missing</span>{% endif %}</span>
+          <span>{% if score_breakdown.github_completed %}<span style="color:#059669;font-weight:800;">✅ Achieved</span>{% else %}<span style="color:#334155;">❌ Missing</span>{% endif %}</span>
         </div>
         
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span>Live Demo Website (+10)</span>
-          <span>{% if score_breakdown.live_completed %}<span style="color:var(--green);font-weight:700;">✔️ Achieved</span>{% else %}<span style="color:var(--txt-3);">❌ Missing</span>{% endif %}</span>
+          <span>{% if score_breakdown.live_completed %}<span style="color:#059669;font-weight:800;">✅ Achieved</span>{% else %}<span style="color:#334155;">❌ Missing</span>{% endif %}</span>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span>Documentation Website URL (+5)</span>
-          <span>{% if score_breakdown.doc_completed %}<span style="color:var(--green);font-weight:700;">✔️ Achieved</span>{% else %}<span style="color:var(--txt-3);">❌ Missing</span>{% endif %}</span>
+          <span>{% if score_breakdown.doc_completed %}<span style="color:#059669;font-weight:800;">✅ Achieved</span>{% else %}<span style="color:#334155;">❌ Missing</span>{% endif %}</span>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span>Detailed Description (+5)</span>
-          <span>{% if score_breakdown.desc_completed %}<span style="color:var(--green);font-weight:700;">✔️ Achieved</span>{% else %}<span style="color:var(--txt-3);">❌ Missing</span>{% endif %}</span>
+          <span>{% if score_breakdown.desc_completed %}<span style="color:#059669;font-weight:800;">✅ Achieved</span>{% else %}<span style="color:#334155;">❌ Missing</span>{% endif %}</span>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span>5+ Technologies Badge (+5)</span>
-          <span>{% if score_breakdown.tech_completed %}<span style="color:var(--green);font-weight:700;">✔️ Achieved</span>{% else %}<span style="color:var(--txt-3);">❌ Missing</span>{% endif %}</span>
+          <span>{% if score_breakdown.tech_completed %}<span style="color:#059669;font-weight:800;">✅ Achieved</span>{% else %}<span style="color:#334155;">❌ Missing</span>{% endif %}</span>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span>Video Demo Walkthrough (+5)</span>
-          <span>{% if score_breakdown.video_completed %}<span style="color:var(--green);font-weight:700;">✔️ Achieved</span>{% else %}<span style="color:var(--txt-3);">❌ Missing</span>{% endif %}</span>
+          <span>{% if score_breakdown.video_completed %}<span style="color:#059669;font-weight:800;">✅ Achieved</span>{% else %}<span style="color:#334155;">❌ Missing</span>{% endif %}</span>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span>Featured Portfolio Project (+5)</span>
-          <span>{% if score_breakdown.featured_completed %}<span style="color:var(--green);font-weight:700;">✔️ Achieved</span>{% else %}<span style="color:var(--txt-3);">❌ Missing</span>{% endif %}</span>
+          <span>{% if score_breakdown.featured_completed %}<span style="color:#059669;font-weight:800;">✅ Achieved</span>{% else %}<span style="color:#334155;">❌ Missing</span>{% endif %}</span>
         </div>
 
-        <div style="margin-top:0.5rem; border-top:1px solid var(--border); padding-top:0.75rem; display:flex; justify-content:space-between; align-items:center; font-weight:700; color:#fff; font-size:0.85rem;">
+        <div style="margin-top:0.5rem; border-top:1.5px solid #CBD5E1; padding-top:0.75rem; display:flex; justify-content:space-between; align-items:center; font-weight:800; color:#0F172A !important; font-size:0.9rem;">
           <span>Verification Score</span>
-          <span style="color:#a78bfa;">{{ project.portfolio_score }} / 45 points</span>
+          <span style="color:#7C3AED !important;">{{ project.portfolio_score }} / 45 points</span>
         </div>
 
       </div>

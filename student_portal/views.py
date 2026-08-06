@@ -1884,9 +1884,9 @@ class StudentAnalyticsView(StudentRequiredMixin, View):
                     'earned': round(earned, 2)
                 })
 
-        predicted_salary = base_salary + total_premium
-        predicted_min = round(max(predicted_salary - 0.75, 4.5), 2)
-        predicted_max = round(predicted_salary + 1.25, 2)
+        predicted_salary = round(base_salary + total_premium, 2)
+        predicted_min = round(max(predicted_salary - 1.00, 3.5), 2)
+        predicted_max = round(predicted_salary + 1.00, 2)
 
         return render(request, self.template_name, {
             **_base_ctx(request, student),
@@ -1904,6 +1904,7 @@ class StudentAnalyticsView(StudentRequiredMixin, View):
             # Salary Prediction details
             'salary_min': predicted_min,
             'salary_max': predicted_max,
+            'predicted_salary': predicted_salary,
             'base_salary': base_salary,
             'applied_premiums': applied_premiums,
             'total_premium': round(total_premium, 2)

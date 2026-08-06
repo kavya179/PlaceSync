@@ -182,12 +182,15 @@
     
     <!-- Left: Large Estimated Range Display -->
     <div style="background:#F8FAFC !important; border:1.5px dashed #7C3AED !important; border-radius:8px; padding:2rem 1.5rem; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; box-sizing:border-box;">
-      <span style="font-size:.78rem; text-transform:uppercase; color:#334155 !important; font-weight:800; letter-spacing:.05em; display:block; margin-bottom:.5rem;">Estimated Fresher Package</span>
+      <span style="font-size:.78rem; text-transform:uppercase; color:#334155 !important; font-weight:800; letter-spacing:.05em; display:block; margin-bottom:.5rem;">Estimated Fresher Package Range</span>
       <h3 style="font-size:1.95rem; font-weight:800; color:#0F172A !important; margin:0; font-family:'Space Grotesk',sans-serif; line-height:1.2;">
         ₹{{ salary_min }} - ₹{{ salary_max }}
       </h3>
       <span style="font-size:.9rem; font-weight:800; color:#7C3AED !important; display:block; margin-top:.35rem;">LPA (Lakhs Per Annum)</span>
-      <p style="font-size:.78rem; color:#1E293B !important; font-weight:600; margin-top:1rem; line-height:1.5;">
+      <div style="margin-top:0.85rem; padding:0.4rem 0.75rem; background:#F3E8FF; border:1px solid #C084FC; border-radius:6px; font-size:.82rem; color:#6B21A8; font-weight:800;">
+        Target Valuation: ₹{{ predicted_salary }} LPA
+      </div>
+      <p style="font-size:.78rem; color:#1E293B !important; font-weight:600; margin-top:0.75rem; line-height:1.5;">
         Average placement package range estimated for candidates matching your technical credentials.
       </p>
     </div>
@@ -232,6 +235,12 @@
         <div style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #CBD5E1; padding-top:.85rem; margin-top:.25rem;">
           <span style="font-size:.85rem; color:#1E293B !important; font-weight:700;">Total Skill Premiums Added</span>
           <strong style="font-size:1rem; color:#059669 !important; font-weight:800;">+ ₹{{ total_premium }} LPA</strong>
+        </div>
+
+        <!-- Final Sum Validation Box -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#F0FDF4 !important; border:1.5px solid #059669 !important; border-radius:8px; padding:.75rem 1.1rem; margin-top:.25rem;">
+          <span style="font-size:.88rem; color:#065F46 !important; font-weight:800;">Total Calculated Salary (Base + Premiums)</span>
+          <strong style="font-size:1.1rem; color:#059669 !important; font-weight:800;">₹{{ predicted_salary }} LPA</strong>
         </div>
 
       </div>

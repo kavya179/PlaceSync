@@ -1000,13 +1000,27 @@ a:hover {
   }
 }
 
-/* ─────────────── UNIVERSAL HIGH-VISIBILITY CONTRAST OVERRIDES ─────────────── */
-.sp-card, .sp-stat, .sp-welcome, .sp-table-wrap, .sp-table-wrapper, .sk-card, .sp-assistant-box, .sp-badge-card {
+/* ─────────────── UNIVERSAL HIGH-VISIBILITY CONTRAST & HOVER SYSTEM ─────────────── */
+.sp-card, .sp-stat, .sp-welcome, .sp-table-wrap, .sp-table-wrapper, .sk-card, .sp-assistant-box, .sp-badge-card, .sp-mission-item {
   background-color: #FFFFFF !important;
   background: #FFFFFF !important;
   border: 1.5px solid #475569 !important;
   border-radius: 8px !important;
   color: #0F172A !important;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease) !important;
+}
+
+.sp-card:hover,
+.sp-stat:hover,
+.sp-welcome:hover,
+.sk-card:hover,
+.sp-assistant-box:hover,
+.sp-badge-card:hover,
+.sp-mission-item:hover,
+.sp-table-wrapper:hover,
+.stats-card:hover {
+  background: #FFFFFF !important;
+  border-color: #32867D !important;
 }
 
 .sp-card h1, .sp-card h2, .sp-card h3, .sp-card h4, .sp-card h5, .sp-card h6,

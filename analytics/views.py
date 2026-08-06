@@ -123,7 +123,8 @@ class AnalyticsDashboardView(LoginRequiredMixin, View):
                 company_names.append(c.name)
                 hires_counts.append(selections)
 
-        # Sort companies by hires descending
+        import json
+
         company_data = sorted(zip(company_names, hires_counts), key=lambda x: x[1], reverse=True)[:5]
         if company_data:
             c_names, c_hires = zip(*company_data)
@@ -141,6 +142,17 @@ class AnalyticsDashboardView(LoginRequiredMixin, View):
             'company_chart': company_chart,
             'dept_data': list(zip(dept_names, dept_avg_packages, dept_ratios)),
             'batch_data': list(zip(batch_names, batch_ratios)),
-            'company_data': list(zip(c_names, c_hires))
+            'company_data': list(zip(c_names, c_hires)),
+            # Chart.js JSON datasets
+            'status_labels_json': json.dumps(['Placed', 'Internship', 'Placed & Intern', 'Unplaced']),
+            'status_data_json': json.dumps([placed_only, intern_only, both_status, unplaced]),
+            'dept_labels_json': json.dumps(dept_names),
+            'dept_avg_pkg_json': json.dumps([round(p, 2) for p in dept_avg_packages]),
+            'dept_ratios_json': json.dumps([round(r, 1) for r in dept_ratios]),
+            'batch_labels_json': json.dumps(batch_names),
+            'batch_ratios_json': json.dumps([round(r, 1) for r in batch_ratios]),
+            'scatter_data_json': json.dumps([{'x': round(c, 2), 'y': round(p, 2)} for c, p in zip(cgpas, packages)]),
+            'company_labels_json': json.dumps(list(c_names)),
+            'company_hires_json': json.dumps(list(c_hires)),
         }
         return render(request, self.template_name, context)

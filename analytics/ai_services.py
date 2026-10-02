@@ -91,7 +91,7 @@ def predict_placement_readiness(student):
     certs_count = student.certificates.count()
 
     active_resume = student.resume_versions.filter(is_active=True).first()
-    ats_score = active_resume.ats_score if active_resume else (55 if student.resume else 30)
+    ats_score = active_resume.ats_score if active_resume else (55 if student.resume else 0)
 
     # Estimate scores based on student profile data
     skills_count = len([s for s in (student.skills or "").split(',') if s.strip()])
@@ -159,7 +159,10 @@ def predict_fresher_salary(student):
     Predicts expected fresher salary CTC package in LPA using the Random Forest Regressor model.
     """
     if not student:
-        return 6.0
+        return 0.0
+
+    if not student.cgpa and not student.skills and student.projects.count() == 0 and not student.resume and student.resume_versions.count() == 0 and not student.package_amount:
+        return 0.0
 
     cgpa = float(student.cgpa or 6.5)
     backlogs = int(student.backlogs or 0)

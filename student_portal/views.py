@@ -53,6 +53,28 @@ def _get_student(request):
         return None
 
 
+def _safe_json_loads(val, default=None):
+    """Safely parse JSON string, returning list/dict or falling back to comma-separated list/default."""
+    if default is None:
+        default = []
+    if not val:
+        return default
+    if isinstance(val, (list, dict)):
+        return val
+    val_str = str(val).strip()
+    if not val_str:
+        return default
+    try:
+        res = json.loads(val_str)
+        if isinstance(res, (list, dict)):
+            return res
+        return [str(res)]
+    except (json.JSONDecodeError, ValueError, TypeError):
+        if ',' in val_str:
+            return [item.strip() for item in val_str.split(',') if item.strip()]
+        return [val_str]
+
+
 def _base_ctx(request, student=None):
     """Common context keys needed by student_portal/base.html (sidebar badge etc.)"""
     unread = 0
@@ -121,6 +143,15 @@ class StudentDashboardView(StudentRequiredMixin, View):
         readiness = student.placement_readiness()
         career = student.career_score()
 
+        if student.package_amount:
+            salary_forecast = float(student.package_amount)
+        else:
+            try:
+                from analytics.ai_services import predict_fresher_salary
+                salary_forecast = predict_fresher_salary(student)
+            except Exception:
+                salary_forecast = 0.0
+
         context = {
             **_base_ctx(request, student),
             'app_count': app_count,
@@ -135,7 +166,8 @@ class StudentDashboardView(StudentRequiredMixin, View):
             'ats_score': ats,
             'readiness_score': readiness,
             'career_score': career,
-            'resume_uploaded': bool(student.resume),
+            'salary_forecast': salary_forecast,
+            'resume_uploaded': bool(student.resume or student.resume_versions.exists()),
         }
         return render(request, self.template_name, context)
 
@@ -1141,13 +1173,13 @@ class StudentATSAnalysisView(StudentRequiredMixin, View):
                 except Exception:
                     pass
 
-            projects = json.loads(selected_resume.projects_found or '[]')
-            education = json.loads(selected_resume.education_found or '[]')
-            skills = json.loads(selected_resume.skills_found or '[]')
-            certificates = json.loads(selected_resume.certificates_found or '[]')
-            experience = json.loads(selected_resume.experience_found or '[]')
-            missing = json.loads(selected_resume.missing_keywords or '[]')
-            suggestions = json.loads(selected_resume.suggestions or '[]')
+            projects = _safe_json_loads(selected_resume.projects_found)
+            education = _safe_json_loads(selected_resume.education_found)
+            skills = _safe_json_loads(selected_resume.skills_found)
+            certificates = _safe_json_loads(selected_resume.certificates_found)
+            experience = _safe_json_loads(selected_resume.experience_found)
+            missing = _safe_json_loads(selected_resume.missing_keywords)
+            suggestions = _safe_json_loads(selected_resume.suggestions)
 
             strengths = []
             if selected_resume.ats_score >= 80:
@@ -1208,17 +1240,17 @@ class StudentATSAnalysisView(StudentRequiredMixin, View):
             comp_ver2 = StudentResume.objects.filter(pk=pk2, student=student).first()
 
             if comp_ver1 and comp_ver2:
-                p1 = json.loads(comp_ver1.projects_found or '[]')
-                e1 = json.loads(comp_ver1.education_found or '[]')
-                s1 = json.loads(comp_ver1.skills_found or '[]')
-                ex1 = json.loads(comp_ver1.experience_found or '[]')
-                m1 = json.loads(comp_ver1.missing_keywords or '[]')
+                p1 = _safe_json_loads(comp_ver1.projects_found)
+                e1 = _safe_json_loads(comp_ver1.education_found)
+                s1 = _safe_json_loads(comp_ver1.skills_found)
+                ex1 = _safe_json_loads(comp_ver1.experience_found)
+                m1 = _safe_json_loads(comp_ver1.missing_keywords)
 
-                p2 = json.loads(comp_ver2.projects_found or '[]')
-                e2 = json.loads(comp_ver2.education_found or '[]')
-                s2 = json.loads(comp_ver2.skills_found or '[]')
-                ex2 = json.loads(comp_ver2.experience_found or '[]')
-                m2 = json.loads(comp_ver2.missing_keywords or '[]')
+                p2 = _safe_json_loads(comp_ver2.projects_found)
+                e2 = _safe_json_loads(comp_ver2.education_found)
+                s2 = _safe_json_loads(comp_ver2.skills_found)
+                ex2 = _safe_json_loads(comp_ver2.experience_found)
+                m2 = _safe_json_loads(comp_ver2.missing_keywords)
 
                 comp_analysis1 = {
                     'projects': p1, 'education': e1, 'skills': s1, 'experience': ex1, 'keywords': m1,
@@ -1300,17 +1332,17 @@ class StudentResumeCompareView(StudentRequiredMixin, View):
             ver2 = StudentResume.objects.filter(pk=pk2, student=student).first()
 
         if ver1 and ver2:
-            p1 = json.loads(ver1.projects_found or '[]')
-            e1 = json.loads(ver1.education_found or '[]')
-            s1 = json.loads(ver1.skills_found or '[]')
-            ex1 = json.loads(ver1.experience_found or '[]')
-            m1 = json.loads(ver1.missing_keywords or '[]')
+            p1 = _safe_json_loads(ver1.projects_found)
+            e1 = _safe_json_loads(ver1.education_found)
+            s1 = _safe_json_loads(ver1.skills_found)
+            ex1 = _safe_json_loads(ver1.experience_found)
+            m1 = _safe_json_loads(ver1.missing_keywords)
 
-            p2 = json.loads(ver2.projects_found or '[]')
-            e2 = json.loads(ver2.education_found or '[]')
-            s2 = json.loads(ver2.skills_found or '[]')
-            ex2 = json.loads(ver2.experience_found or '[]')
-            m2 = json.loads(ver2.missing_keywords or '[]')
+            p2 = _safe_json_loads(ver2.projects_found)
+            e2 = _safe_json_loads(ver2.education_found)
+            s2 = _safe_json_loads(ver2.skills_found)
+            ex2 = _safe_json_loads(ver2.experience_found)
+            m2 = _safe_json_loads(ver2.missing_keywords)
 
             analysis1 = {
                 'projects': p1, 'education': e1, 'skills': s1, 'experience': ex1, 'keywords': m1,
@@ -3247,14 +3279,14 @@ class StudentAIResumeParserView(StudentRequiredMixin, View):
         certificates = []
 
         if selected_resume:
-            prog_langs = json.loads(selected_resume.programming_languages_found or '[]')
-            tools = json.loads(selected_resume.tools_found or '[]')
-            soft_skills = json.loads(selected_resume.soft_skills_found or '[]')
-            all_skills = json.loads(selected_resume.skills_found or '[]')
-            education = json.loads(selected_resume.education_found or '[]')
-            experience = json.loads(selected_resume.experience_found or '[]')
-            projects = json.loads(selected_resume.projects_found or '[]')
-            certificates = json.loads(selected_resume.certificates_found or '[]')
+            prog_langs = _safe_json_loads(selected_resume.programming_languages_found)
+            tools = _safe_json_loads(selected_resume.tools_found)
+            soft_skills = _safe_json_loads(selected_resume.soft_skills_found)
+            all_skills = _safe_json_loads(selected_resume.skills_found)
+            education = _safe_json_loads(selected_resume.education_found)
+            experience = _safe_json_loads(selected_resume.experience_found)
+            projects = _safe_json_loads(selected_resume.projects_found)
+            certificates = _safe_json_loads(selected_resume.certificates_found)
 
         return render(request, self.template_name, {
             **_base_ctx(request, student),

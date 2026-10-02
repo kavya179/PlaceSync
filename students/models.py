@@ -191,7 +191,7 @@ class Student(models.Model):
         if active_resume:
             return active_resume.ats_score
         if not self.resume:
-            return 30
+            return 0
         score = 55
         if self.skills:
             score += 15

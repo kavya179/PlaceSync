@@ -7,6 +7,27 @@ from django.db.models import Q
 from students.models import Student, StudentResume, StudentSkill, Project, Certificate
 from .resume_analyzer import extract_pdf_text
 
+
+def _safe_json_loads(val, default=None):
+    if default is None:
+        default = []
+    if not val:
+        return default
+    if isinstance(val, (list, dict)):
+        return val
+    val_str = str(val).strip()
+    if not val_str:
+        return default
+    try:
+        res = json.loads(val_str)
+        if isinstance(res, (list, dict)):
+            return res
+        return [str(res)]
+    except (json.JSONDecodeError, ValueError, TypeError):
+        if ',' in val_str:
+            return [item.strip() for item in val_str.split(',') if item.strip()]
+        return [val_str]
+
 # ═════════════════════════════════════════════════════════════════════════════
 # Categorization Dictionaries for AI Skill Extraction
 # ═════════════════════════════════════════════════════════════════════════════
@@ -244,10 +265,10 @@ def sync_extracted_data_to_profile(student, resume_instance):
     certificates_synced = 0
 
     # ── 1. SKILLS SYNCHRONIZATION ───────────────────────────────────────────
-    all_parsed_skills = json.loads(resume_instance.skills_found or '[]')
-    prog_langs = json.loads(resume_instance.programming_languages_found or '[]')
-    tools_parsed = json.loads(resume_instance.tools_found or '[]')
-    soft_parsed = json.loads(resume_instance.soft_skills_found or '[]')
+    all_parsed_skills = _safe_json_loads(resume_instance.skills_found)
+    prog_langs = _safe_json_loads(resume_instance.programming_languages_found)
+    tools_parsed = _safe_json_loads(resume_instance.tools_found)
+    soft_parsed = _safe_json_loads(resume_instance.soft_skills_found)
 
     # Update Student.skills string field
     existing_skills_str = student.skills or ""
@@ -294,7 +315,7 @@ def sync_extracted_data_to_profile(student, resume_instance):
             skills_added += 1
 
     # ── 2. PROJECTS SYNCHRONIZATION ─────────────────────────────────────────
-    parsed_projects = json.loads(resume_instance.projects_found or '[]')
+    parsed_projects = _safe_json_loads(resume_instance.projects_found)
     for proj_line in parsed_projects:
         proj_title = proj_line.split('-')[0].split(':')[0].strip()
         if len(proj_title) < 4:
@@ -321,7 +342,7 @@ def sync_extracted_data_to_profile(student, resume_instance):
                 existing_proj.save()
 
     # ── 3. CERTIFICATES SYNCHRONIZATION ─────────────────────────────────────
-    parsed_certs = json.loads(resume_instance.certificates_found or '[]')
+    parsed_certs = _safe_json_loads(resume_instance.certificates_found)
     for cert_line in parsed_certs:
         cert_title = cert_line.split('-')[0].split(':')[0].strip()
         if len(cert_title) < 4:

@@ -75,7 +75,7 @@
   <div class="sp-stat">
     <div class="sp-stat-icon si-s">💰</div>
     <div class="sp-stat-label">Salary Forecast</div>
-    <div class="sp-stat-value" style="color:#0F172A !important;">₹{% if student.package_amount %}{{ student.package_amount }}{% else %}12.5{% endif %} <span style="font-size:0.85rem; color:#334155 !important; font-weight:700;">LPA</span></div>
+    <div class="sp-stat-value" style="color:#0F172A !important;">₹{% if student.package_amount %}{{ student.package_amount }}{% elif salary_forecast %}{{ salary_forecast }}{% else %}0.0{% endif %} <span style="font-size:0.85rem; color:#334155 !important; font-weight:700;">LPA</span></div>
     <div class="sp-stat-sub">ML Forecast Package</div>
   </div>
 

@@ -82,6 +82,14 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary);">Package Offered</td>
+                            <td style="padding: 0.75rem 0; color: #fff;">{% if company.package_amount %}{{ company.package_amount }} LPA{% else %}Not Specified{% endif %}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary);">Stipend Amount</td>
+                            <td style="padding: 0.75rem 0; color: #fff;">{% if company.stipend_amount %}{{ company.stipend_amount }} /mo{% else %}Not Specified{% endif %}</td>
+                        </tr>
                         <tr>
                             <td style="padding: 0.75rem 0; color: var(--text-secondary);">Head Office Location</td>
                             <td style="padding: 0.75rem 0; color: #fff;">📍 {{ company.location|default:"Not Specified" }}</td>
@@ -163,6 +171,11 @@
                     {% if company.hr_phone %}
                     <div>
                         <span style="color: var(--text-secondary);">📞 {{ company.hr_phone }}</span>
+                    </div>
+                    {% endif %}
+                    {% if company.hr_notes %}
+                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--card-border); font-size: 0.8rem; color: var(--text-secondary);">
+                        📝 {{ company.hr_notes }}
                     </div>
                     {% endif %}
                 </div>

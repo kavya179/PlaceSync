@@ -51,7 +51,7 @@ class CollegeProfileEditView(LoginRequiredMixin, View):
                 CampusImage.objects.filter(id__in=delete_image_ids, college=college).delete()
 
             # Handle creation/upload of new campus images
-            new_files = request.FILES.getlist('campus_images')
+            new_files = form.cleaned_data.get('campus_images') or request.FILES.getlist('campus_images')
             for f in new_files:
                 CampusImage.objects.create(college=college, image=f)
 

@@ -221,3 +221,42 @@ class StudentImportTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "already registered in your college")
         self.assertContains(response, "already registered in the system")
+
+    def test_import_integer_enrollment_number(self):
+        # Test large integer enrollment numbers like 24002170210063 and float/scientific notation strings
+        csv_file = self.generate_csv_file(
+            ['Enrollment Number', 'Student Name', 'Email', 'Phone'],
+            [
+                ['24002170210063', 'Student One', 'student1@ljiet.edu', '9876543210'],
+                ['24002170210064.0', 'Student Two', 'student2@ljiet.edu', '9876543211.0'],
+                ['2.4002170210065e+13', 'Student Three', 'student3@ljiet.edu', '9876543212']
+            ]
+        )
+        response = self.client.post(self.import_url, {
+            'default_password': 'StudentDefaultPassword123',
+            'csv_file': csv_file
+        })
+        self.assertRedirects(response, self.preview_url)
+        
+        preview_data = self.client.session.get('import_preview_data')
+        self.assertEqual(len(preview_data), 3)
+        self.assertEqual(preview_data[0]['roll_number'], '24002170210063')
+        self.assertEqual(preview_data[1]['roll_number'], '24002170210064')
+        self.assertEqual(preview_data[2]['roll_number'], '24002170210065')
+
+        # Post to preview to complete import
+        confirm_response = self.client.post(self.preview_url)
+        self.assertEqual(confirm_response.status_code, 302)
+
+        # Verify created users and profiles in DB
+        u1 = User.objects.get(username='24002170210063')
+        self.assertEqual(u1.student_profile.roll_number, '24002170210063')
+        self.assertEqual(u1.student_profile.phone, '9876543210')
+
+        u2 = User.objects.get(username='24002170210064')
+        self.assertEqual(u2.student_profile.roll_number, '24002170210064')
+        self.assertEqual(u2.student_profile.phone, '9876543211')
+
+        u3 = User.objects.get(username='24002170210065')
+        self.assertEqual(u3.student_profile.roll_number, '24002170210065')
+

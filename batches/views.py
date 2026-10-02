@@ -182,8 +182,16 @@ class BatchStudentImportView(LoginRequiredMixin, View):
             return render(request, self.template_name, {'batch': batch, 'errors': errors})
 
         try:
-            # Parse using Pandas
-            df = pd.read_csv(csv_file, dtype=str)
+            # Parse using Pandas (supporting CSV and Excel)
+            file_name = csv_file.name.lower()
+            if file_name.endswith('.xlsx') or file_name.endswith('.xls'):
+                df = pd.read_excel(csv_file, dtype=str)
+            else:
+                try:
+                    df = pd.read_csv(csv_file, dtype=str)
+                except Exception:
+                    csv_file.seek(0)
+                    df = pd.read_csv(csv_file, dtype=str, encoding='latin1')
             
             # Clean headers: lowercase and stripped
             df.columns = [str(c).strip() for c in df.columns]
@@ -191,20 +199,20 @@ class BatchStudentImportView(LoginRequiredMixin, View):
             # Map canonical column names to CSV columns dynamically
             header_map = {}
             for col in df.columns:
-                c = str(col).strip().lower().replace(' ', '_').replace('current_', '').replace('graduation_', 'passing_')
-                if c in ['enrollment_number', 'roll_number', 'enrollmentno', 'username']:
+                c = str(col).strip().lower().replace(' ', '_').replace('.', '_').replace('-', '_').replace('current_', '').replace('graduation_', 'passing_')
+                if c in ['enrollment_number', 'roll_number', 'enrollmentno', 'username', 'enrollment_no', 'enrollment', 'roll_no', 'rollno', 'roll', 'enroll_no', 'enroll_number', 'enroll', 'student_id']:
                     header_map['roll_number'] = col
-                elif c in ['student_name', 'name', 'fullname']:
+                elif c in ['student_name', 'name', 'fullname', 'candidate_name']:
                     header_map['name'] = col
                 elif c in ['email', 'email_address']:
                     header_map['email'] = col
-                elif c in ['phone', 'phone_number', 'contact']:
+                elif c in ['phone', 'phone_number', 'contact', 'mobile']:
                     header_map['phone'] = col
-                elif c in ['department', 'dept']:
+                elif c in ['department', 'dept', 'branch']:
                     header_map['department'] = col
                 elif c in ['semester', 'sem']:
                     header_map['semester'] = col
-                elif c in ['division', 'div']:
+                elif c in ['division', 'div', 'section']:
                     header_map['division'] = col
                 elif c in ['spi']:
                     header_map['spi'] = col
@@ -214,7 +222,7 @@ class BatchStudentImportView(LoginRequiredMixin, View):
                     header_map['cgpa'] = col
                 elif c in ['backlogs', 'backlog', 'active_backlogs']:
                     header_map['backlogs'] = col
-                elif c in ['passing_year', 'year']:
+                elif c in ['passing_year', 'year', 'batch_year']:
                     header_map['passing_year'] = col
 
             # Check required columns
@@ -242,23 +250,57 @@ class BatchStudentImportView(LoginRequiredMixin, View):
             rolls_seen = set()
             emails_seen = set()
 
+            from decimal import Decimal
+
+            def clean_roll_number_val(val):
+                if val is None:
+                    return ''
+                val_str = str(val).strip()
+                if not val_str or val_str.lower() in ['nan', 'none', 'null']:
+                    return ''
+                
+                # Remove any embedded newlines, carriage returns, tabs, or spaces inside enrollment numbers
+                val_str = re.sub(r'[\r\n\t\s]+', '', val_str)
+                
+                if val_str.endswith('.0'):
+                    val_str = val_str[:-2]
+                    
+                if 'e+' in val_str.lower() or 'e-' in val_str.lower() or ('e' in val_str.lower() and any(ch.isdigit() for ch in val_str)):
+                    try:
+                        d_val = Decimal(val_str)
+                        if d_val == d_val.to_integral_value():
+                            val_str = str(int(d_val))
+                        else:
+                            val_str = f"{d_val:f}"
+                    except Exception:
+                        pass
+                elif '.' in val_str:
+                    try:
+                        d_val = Decimal(val_str)
+                        if d_val == d_val.to_integral_value():
+                            val_str = str(int(d_val))
+                    except Exception:
+                        pass
+                return val_str
+
             for idx, row in df.iterrows():
                 row_num = idx + 2 # 1-based index + header row = idx + 2
                 
                 # Fetch row fields dynamically based on header mapping
-                roll = row[header_map['roll_number']].strip()
-                name = row[header_map['name']].strip()
-                email = row[header_map['email']].strip()
+                raw_roll = str(row[header_map['roll_number']]).strip()
+                roll = clean_roll_number_val(raw_roll)
+                name = str(row[header_map['name']]).strip()
+                email = str(row[header_map['email']]).strip()
                 
-                phone = row[header_map['phone']].strip() if 'phone' in header_map else ''
-                dept_val = row[header_map['department']].strip() if 'department' in header_map else ''
-                sem_val = row[header_map['semester']].strip() if 'semester' in header_map else ''
-                div_val = row[header_map['division']].strip() if 'division' in header_map else ''
-                spi_val = row[header_map['spi']].strip() if 'spi' in header_map else ''
-                cpi_val = row[header_map['cpi']].strip() if 'cpi' in header_map else ''
-                cgpa_val = row[header_map['cgpa']].strip() if 'cgpa' in header_map else ''
-                backlog_val = row[header_map['backlogs']].strip() if 'backlogs' in header_map else ''
-                passing_val = row[header_map['passing_year']].strip() if 'passing_year' in header_map else ''
+                phone = clean_roll_number_val(row[header_map['phone']]) if 'phone' in header_map else ''
+                dept_val = str(row[header_map['department']]).strip() if 'department' in header_map else ''
+                sem_val = str(row[header_map['semester']]).strip() if 'semester' in header_map else ''
+                div_val = str(row[header_map['division']]).strip() if 'division' in header_map else ''
+                spi_val = str(row[header_map['spi']]).strip() if 'spi' in header_map else ''
+                cpi_val = str(row[header_map['cpi']]).strip() if 'cpi' in header_map else ''
+                cgpa_val = str(row[header_map['cgpa']]).strip() if 'cgpa' in header_map else ''
+                backlog_val = str(row[header_map['backlogs']]).strip() if 'backlogs' in header_map else ''
+                passing_val = str(row[header_map['passing_year']]).strip() if 'passing_year' in header_map else ''
 
                 # Skip completely empty rows
                 if not any([roll, name, email]):
@@ -279,19 +321,23 @@ class BatchStudentImportView(LoginRequiredMixin, View):
 
                 # Parse and validate numbers / decimals
                 def parse_decimal(val, name_label):
-                    if not val:
+                    if not val or val.lower() in ['nan', 'none', 'null']:
                         return None, None
                     try:
                         return float(val), None
-                    except ValueError:
+                    except (ValueError, OverflowError):
                         return None, f"Invalid {name_label} value '{val}'"
 
                 def parse_int(val, name_label):
-                    if not val:
+                    if not val or val.lower() in ['nan', 'none', 'null']:
                         return None, None
+                    val_str = str(val).strip()
+                    if val_str.endswith('.0'):
+                        val_str = val_str[:-2]
                     try:
-                        return int(val), None
-                    except ValueError:
+                        f = float(val_str)
+                        return int(f), None
+                    except (ValueError, OverflowError):
                         return None, f"Invalid {name_label} value '{val}'"
 
                 spi_num, err = parse_decimal(spi_val, "SPI")
